@@ -1,3 +1,3 @@
 # Advent of Code 2019!
 
-https://adventofcode.com
+Repository to take part in the coding exercises at https://adventofcode.com
