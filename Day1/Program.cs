@@ -31,8 +31,7 @@ namespace Day1
         /// <summary>
         /// To find the fuel required, take its value, divide by three, round down, and subtract 2.
         /// </summary>
-        /// <remarks>
-        /// Note, no need for round down because long division always just takes the whole number part.</remarks>
+        /// <remarks>Note, no need for round down because long division always just takes the whole number part.</remarks>
         static long GetRequiredFuel(long value) => value / 3 - 2;
     }
 }
