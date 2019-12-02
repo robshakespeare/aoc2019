@@ -6,14 +6,16 @@ open System.Linq
 
 [<EntryPoint>]
 let main argv =
-    let intCodes =
-        File.ReadAllText("input.txt")
-            .Split(',')
-            .Select(fun s -> int(s))
-            .ToArray()
-
-    Array.set intCodes 1 12
-    Array.set intCodes 2 2
+    let loadIntCodes noun verb =
+        let intCodes =
+            File.ReadAllText("input.txt")
+                .Split(',')
+                .Select(fun s -> int(s))
+                .ToArray()
+        Array.set intCodes 1 noun
+        Array.set intCodes 2 verb
+        
+        intCodes
 
     let processIntCodes (intCodes : int[]) =
         let mutable index = 0
@@ -38,8 +40,14 @@ let main argv =
     
         intCodes.[0]
 
-    let result = processIntCodes intCodes
-    
-    printfn "Solution: %s" (string(result))
+    for noun in 0 .. 99 do
+        for verb in 0 .. 99 do
+            let result = processIntCodes (loadIntCodes noun verb)
 
-    0 // return an integer exit code
+            if result = 19690720 then
+                let solution = 100 * noun + verb
+                printfn "Solution: %s" (string(solution))
+
+                exit 0 // return integer exit code indicating success
+
+    1 // return integer exit code indicating failure
