@@ -4,22 +4,22 @@ Repository to take part in the Advent of Code 2019 exercises at https://adventof
 
 ## Languages used so far
 
-* C#
-* F#
+1. C#
+1. F#
 
 ## Potential other languages to use
 
-* JavaScript
-* TypeScript
-* Python
-* Rust
-* Go
-* C
-* C++
-* PHP
-* Clojure
-* Kotlin
-* Scala
-* Ruby
-* PySpark / Azure Databricks
-* Azure Data Factory?!
+1. JavaScript
+1. TypeScript
+1. Python
+1. Rust
+1. Go
+1. C
+1. C++
+1. PHP
+1. Clojure
+1. Kotlin
+1. Scala
+1. Ruby
+1. PySpark / Azure Databricks
+1. Azure Data Factory?!
