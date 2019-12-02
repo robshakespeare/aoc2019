@@ -20,12 +20,9 @@ type Solver = class
     static member processIntCodes (intCodes : int[]) (index : int) =
         if (intCodes.[index] <> 99) then
             let opcode = intCodes.[index]
-            let leftIndex = intCodes.[index + 1]
-            let rightIndex = intCodes.[index + 2]
+            let left = intCodes.[intCodes.[index + 1]]
+            let right = intCodes.[intCodes.[index + 2]]
             let storageIndex = intCodes.[index + 3]
-
-            let left = intCodes.[leftIndex]
-            let right = intCodes.[rightIndex]
 
             let result =
                 match opcode with
@@ -45,8 +42,8 @@ type Solver = class
                     for verb in 0 .. 99 ->
                         (Solver.processIntCodes (Solver.loadIntCodes noun verb) 0, noun, verb)
             }
-            |> Seq.find (fun (result, noun, verb) -> result = 19690720)
-            |> fun (result, noun, verb) -> 100 * noun + verb
+            |> Seq.find (fun (result, _, _) -> result = 19690720)
+            |> fun (_, noun, verb) -> 100 * noun + verb
 end
 
 [<EntryPoint>]
