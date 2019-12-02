@@ -9,16 +9,13 @@ type Solver = class
     static member updateElement (list:int list) (index:int) (newValue:int) = 
         List.concat [ list.[..(index-1)]; [newValue]; list.[(index+1)..] ]
 
-    static member loadIntCodes noun verb =
-        Solver.updateElement
-            (Solver.updateElement
-                (List.ofSeq (File.ReadAllText("input.txt")
-                    .Split(',')
-                    .Select(fun s -> int(s))))
-                1
-                noun)
-            2
-            verb
+    static member loadIntCodes () =
+        List.ofSeq (File.ReadAllText("input.txt")
+            .Split(',')
+            .Select(fun s -> int(s)))
+
+    static member seedIntCodes intCodes noun verb =
+        Solver.updateElement (Solver.updateElement intCodes 1 noun) 2 verb
 
     static member processIntCodes (intCodes:int list) (index:int) =
         if (intCodes.[index] <> 99) then
@@ -38,10 +35,12 @@ type Solver = class
             intCodes.[0]
 
     static member findSolution () =
+        let intCodes = Solver.loadIntCodes ()
+
         seq {
                 for noun in 0 .. 99 do
                     for verb in 0 .. 99 ->
-                        (Solver.processIntCodes (Solver.loadIntCodes noun verb) 0, noun, verb)
+                        (Solver.processIntCodes (Solver.seedIntCodes intCodes noun verb) 0, noun, verb)
             }
             |> Seq.find (fun (result, _, _) -> result = 19690720)
             |> fun (_, noun, verb) -> 100 * noun + verb
