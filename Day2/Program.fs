@@ -17,9 +17,8 @@ type Solver = class
 
         intCodes
 
-    static member processIntCodes (intCodes : int[]) =
-        let mutable index = 0
-        while intCodes.[index] <> 99 do
+    static member processIntCodes (intCodes : int[]) (index : int) =
+        if (intCodes.[index] <> 99) then
             let opcode = intCodes.[index]
             let leftIndex = intCodes.[index + 1]
             let rightIndex = intCodes.[index + 2]
@@ -36,15 +35,15 @@ type Solver = class
 
             Array.set intCodes storageIndex result
 
-            index <- index + 4
-
-        intCodes.[0]
+            Solver.processIntCodes intCodes (index + 4)
+        else
+            intCodes.[0]
 
     static member findSolution () =
         seq {
                 for noun in 0 .. 99 do
                     for verb in 0 .. 99 ->
-                        (Solver.processIntCodes (Solver.loadIntCodes noun verb), noun, verb)
+                        (Solver.processIntCodes (Solver.loadIntCodes noun verb) 0, noun, verb)
             }
             |> Seq.find (fun (result, noun, verb) -> result = 19690720)
             |> fun (result, noun, verb) -> 100 * noun + verb
