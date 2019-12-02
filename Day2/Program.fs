@@ -6,18 +6,21 @@ open System.IO
 open System.Linq
 
 type Solver = class
+    static member updateElement (list:int list) (index:int) (newValue:int) = 
+        List.concat [ list.[..(index-1)]; [newValue]; list.[(index+1)..] ]
+
     static member loadIntCodes noun verb =
-        let intCodes =
-            File.ReadAllText("input.txt")
-                .Split(',')
-                .Select(fun s -> int(s))
-                .ToArray()
-        Array.set intCodes 1 noun
-        Array.set intCodes 2 verb
+        Solver.updateElement
+            (Solver.updateElement
+                (List.ofSeq (File.ReadAllText("input.txt")
+                    .Split(',')
+                    .Select(fun s -> int(s))))
+                1
+                noun)
+            2
+            verb
 
-        intCodes
-
-    static member processIntCodes (intCodes : int[]) (index : int) =
+    static member processIntCodes (intCodes:int list) (index:int) =
         if (intCodes.[index] <> 99) then
             let opcode = intCodes.[index]
             let left = intCodes.[intCodes.[index + 1]]
@@ -30,9 +33,7 @@ type Solver = class
                 | 2 -> left * right
                 | _ -> raise (InvalidOperationException("Invalid opcode: " + string(opcode)))
 
-            Array.set intCodes storageIndex result
-
-            Solver.processIntCodes intCodes (index + 4)
+            Solver.processIntCodes (Solver.updateElement intCodes storageIndex result) (index + 4)
         else
             intCodes.[0]
 
