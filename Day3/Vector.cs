@@ -31,5 +31,10 @@ namespace Day3
                     return wires;
                 });
         }
+
+        public static Vector operator +(Vector a, Vector b)
+            => new Vector(a.X + b.X, a.Y + b.Y);
+
+        public override string ToString() => $"{X},{Y}";
     }
 }

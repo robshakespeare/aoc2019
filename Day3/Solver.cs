@@ -38,7 +38,19 @@ namespace Day3
 
         public Wire[] ParseWires(string[] wires) => wires
             .Select(wire => wire.Split(','))
-            .Select(wireCoordinates => new Wire(wireCoordinates.Select(ParseWireCoordinate)))
+            .Select(wireCoordinates =>
+            {
+                var currentPosition = Vector.CentralPort;
+
+                var path = wireCoordinates.Select(wireCoordinate =>
+                {
+                    var coordinate = ParseWireCoordinate(wireCoordinate);
+                    currentPosition += coordinate;
+                    return currentPosition;
+                }).ToArray();
+
+                return new Wire(path);
+            })
             .ToArray();
 
         public Vector ParseWireCoordinate(string wireCoordinate)
