@@ -8,7 +8,7 @@ namespace Day3
     public class Solver
     {
         /// <summary>
-        /// Solves what is the Manhattan distance from the central port to the closest intersection.
+        /// Solves: what is the least number of combined steps the wires must take to reach an intersection.
         /// </summary>
         public int Solve(string[] wireInputs)
         {
