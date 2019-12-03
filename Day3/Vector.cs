@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+using System;
 using System.Collections.Generic;
 
 namespace Day3
@@ -24,16 +23,16 @@ namespace Day3
 
         public static int ManhattanDistance(Vector a, Vector b) => Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
 
-        public void VisitGrid(ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, int numberOfSteps)
+        public void VisitGrid(Dictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, int numberOfSteps)
         {
-            grid.AddOrUpdate(
-                this,
-                v => new List<(Wire wire, int numberOfSteps)> { (wire, numberOfSteps) },
-                (v, wires) =>
-                {
-                    wires.Add((wire, numberOfSteps));
-                    return wires;
-                });
+            if (grid.TryGetValue(this, out var list))
+            {
+                list.Add((wire, numberOfSteps));
+            }
+            else
+            {
+                grid.Add(this, new List<(Wire wire, int numberOfSteps)> { (wire, numberOfSteps) });
+            }
         }
 
         public static Vector operator +(Vector a, Vector b)

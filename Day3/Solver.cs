@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Common;
 
 namespace Day3
@@ -16,22 +14,20 @@ namespace Day3
         {
             var wires = ParseWires(wireInputs);
 
-            var grid = new ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>>();
+            var grid = new Dictionary<Vector, List<(Wire wire, int numberOfSteps)>>();
 
             // Trace the wires over the grid
             using (new TimingBlock("Trace wires"))
             {
-                Parallel.ForEach(
-                    wires,
-                    wire =>
+                foreach (var wire in wires)
+                {
+                    var currentPosition = Vector.CentralPort;
+                    var currentNumberOfSteps = 0;
+                    foreach (var movement in wire.Movements)
                     {
-                        var currentPosition = Vector.CentralPort;
-                        var currentNumberOfSteps = 0;
-                        foreach (var movement in wire.Movements)
-                        {
-                            (currentPosition, currentNumberOfSteps) = VisitGrid(grid, wire, currentPosition, currentNumberOfSteps, movement);
-                        }
-                    });
+                        (currentPosition, currentNumberOfSteps) = VisitGrid(grid, wire, currentPosition, currentNumberOfSteps, movement);
+                    }
+                }
             }
 
             // Find the intersections
@@ -49,7 +45,7 @@ namespace Day3
             }
         }
 
-        public (Vector currentPosition, int currentNumberOfSteps) VisitGrid(ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, Vector currentPosition, int currentNumberOfSteps, Vector movement)
+        public (Vector currentPosition, int currentNumberOfSteps) VisitGrid(Dictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, Vector currentPosition, int currentNumberOfSteps, Vector movement)
         {
             var movementNormal = movement.Normal;
             var movementNormalLength = movementNormal.Length;

@@ -1,3 +1,4 @@
+using System.IO;
 using NUnit.Framework;
 
 namespace Day3.Tests
@@ -26,6 +27,20 @@ namespace Day3.Tests
 
             // ASSERT
             Assert.AreEqual(expectedResult, result);
+        }
+
+        [Test]
+        public void ActualTest()
+        {
+            var solver = new Solver();
+
+            var wires = File.ReadAllLines("input.txt");
+
+            // ACT
+            var result = solver.Solve(wires);
+
+            // ASSERT
+            Assert.AreEqual(19242, result);
         }
     }
 }
