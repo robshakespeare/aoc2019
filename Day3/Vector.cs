@@ -18,6 +18,10 @@ namespace Day3
 
         public static readonly Vector CentralPort = new Vector(0, 0);
 
+        public int Length => ManhattanDistance(this, CentralPort);
+
+        public Vector Normal => this / Length;
+
         public static int ManhattanDistance(Vector a, Vector b) => Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
 
         public void VisitGrid(ConcurrentDictionary<Vector, List<Wire>> grid, Wire wire)
@@ -34,6 +38,9 @@ namespace Day3
 
         public static Vector operator +(Vector a, Vector b)
             => new Vector(a.X + b.X, a.Y + b.Y);
+
+        public static Vector operator /(Vector a, int b)
+            => new Vector(a.X / b, a.Y / b);
 
         public override string ToString() => $"{X},{Y}";
     }

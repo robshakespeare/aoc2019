@@ -19,9 +19,10 @@ namespace Day3
             // Trace the wires over the grid
             foreach (var wire in wires)
             {
-                foreach (var coordinate in wire.Coordinates)
+                var currentPosition = Vector.CentralPort;
+                foreach (var movement in wire.Movements)
                 {
-                    coordinate.VisitGrid(grid, wire);
+                    currentPosition = VisitGrid(grid, wire, currentPosition, movement);
                 }
             }
 
@@ -36,21 +37,23 @@ namespace Day3
             return distances.First();
         }
 
+        public Vector VisitGrid(ConcurrentDictionary<Vector, List<Wire>> grid, Wire wire, Vector currentPosition, Vector movement)
+        {
+            var movementNormal = movement.Normal;
+            var destination = currentPosition + movement;
+
+            while (!currentPosition.Equals(destination))
+            {
+                currentPosition += movementNormal;
+                currentPosition.VisitGrid(grid, wire);
+            }
+
+            return destination;
+        }
+
         public Wire[] ParseWires(string[] wires) => wires
             .Select(wire => wire.Split(','))
-            .Select(wireCoordinates =>
-            {
-                var currentPosition = Vector.CentralPort;
-
-                var path = wireCoordinates.Select(wireCoordinate =>
-                {
-                    var coordinate = ParseWireCoordinate(wireCoordinate);
-                    currentPosition += coordinate;
-                    return currentPosition;
-                }).ToArray();
-
-                return new Wire(path);
-            })
+            .Select(wireCoordinates => new Wire(wireCoordinates.Select(ParseWireCoordinate)))
             .ToArray();
 
         public Vector ParseWireCoordinate(string wireCoordinate)

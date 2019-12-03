@@ -4,11 +4,11 @@ namespace Day3
 {
     public class Wire
     {
-        public Wire(IEnumerable<Vector> coordinates)
+        public Wire(IEnumerable<Vector> movements)
         {
-            Coordinates = coordinates;
+            Movements = movements;
         }
 
-        public IEnumerable<Vector> Coordinates { get; }
+        public IEnumerable<Vector> Movements { get; }
     }
 }
