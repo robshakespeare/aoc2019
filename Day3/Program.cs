@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Common;
 
 namespace Day3
 {
@@ -7,13 +8,16 @@ namespace Day3
     {
         static void Main(string[] args)
         {
-            var solver = new Solver();
+            using (new TimingBlock())
+            {
+                var solver = new Solver();
 
-            var wires = File.ReadAllLines("input.txt");
+                var wires = File.ReadAllLines("input.txt");
 
-            var result = solver.Solve(wires);
+                var result = solver.Solve(wires);
 
-            Console.WriteLine($"Manhattan distance from the central port to the closest intersection: {result}");
+                Console.WriteLine($"Manhattan distance from the central port to the closest intersection: {result}");
+            }
         }
     }
 }
