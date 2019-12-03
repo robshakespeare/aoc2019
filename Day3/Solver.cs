@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Common;
 
 namespace Day3
 {
@@ -17,36 +19,46 @@ namespace Day3
             var grid = new ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>>();
 
             // Trace the wires over the grid
-            foreach (var wire in wires)
+            using (new TimingBlock("Trace wires"))
             {
-                var currentPosition = Vector.CentralPort;
-                var currentNumberOfSteps = 0;
-                foreach (var movement in wire.Movements)
-                {
-                    (currentPosition, currentNumberOfSteps) = VisitGrid(grid, wire, currentPosition, currentNumberOfSteps, movement);
-                }
+                Parallel.ForEach(
+                    wires,
+                    wire =>
+                    {
+                        var currentPosition = Vector.CentralPort;
+                        var currentNumberOfSteps = 0;
+                        foreach (var movement in wire.Movements)
+                        {
+                            (currentPosition, currentNumberOfSteps) = VisitGrid(grid, wire, currentPosition, currentNumberOfSteps, movement);
+                        }
+                    });
             }
 
             // Find the intersections
-            var intersections = grid.Where(element => wires.All(wire => element.Value.Any(x => x.wire.Equals(wire))));
+            using (new TimingBlock("Find shortest intersection"))
+            {
+                var intersections =
+                    grid.Where(element => wires.All(wire => element.Value.Any(x => x.wire.Equals(wire))));
 
-            // Calculate the combined steps the wires must take to reach an intersection
-            var numberOfStepsList = intersections
-                .Select(intersection => intersection.Value.Sum(x => x.numberOfSteps))
-                .OrderBy(numberOfSteps => numberOfSteps);
+                // Calculate the combined steps the wires must take to reach an intersection
+                var numberOfStepsList = intersections
+                    .Select(intersection => intersection.Value.Sum(x => x.numberOfSteps))
+                    .OrderBy(numberOfSteps => numberOfSteps);
 
-            return numberOfStepsList.First();
+                return numberOfStepsList.First();
+            }
         }
 
         public (Vector currentPosition, int currentNumberOfSteps) VisitGrid(ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, Vector currentPosition, int currentNumberOfSteps, Vector movement)
         {
             var movementNormal = movement.Normal;
+            var movementNormalLength = movementNormal.Length;
             var destination = currentPosition + movement;
 
             while (!currentPosition.Equals(destination))
             {
                 currentPosition += movementNormal;
-                currentNumberOfSteps += movementNormal.Length;
+                currentNumberOfSteps += movementNormalLength;
                 currentPosition.VisitGrid(grid, wire, currentNumberOfSteps);
             }
 
@@ -61,7 +73,9 @@ namespace Day3
         public Vector ParseWireCoordinate(string wireCoordinate)
         {
             var direction = wireCoordinate[0];
-            var amount = int.Parse(new string(wireCoordinate.Skip(1).ToArray())); // rs-todo: could try using Span here
+
+            var amountSpan = new Span<char>(wireCoordinate.ToCharArray(), 1, wireCoordinate.Length - 1);
+            var amount = int.Parse(amountSpan);
 
             return direction switch {
                 'R' => new Vector(+amount, 0),

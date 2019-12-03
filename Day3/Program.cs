@@ -8,16 +8,15 @@ namespace Day3
     {
         static void Main(string[] args)
         {
-            using (new TimingBlock())
-            {
-                var solver = new Solver();
+            using var _ = new TimingBlock("Overall");
 
-                var wires = File.ReadAllLines("input.txt");
+            var solver = new Solver();
 
-                var result = solver.Solve(wires);
+            var wires = File.ReadAllLines("input.txt");
 
-                Console.WriteLine($"Manhattan distance from the central port to the closest intersection: {result}");
-            }
+            var result = solver.Solve(wires);
+
+            Console.WriteLine($"Least number of combined steps the wires must take to reach an intersection: {result}");
         }
     }
 }
