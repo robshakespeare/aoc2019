@@ -24,14 +24,14 @@ namespace Day3
 
         public static int ManhattanDistance(Vector a, Vector b) => Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
 
-        public void VisitGrid(ConcurrentDictionary<Vector, List<Wire>> grid, Wire wire)
+        public void VisitGrid(ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, int numberOfSteps)
         {
             grid.AddOrUpdate(
                 this,
-                v => new List<Wire> { wire },
+                v => new List<(Wire wire, int numberOfSteps)> { (wire, numberOfSteps) },
                 (v, wires) =>
                 {
-                    wires.Add(wire);
+                    wires.Add((wire, numberOfSteps));
                     return wires;
                 });
         }

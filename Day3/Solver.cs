@@ -14,30 +14,31 @@ namespace Day3
         {
             var wires = ParseWires(wireInputs);
 
-            var grid = new ConcurrentDictionary<Vector, List<Wire>>();
+            var grid = new ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>>();
 
             // Trace the wires over the grid
             foreach (var wire in wires)
             {
                 var currentPosition = Vector.CentralPort;
+                var currentNumberOfSteps = 0;
                 foreach (var movement in wire.Movements)
                 {
-                    currentPosition = VisitGrid(grid, wire, currentPosition, movement);
+                    (currentPosition, currentNumberOfSteps) = VisitGrid(grid, wire, currentPosition, currentNumberOfSteps, movement);
                 }
             }
 
             // Find the intersections
-            var intersections = grid.Where(element => wires.All(wire => element.Value.Contains(wire)));
+            var intersections = grid.Where(element => wires.All(wire => element.Value.Any(x => x.wire.Equals(wire))));
 
-            // Calculate the Manhattan Distance from each intersection to the central port
-            var distances = intersections
-                .Select(intersection => Vector.ManhattanDistance(intersection.Key, Vector.CentralPort))
-                .OrderBy(distance => distance);
+            // Calculate the combined steps the wires must take to reach an intersection
+            var numberOfStepsList = intersections
+                .Select(intersection => intersection.Value.Sum(x => x.numberOfSteps))
+                .OrderBy(numberOfSteps => numberOfSteps);
 
-            return distances.First();
+            return numberOfStepsList.First();
         }
 
-        public Vector VisitGrid(ConcurrentDictionary<Vector, List<Wire>> grid, Wire wire, Vector currentPosition, Vector movement)
+        public (Vector currentPosition, int currentNumberOfSteps) VisitGrid(ConcurrentDictionary<Vector, List<(Wire wire, int numberOfSteps)>> grid, Wire wire, Vector currentPosition, int currentNumberOfSteps, Vector movement)
         {
             var movementNormal = movement.Normal;
             var destination = currentPosition + movement;
@@ -45,10 +46,11 @@ namespace Day3
             while (!currentPosition.Equals(destination))
             {
                 currentPosition += movementNormal;
-                currentPosition.VisitGrid(grid, wire);
+                currentNumberOfSteps += movementNormal.Length;
+                currentPosition.VisitGrid(grid, wire, currentNumberOfSteps);
             }
 
-            return destination;
+            return (destination, currentNumberOfSteps);
         }
 
         public Wire[] ParseWires(string[] wires) => wires
