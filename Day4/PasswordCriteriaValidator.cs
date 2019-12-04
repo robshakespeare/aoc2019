@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Day4
 {
@@ -15,21 +15,14 @@ namespace Day4
             return Validate(number.ToString());
         }
 
-        private static bool Validate(IEnumerable<char> passwordChars)
+        private static bool Validate(string passwordChars)
         {
             char? previousChar = null;
-            var containsDoubleChars = false;
 
             foreach (var currentChar in passwordChars)
             {
                 if (previousChar != null)
                 {
-                    // Must contain two adjacent digits that are the same (like 22 in 122345)
-                    if (previousChar == currentChar)
-                    {
-                        containsDoubleChars = true;
-                    }
-
                     // Going from left to right, the digits never decrease;
                     // they only ever increase or stay the same (like 111123 or 135679).
                     if (currentChar < previousChar)
@@ -41,7 +34,11 @@ namespace Day4
                 previousChar = currentChar;
             }
 
-            return containsDoubleChars;
+            // Must contain at least one set of two adjacent matching digits that are not part of a larger group of matching digits
+            // Note that `GroupBy` is not contiguous, but that's fine because the decreasing rule stops non-contiguous
+            // matching numbers from ever come through to here.
+            return passwordChars.GroupBy(c => c)
+                .Any(grp => grp.Count() == 2); // Any set of 2 matching digits
         }
     }
 }
