@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Day4
@@ -35,10 +36,33 @@ namespace Day4
             }
 
             // Must contain at least one set of two adjacent matching digits that are not part of a larger group of matching digits
-            // Note that `GroupBy` is not contiguous, but that's fine because the decreasing rule stops non-contiguous
-            // matching numbers from ever come through to here.
-            return passwordChars.GroupBy(c => c)
-                .Any(grp => grp.Count() == 2); // Any set of 2 matching digits
+            return GetAdjacentGroupLengths(passwordChars).Any(groupLength => groupLength == 2);
+        }
+
+        public static IEnumerable<int> GetAdjacentGroupLengths(string passwordChars)
+        {
+            char? previousChar = null;
+            var groupLength = 0;
+
+            foreach (var currentChar in passwordChars)
+            {
+                if (currentChar != previousChar && previousChar != null)
+                {
+                    yield return groupLength;
+                    groupLength = 1;
+                }
+                else
+                {
+                    groupLength++;
+                }
+
+                previousChar = currentChar;
+            }
+
+            if (groupLength > 0)
+            {
+                yield return groupLength;
+            }
         }
     }
 }

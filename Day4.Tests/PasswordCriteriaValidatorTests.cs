@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace Day4.Tests
@@ -38,6 +40,8 @@ namespace Day4.Tests
 
         [TestCase(101234, false)]
         [TestCase(121234, false)]
+
+        [TestCase(123455, true)]
         public void IsValid_Tests(int inputNumber, bool expectedResult)
         {
             // ACT
@@ -46,5 +50,33 @@ namespace Day4.Tests
             // ASSERT
             Assert.AreEqual(expectedResult, actualResult);
         }
+
+        [TestCaseSource(nameof(GetAdjacentGroupLengths_TestCases))]
+        public void GetAdjacentGroupLengths_Tests(string inputString, int[] expectedAdjacentGroupLengths)
+        {
+            // ACT
+            var result = PasswordCriteriaValidator.GetAdjacentGroupLengths(inputString);
+
+            // ASSERT
+            result.Should().BeEquivalentTo(
+                expectedAdjacentGroupLengths,
+                options => options.WithStrictOrdering());
+        }
+
+        public static IEnumerable<TestCaseData> GetAdjacentGroupLengths_TestCases() => new[]
+        {
+            new TestCaseData("", new int[0]),
+            new TestCaseData("112233", new[] { 2, 2, 2 }),
+            new TestCaseData("123456", new[] { 1, 1, 1, 1, 1, 1 }),
+            new TestCaseData("111111", new[] { 6 }),
+            new TestCaseData("1", new[] { 1 }),
+            new TestCaseData("111116", new[] { 5, 1 }),
+            new TestCaseData("211111", new[] { 1, 5 }),
+            new TestCaseData("221111", new[] { 2, 4 }),
+            new TestCaseData("222111", new[] { 3, 3 }),
+            new TestCaseData("111122", new[] { 4, 2 }),
+            new TestCaseData("211222", new[] { 1, 2, 3 }),
+            new TestCaseData("222112", new[] { 3, 2, 1 })
+        };
     }
 }
