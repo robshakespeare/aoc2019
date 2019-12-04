@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Common;
 
 namespace Day4
 {
@@ -6,7 +7,14 @@ namespace Day4
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            using var _ = new TimingBlock("Overall");
+
+            const string input = "138241-674034";
+
+            var solver = new Solver();
+            var solution = solver.HowManyDifferentPasswordsWithinRange(input);
+
+            Console.WriteLine($"HowManyDifferentPasswordsWithinRange: {solution}");
         }
     }
 }
