@@ -4,176 +4,127 @@ using System.Linq;
 
 namespace Day5
 {
-    public class IntcodeComputer
+    public class IntCodeComputer
     {
-        private int[] intCodes;
-        private int _inputSystemId;
-        private int instructionPointer;
-        private Stack<int> outputs;
-
-        //public int InstructionPointer => instructionPointer;
-        //public Stack<int> Outputs => outputs;
-
-        public void Reset(string input, int inputSystemId)
-        {
-            intCodes = input.Split(',')
+        public IntCodes Parse(string input) => new IntCodes(
+            input.Split(',')
                 .Select(int.Parse)
-                .ToArray();
-            _inputSystemId = inputSystemId;
-            instructionPointer = 0;
-            outputs = new Stack<int>();
-        }
+                .ToArray());
 
-        public static (int opCode, bool param1IsImmediate, bool param2IsImmediate, bool param3IsImmediate) ParseFullOpCode(int fullOpCode)
+        public (IntCodes intCodes, Stack<int> outputs, int diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
         {
-            fullOpCode = Math.Abs(fullOpCode); // Ignore negative numbers
+            var intCodes = Parse(input);
+            var outputs = new Stack<int>();
 
-            var opCodeChars = fullOpCode.ToString().PadLeft(5, '0').ToCharArray();
-
-            if (opCodeChars.Length > 5)
+            Instruction instruction;
+            while ((instruction = intCodes.ReadNextInstruction()).OpCode != 99)
             {
-                throw new InvalidOperationException("Invalid length of opCode: " + fullOpCode);
+                var gotoInstructionPointer = EvalInstruction(instruction, inputSystemId, outputs);
+
+                intCodes.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             }
 
-            var param3IsImmediate = opCodeChars[^5] == '1';
-            var param2IsImmediate = opCodeChars[^4] == '1';
-            var param1IsImmediate = opCodeChars[^3] == '1';
-
-            var opCode = int.Parse($"{opCodeChars[^2]}{opCodeChars[^1]}");
-
-            return (opCode, param1IsImmediate, param2IsImmediate, param3IsImmediate);
+            return (intCodes, outputs, outputs.Peek());
         }
 
-        public int Evaluate(string input, int inputSystemId)
+        private static int? EvalInstruction(Instruction instruction, int inputSystemId, Stack<int> outputs)
         {
-            Reset(input, inputSystemId);
+            return instruction.OpCode switch
+                {
+                1 => EvalMathInstruction(instruction),
+                2 => EvalMathInstruction(instruction),
+                3 => EvalTakeInstruction(instruction, inputSystemId),
+                4 => EvalOutputInstruction(instruction, outputs),
+                5 => EvalJumpInstruction(instruction),
+                6 => EvalJumpInstruction(instruction),
+                7 => EvalRelationalInstruction(instruction),
+                8 => EvalRelationalInstruction(instruction),
+                _ => throw new InvalidOperationException("Invalid opCode: " + instruction.OpCode)
+                };
+        }
 
-            var fullOpCode = intCodes[instructionPointer];
-            var (opCode, param1IsImmediate, param2IsImmediate, _) = ParseFullOpCode(fullOpCode);
+        private static int? EvalMathInstruction(Instruction instruction)
+        {
+            var param1 = instruction.GetParamUsingMode(0);
+            var param2 = instruction.GetParamUsingMode(1);
+            var param3 = instruction.GetParam(2);
 
-            if (opCode == 99)
+            var storageIndex = param3;
+
+            var result = instruction.OpCode switch
+                {
+                1 => param1 + param2,
+                2 => param1 * param2,
+                _ => throw new InvalidOperationException("Invalid Math opCode: " + instruction.OpCode)
+                };
+
+            instruction.IntCodes[storageIndex] = result;
+            return null;
+        }
+
+        private static int? EvalTakeInstruction(Instruction instruction, int inputSystemId)
+        {
+            // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
+            // For example, the instruction 3,50 would take an input value and store it at address 50.
+            var addressIndex = instruction.GetParam(0);
+            instruction.IntCodes[addressIndex] = inputSystemId;
+            return null;
+        }
+
+        private static int? EvalOutputInstruction(Instruction instruction, Stack<int> outputs)
+        {
+            // opCode 4 outputs the value of its only parameter.
+            // For example, the instruction 4,50 would output the value at address 50.
+            var addressIndex = instruction.GetParam(0);
+            outputs.Push(instruction.IntCodes[addressIndex]);
+            return null;
+        }
+
+        private static int? EvalJumpInstruction(Instruction instruction)
+        {
+            // Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to
+            // the value from the second parameter. Otherwise, it does nothing.
+
+            // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to
+            // the value from the second parameter. Otherwise, it does nothing.
+
+            var param1 = instruction.GetParamUsingMode(0);
+            var param2 = instruction.GetParamUsingMode(1);
+
+            switch (instruction.OpCode)
             {
-                return intCodes[0];
-            }
-
-            int newInstructionPointer;
-
-            switch (opCode)
-            {
-                case 3:
-                    {
-                        // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
-                        // For example, the instruction 3,50 would take an input value and store it at address 50.
-                        var addressIndex = intCodes[instructionPointer + 1];
-                        intCodes[addressIndex] = _inputSystemId;
-
-                        newInstructionPointer = instructionPointer + 2;
-                        break;
-                    }
-
-                case 4:
-                    {
-                        // opCode 4 outputs the value of its only parameter.
-                        // For example, the instruction 4,50 would output the value at address 50.
-                        var addressIndex = intCodes[instructionPointer + 1];
-                        outputs.Push(intCodes[addressIndex]);
-
-                        newInstructionPointer = instructionPointer + 2;
-                        break;
-                    }
-
-                case 5:
-                case 6:
-                    {
-                        // Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to
-                        // the value from the second parameter. Otherwise, it does nothing.
-
-                        // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to
-                        // the value from the second parameter. Otherwise, it does nothing.
-
-                        var param1 = intCodes[instructionPointer + 1];
-                        var param2 = intCodes[instructionPointer + 2];
-
-                        param1 = param1IsImmediate ? param1 : intCodes[param1];
-                        param2 = param2IsImmediate ? param2 : intCodes[param2];
-
-                        switch (opCode)
-                        {
-                            case 5 when param1 != 0:
-                            case 6 when param1 == 0:
-                                newInstructionPointer = param2;
-                                break;
-
-                            default:
-                                newInstructionPointer = instructionPointer + 3;
-                                break;
-                        }
-
-                        break;
-                    }
-
-                case 7:
-                case 8:
-                    {
-                        // Opcode 7 is less than: if the first parameter is less than the second parameter,
-                        // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-
-                        // Opcode 8 is equals: if the first parameter is equal to the second parameter,
-                        // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-
-                        var param1 = intCodes[instructionPointer + 1];
-                        var param2 = intCodes[instructionPointer + 2];
-                        var param3 = intCodes[instructionPointer + 3];
-
-                        param1 = param1IsImmediate ? param1 : intCodes[param1];
-                        param2 = param2IsImmediate ? param2 : intCodes[param2];
-
-                        var storageIndex = param3;
-
-                        var result = opCode switch
-                        {
-                            7 when param1 < param2 => 1,
-                            8 when param1 == param2 => 1,
-                            _ => 0
-                        };
-
-                        intCodes[storageIndex] = result;
-
-                        newInstructionPointer = instructionPointer + 4;
-                        break;
-                    }
+                case 5 when param1 != 0:
+                case 6 when param1 == 0:
+                    return param2; // i.e. goto this Instruction Pointer
 
                 default:
-                    {
-                        // Immediate means the value is what used
-                        // Positional means its value is the address
-
-                        var param1 = intCodes[instructionPointer + 1];
-                        var param2 = intCodes[instructionPointer + 2];
-                        var param3 = intCodes[instructionPointer + 3];
-
-                        param1 = param1IsImmediate ? param1 : intCodes[param1];
-                        param2 = param2IsImmediate ? param2 : intCodes[param2];
-
-                        var storageIndex = param3;
-
-                        var result = opCode switch
-                        {
-                            1 => param1 + param2,
-                            2 => param1 * param2,
-                            _ => throw new InvalidOperationException("Invalid opCode: " + opCode)
-                        };
-
-                        intCodes[storageIndex] = result;
-
-                        newInstructionPointer = instructionPointer + 4;
-                        break;
-                    }
+                    return null;
             }
+        }
 
-            instructionPointer = newInstructionPointer;
+        private static int? EvalRelationalInstruction(Instruction instruction)
+        {
+            // Opcode 7 is less than: if the first parameter is less than the second parameter,
+            // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
 
-            return Evaluate();
+            // Opcode 8 is equals: if the first parameter is equal to the second parameter,
+            // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+
+            var param1 = instruction.GetParamUsingMode(0);
+            var param2 = instruction.GetParamUsingMode(1);
+            var param3 = instruction.GetParam(2);
+
+            var storageIndex = param3;
+
+            var result = instruction.OpCode switch
+                {
+                7 when param1 < param2 => 1,
+                8 when param1 == param2 => 1,
+                _ => 0
+                };
+
+            instruction.IntCodes[storageIndex] = result;
+            return null;
         }
     }
 }
