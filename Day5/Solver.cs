@@ -81,8 +81,7 @@ namespace Day5
                     var left = param1IsImmediate ? param1 : intCodes[param1];
                     var right = param2IsImmediate ? param2 : intCodes[param2];
 
-                    var storageIndex = param3; // Parameters that an instruction writes to will never be in immediate mode
-                    ////var storageIndex = param3IsImmediate ? param3 : intCodes[param3];
+                    var storageIndex = param3;
 
                     var result = opCode switch
                         {
@@ -110,12 +109,6 @@ namespace Day5
             ProcessIntCodes(intCodes, inputValue, outputs, 0);
 
             var diagnosticCode = outputs.Pop();
-
-            ////if (outputs.Any(output => output != 0))
-            ////{
-            ////    throw new InvalidOperationException(
-            ////        "Non-zero outputs mean that a function is not working correctly; check the instructions that were run before the output instruction to see which one failed");
-            ////}
 
             return diagnosticCode;
         }
