@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Day5
+namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
@@ -23,7 +23,7 @@ namespace Day5
                 intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             }
 
-            return (intCodeState, intCodeState.Outputs.FirstOrDefault());
+            return (intCodeState, intCodeState.Outputs.Any() ? intCodeState.Outputs.Peek() : (int?)null);
         }
 
         private static int? EvalInstruction(Instruction instruction) =>

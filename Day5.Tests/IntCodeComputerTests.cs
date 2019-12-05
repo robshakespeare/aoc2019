@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
+using Common.IntCodes;
 
 namespace Day5.Tests
 {

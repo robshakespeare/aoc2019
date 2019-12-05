@@ -1,6 +1,6 @@
 using System;
 
-namespace Day5
+namespace Common.IntCodes
 {
     public class Instruction
     {

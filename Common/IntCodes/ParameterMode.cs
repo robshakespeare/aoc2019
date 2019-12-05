@@ -1,4 +1,4 @@
-namespace Day5
+namespace Common.IntCodes
 {
     public enum ParameterMode
     {
