@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace Common
@@ -17,7 +17,7 @@ namespace Common
         public void Dispose()
         {
             _stopwatch.Stop();
-            Console.WriteLine($"[{_name}] time taken (seconds): {_stopwatch.Elapsed.TotalSeconds:0.###}");
+            Console.WriteLine($"[{_name}] time taken (seconds): {_stopwatch.Elapsed.TotalSeconds:0.000}");
         }
     }
 }

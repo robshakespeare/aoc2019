@@ -3,14 +3,18 @@ using Common;
 
 namespace Day5
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main()
         {
             using var _ = new TimingBlock("Overall");
 
-            var solution = new Solver().Solve();
-            Console.WriteLine($"Solution: {solution}");
+            Console.WriteLine($"Diagnostic code: {Solve()}");
+        }
+
+        public static int Solve()
+        {
+            return new Solver().Solve();
         }
     }
 }
