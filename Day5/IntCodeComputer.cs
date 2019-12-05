@@ -11,7 +11,7 @@ namespace Day5
                 .ToArray(),
             inputSystemId);
 
-        public (IntCodeState intCodeState, int diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
+        public (IntCodeState intCodeState, int? diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
         {
             var intCodeState = Parse(input, inputSystemId);
 
@@ -23,7 +23,7 @@ namespace Day5
                 intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             }
 
-            return (intCodeState, intCodeState.Outputs.Peek());
+            return (intCodeState, intCodeState.Outputs.FirstOrDefault());
         }
 
         private static int? EvalInstruction(Instruction instruction) =>

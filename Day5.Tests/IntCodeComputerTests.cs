@@ -20,5 +20,31 @@ namespace Day5.Tests
             // ASSERT
             result.diagnosticCode.Should().Be(testInputSystemId);
         }
+
+        [Test]
+        public void BasicParameterModesTest()
+        {
+            // ACT
+            var result = sut.ParseAndEvaluate(
+                "1002,4,3,4,33",
+                default);
+
+            // ASSERT
+            result.intCodeState[4].Should().Be(99);
+            result.diagnosticCode.Should().BeNull();
+        }
+
+        [Test]
+        public void IntegersCanBeNegative()
+        {
+            // ACT
+            var result = sut.ParseAndEvaluate(
+                "1101,100,-1,4,0",
+                default);
+
+            // ASSERT
+            result.intCodeState[4].Should().Be(99);
+            result.diagnosticCode.Should().BeNull();
+        }
     }
 }
