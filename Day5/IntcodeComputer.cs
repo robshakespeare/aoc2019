@@ -26,9 +26,8 @@ namespace Day5
             return (intCodeState, intCodeState.Outputs.Peek());
         }
 
-        private static int? EvalInstruction(Instruction instruction)
-        {
-            return instruction.OpCode switch
+        private static int? EvalInstruction(Instruction instruction) =>
+            instruction.OpCode switch
                 {
                 1 => EvalMathInstruction(instruction),
                 2 => EvalMathInstruction(instruction),
@@ -40,7 +39,6 @@ namespace Day5
                 8 => EvalRelationalInstruction(instruction),
                 _ => throw new InvalidOperationException("Invalid opCode: " + instruction.OpCode)
                 };
-        }
 
         private static int? EvalMathInstruction(Instruction instruction)
         {
