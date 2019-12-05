@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Day5
 {
+    // Yuk.  This has become horrible code!  Needs refactoring to do it properly!
     public class Solver
     {
         public static int[] LoadIntCodes() =>
@@ -33,17 +34,17 @@ namespace Day5
             return (opCode, param1IsImmediate, param2IsImmediate, param3IsImmediate);
         }
 
-        public int ProcessIntCodes(int[] intCodes, int inputValue, Stack<int> outputs, int instructionPointer)
+        public int ProcessIntCodes(int[] intCodes, int inputValue, Stack<int> outputs, int instructionPointer = 0)
         {
             var fullOpCode = intCodes[instructionPointer];
-            var (opCode, param1IsImmediate, param2IsImmediate, param3IsImmediate) = ParseFullOpCode(fullOpCode);
+            var (opCode, param1IsImmediate, param2IsImmediate, _) = ParseFullOpCode(fullOpCode);
 
             if (opCode == 99)
             {
                 return intCodes[0];
             }
 
-            int instructionPointerIncrease;
+            int newInstructionPointer;
 
             switch (opCode)
             {
@@ -54,7 +55,7 @@ namespace Day5
                     var addressIndex = intCodes[instructionPointer + 1];
                     intCodes[addressIndex] = inputValue;
 
-                    instructionPointerIncrease = 2;
+                    newInstructionPointer = instructionPointer + 2;
                     break;
                 }
 
@@ -65,7 +66,68 @@ namespace Day5
                     var addressIndex = intCodes[instructionPointer + 1];
                     outputs.Push(intCodes[addressIndex]);
 
-                    instructionPointerIncrease = 2;
+                    newInstructionPointer = instructionPointer + 2;
+                    break;
+                }
+
+                case 5:
+                case 6:
+                {
+                    // Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to
+                    // the value from the second parameter. Otherwise, it does nothing.
+
+                    // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to
+                    // the value from the second parameter. Otherwise, it does nothing.
+
+                    var param1 = intCodes[instructionPointer + 1];
+                    var param2 = intCodes[instructionPointer + 2];
+
+                    param1 = param1IsImmediate ? param1 : intCodes[param1];
+                    param2 = param2IsImmediate ? param2 : intCodes[param2];
+
+                    switch (opCode)
+                    {
+                        case 5 when param1 != 0:
+                        case 6 when param1 == 0:
+                            newInstructionPointer = param2;
+                            break;
+
+                        default:
+                            newInstructionPointer = instructionPointer + 3;
+                            break;
+                    }
+
+                    break;
+                }
+
+                case 7:
+                case 8:
+                {
+                    // Opcode 7 is less than: if the first parameter is less than the second parameter,
+                    // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+
+                    // Opcode 8 is equals: if the first parameter is equal to the second parameter,
+                    // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+
+                    var param1 = intCodes[instructionPointer + 1];
+                    var param2 = intCodes[instructionPointer + 2];
+                    var param3 = intCodes[instructionPointer + 3];
+
+                    param1 = param1IsImmediate ? param1 : intCodes[param1];
+                    param2 = param2IsImmediate ? param2 : intCodes[param2];
+
+                    var storageIndex = param3;
+
+                    var result = opCode switch
+                        {
+                        7 when param1 < param2 => 1,
+                        8 when param1 == param2 => 1,
+                        _ => 0
+                        };
+
+                    intCodes[storageIndex] = result;
+
+                    newInstructionPointer = instructionPointer + 4;
                     break;
                 }
 
@@ -78,35 +140,37 @@ namespace Day5
                     var param2 = intCodes[instructionPointer + 2];
                     var param3 = intCodes[instructionPointer + 3];
 
-                    var left = param1IsImmediate ? param1 : intCodes[param1];
-                    var right = param2IsImmediate ? param2 : intCodes[param2];
+                    param1 = param1IsImmediate ? param1 : intCodes[param1];
+                    param2 = param2IsImmediate ? param2 : intCodes[param2];
 
                     var storageIndex = param3;
 
                     var result = opCode switch
                         {
-                        1 => left + right,
-                        2 => left * right,
+                        1 => param1 + param2,
+                        2 => param1 * param2,
                         _ => throw new InvalidOperationException("Invalid opCode: " + opCode)
                         };
 
                     intCodes[storageIndex] = result;
 
-                    instructionPointerIncrease = 4;
+                    newInstructionPointer = instructionPointer + 4;
                     break;
                 }
             }
 
-            return ProcessIntCodes(intCodes, inputValue, outputs, instructionPointer + instructionPointerIncrease);
+            return ProcessIntCodes(intCodes, inputValue, outputs, newInstructionPointer);
         }
 
         public int Solve()
         {
             var intCodes = LoadIntCodes();
-            const int inputValue = 1;
+            // Note: const int airConditionerUnitId = 1;
+            const int thermalRadiatorControllerId = 5;
+            const int inputValue = thermalRadiatorControllerId;
             var outputs = new Stack<int>();
 
-            ProcessIntCodes(intCodes, inputValue, outputs, 0);
+            ProcessIntCodes(intCodes, inputValue, outputs);
 
             var diagnosticCode = outputs.Pop();
 
