@@ -6,20 +6,21 @@ namespace Day5
 {
     public class IntCodeComputer
     {
-        public IntCodes Parse(string input) => new IntCodes(
+        public IntCodes Parse(string input, int inputSystemId) => new IntCodes(
             input.Split(',')
                 .Select(int.Parse)
-                .ToArray());
+                .ToArray(),
+            inputSystemId);
 
         public (IntCodes intCodes, Stack<int> outputs, int diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
         {
-            var intCodes = Parse(input);
+            var intCodes = Parse(input, inputSystemId);
             var outputs = new Stack<int>();
 
             Instruction instruction;
             while ((instruction = intCodes.ReadNextInstruction()).OpCode != 99)
             {
-                var gotoInstructionPointer = EvalInstruction(instruction, inputSystemId, outputs);
+                var gotoInstructionPointer = EvalInstruction(instruction, outputs);
 
                 intCodes.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             }
@@ -27,13 +28,13 @@ namespace Day5
             return (intCodes, outputs, outputs.Peek());
         }
 
-        private static int? EvalInstruction(Instruction instruction, int inputSystemId, Stack<int> outputs)
+        private static int? EvalInstruction(Instruction instruction, Stack<int> outputs)
         {
             return instruction.OpCode switch
                 {
                 1 => EvalMathInstruction(instruction),
                 2 => EvalMathInstruction(instruction),
-                3 => EvalTakeInstruction(instruction, inputSystemId),
+                3 => EvalTakeInstruction(instruction),
                 4 => EvalOutputInstruction(instruction, outputs),
                 5 => EvalJumpInstruction(instruction),
                 6 => EvalJumpInstruction(instruction),
@@ -62,12 +63,12 @@ namespace Day5
             return null;
         }
 
-        private static int? EvalTakeInstruction(Instruction instruction, int inputSystemId)
+        private static int? EvalTakeInstruction(Instruction instruction)
         {
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
             var addressIndex = instruction.GetParam(0);
-            instruction.IntCodes[addressIndex] = inputSystemId;
+            instruction.IntCodes[addressIndex] = instruction.IntCodes.InputSystemId;
             return null;
         }
 

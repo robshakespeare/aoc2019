@@ -7,11 +7,14 @@ namespace Day5
     {
         private readonly int[] intCodes;
 
-        public IntCodes(int[] intCodes)
+        public IntCodes(int[] intCodes, int inputSystemId)
         {
+            InputSystemId = inputSystemId;
             this.intCodes = intCodes;
             InstructionPointer = 0;
         }
+
+        public int InputSystemId { get; }
 
         public int InstructionPointer { get; set; }
 
@@ -41,7 +44,7 @@ namespace Day5
                 .Select(chr => chr == '1' ? ParameterMode.Immediate : ParameterMode.Positional)
                 .ToArray();
 
-            return new Instruction(opCode, intCodes, parameterModes, InstructionPointer);
+            return new Instruction(opCode, this, parameterModes, InstructionPointer);
         }
     }
 }

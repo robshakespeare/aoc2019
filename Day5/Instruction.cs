@@ -6,11 +6,11 @@ namespace Day5
     {
         private readonly ParameterMode[] parameterModes;
 
-        public int[] IntCodes { get; }
+        public IntCodes IntCodes { get; }
         public int OpCode { get; }
         public int CurrentInstructionPointer { get; }
 
-        public Instruction(int opCode, int[] intCodes, ParameterMode[] parameterModes, int instructionPointer)
+        public Instruction(int opCode, IntCodes intCodes, ParameterMode[] parameterModes, int instructionPointer)
         {
             OpCode = opCode;
             IntCodes = intCodes;
