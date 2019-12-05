@@ -6,14 +6,14 @@ namespace Day5
     {
         private readonly ParameterMode[] parameterModes;
 
-        public IntCodes IntCodes { get; }
+        public IntCodeState IntCodeState { get; }
         public int OpCode { get; }
         public int CurrentInstructionPointer { get; }
 
-        public Instruction(int opCode, IntCodes intCodes, ParameterMode[] parameterModes, int instructionPointer)
+        public Instruction(int opCode, IntCodeState intCodeState, ParameterMode[] parameterModes, int instructionPointer)
         {
             OpCode = opCode;
-            IntCodes = intCodes;
+            IntCodeState = intCodeState;
             this.parameterModes = parameterModes;
             CurrentInstructionPointer = instructionPointer;
         }
@@ -28,7 +28,7 @@ namespace Day5
         {
             var absoluteParamIndex = CurrentInstructionPointer + 1 + paramIndex; // Note: +1 for reading the opCode
             NewInstructionPointer = Math.Max(NewInstructionPointer, absoluteParamIndex + 1); // Note: +1 to send to next unprocessed instruction
-            return IntCodes[absoluteParamIndex];
+            return IntCodeState[absoluteParamIndex];
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Day5
             return parameterMode switch
                 {
                 ParameterMode.Immediate => rawValue,
-                ParameterMode.Positional => IntCodes[rawValue],
+                ParameterMode.Positional => IntCodeState[rawValue],
                 _ => throw new InvalidOperationException("Invalid ParameterMode: " + new { parameterMode, CurrentInstructionPointer, paramIndex })
                 };
         }

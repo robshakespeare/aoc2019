@@ -1,22 +1,26 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Day5
 {
-    public class IntCodes
+    public class IntCodeState
     {
         private readonly int[] intCodes;
 
-        public IntCodes(int[] intCodes, int inputSystemId)
+        public IntCodeState(int[] intCodes, int inputSystemId)
         {
             InputSystemId = inputSystemId;
             this.intCodes = intCodes;
             InstructionPointer = 0;
+            Outputs = new Stack<int>();
         }
 
         public int InputSystemId { get; }
 
         public int InstructionPointer { get; set; }
+
+        public Stack<int> Outputs { get; }
 
         /// <summary>
         /// Gets or sets the int code at the specified index.

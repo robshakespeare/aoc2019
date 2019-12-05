@@ -1,41 +1,39 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Day5
 {
     public class IntCodeComputer
     {
-        public IntCodes Parse(string input, int inputSystemId) => new IntCodes(
+        public IntCodeState Parse(string input, int inputSystemId) => new IntCodeState(
             input.Split(',')
                 .Select(int.Parse)
                 .ToArray(),
             inputSystemId);
 
-        public (IntCodes intCodes, Stack<int> outputs, int diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
+        public (IntCodeState intCodeState, int diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
         {
-            var intCodes = Parse(input, inputSystemId);
-            var outputs = new Stack<int>();
+            var intCodeState = Parse(input, inputSystemId);
 
             Instruction instruction;
-            while ((instruction = intCodes.ReadNextInstruction()).OpCode != 99)
+            while ((instruction = intCodeState.ReadNextInstruction()).OpCode != 99)
             {
-                var gotoInstructionPointer = EvalInstruction(instruction, outputs);
+                var gotoInstructionPointer = EvalInstruction(instruction);
 
-                intCodes.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
+                intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             }
 
-            return (intCodes, outputs, outputs.Peek());
+            return (intCodeState, intCodeState.Outputs.Peek());
         }
 
-        private static int? EvalInstruction(Instruction instruction, Stack<int> outputs)
+        private static int? EvalInstruction(Instruction instruction)
         {
             return instruction.OpCode switch
                 {
                 1 => EvalMathInstruction(instruction),
                 2 => EvalMathInstruction(instruction),
                 3 => EvalTakeInstruction(instruction),
-                4 => EvalOutputInstruction(instruction, outputs),
+                4 => EvalOutputInstruction(instruction),
                 5 => EvalJumpInstruction(instruction),
                 6 => EvalJumpInstruction(instruction),
                 7 => EvalRelationalInstruction(instruction),
@@ -59,7 +57,7 @@ namespace Day5
                 _ => throw new InvalidOperationException("Invalid Math opCode: " + instruction.OpCode)
                 };
 
-            instruction.IntCodes[storageIndex] = result;
+            instruction.IntCodeState[storageIndex] = result;
             return null;
         }
 
@@ -68,16 +66,16 @@ namespace Day5
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
             var addressIndex = instruction.GetParam(0);
-            instruction.IntCodes[addressIndex] = instruction.IntCodes.InputSystemId;
+            instruction.IntCodeState[addressIndex] = instruction.IntCodeState.InputSystemId;
             return null;
         }
 
-        private static int? EvalOutputInstruction(Instruction instruction, Stack<int> outputs)
+        private static int? EvalOutputInstruction(Instruction instruction)
         {
             // opCode 4 outputs the value of its only parameter.
             // For example, the instruction 4,50 would output the value at address 50.
             var addressIndex = instruction.GetParam(0);
-            outputs.Push(instruction.IntCodes[addressIndex]);
+            instruction.IntCodeState.Outputs.Push(instruction.IntCodeState[addressIndex]);
             return null;
         }
 
@@ -124,7 +122,7 @@ namespace Day5
                 _ => 0
                 };
 
-            instruction.IntCodes[storageIndex] = result;
+            instruction.IntCodeState[storageIndex] = result;
             return null;
         }
     }
