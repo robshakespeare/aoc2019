@@ -1,4 +1,4 @@
-using System;
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -11,8 +11,7 @@ namespace Day6.Tests
         [Test]
         public void SpecExampleTest_Part1()
         {
-            // rs-todo: fix issue with new line conflicts here
-            var mapLines = @"COM)B
+            const string mapLines = @"COM)B
 B)C
 C)D
 D)E
@@ -25,7 +24,7 @@ J)K
 K)L";
 
             // ACT
-            var result = sut.SolvePart1(mapLines.Split(Environment.NewLine));
+            var result = sut.SolvePart1(mapLines.ReadAllLines());
 
             // ASSERT
             result.Should().Be(42);
@@ -34,8 +33,7 @@ K)L";
         [Test]
         public void SpecExampleTest_Part2()
         {
-            // rs-todo: fix issue with new line conflicts here
-            var mapLines = @"COM)B
+            const string mapLines = @"COM)B
 B)C
 C)D
 D)E
@@ -50,7 +48,7 @@ K)YOU
 I)SAN";
 
             // ACT
-            var result = sut.SolvePart2(mapLines.Split(Environment.NewLine));
+            var result = sut.SolvePart2(mapLines.ReadAllLines());
 
             // ASSERT
             result.Should().Be(4);
