@@ -22,8 +22,8 @@ namespace Day6
                 .Select(line => line.Split(')'))
                 .Select(pair => new {parentId = pair[0], childId = pair[1]}))
             {
-                var parent = GetOrAddNodes(nodes, pair.parentId);
-                var child = GetOrAddNodes(nodes, pair.childId);
+                var parent = GetOrAddNode(pair.parentId, nodes);
+                var child = GetOrAddNode(pair.childId, nodes);
 
                 parent.AddChild(child);
             }
@@ -31,11 +31,11 @@ namespace Day6
             return nodes;
         }
 
-        private static HierarchicalNode GetOrAddNodes(IDictionary<string, HierarchicalNode> nodes, string id)
+        private static HierarchicalNode GetOrAddNode(string nodeId, IDictionary<string, HierarchicalNode> nodes)
         {
-            if (!nodes.TryGetValue(id, out var node))
+            if (!nodes.TryGetValue(nodeId, out var node))
             {
-                nodes.Add(id, node = new HierarchicalNode(false, id));
+                nodes.Add(nodeId, node = new HierarchicalNode(false, nodeId));
             }
             return node;
         }
