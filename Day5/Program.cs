@@ -7,10 +7,10 @@ namespace Day5
 {
     public class Program
     {
-        const int airConditionerUnitId = 1;
-        const int thermalRadiatorControllerId = 5;
+        private const int AirConditionerUnitId = 1;
+        private const int ThermalRadiatorControllerId = 5;
 
-        static Lazy<string> Input = new Lazy<string>(() => File.ReadAllText("input.txt"));
+        private static readonly Lazy<string> Input = new Lazy<string>(() => File.ReadAllText("input.txt"));
 
         public static void Main()
         {
@@ -19,9 +19,9 @@ namespace Day5
             Console.WriteLine($"Part 2 - Diagnostic code: {SolvePart2()}");
         }
 
-        public static int? SolvePart1() => Solve(airConditionerUnitId);
+        public static int? SolvePart1() => Solve(AirConditionerUnitId);
 
-        public static int? SolvePart2() => Solve(thermalRadiatorControllerId);
+        public static int? SolvePart2() => Solve(ThermalRadiatorControllerId);
 
         public static int? Solve(int inputSystemId)
         {
