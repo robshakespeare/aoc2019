@@ -1,9 +1,16 @@
 using System.Linq;
+using Common;
 
 namespace Day4
 {
-    public class Solver
+    public class Day4Solver : SolverStaticInput<string>
     {
+        public Day4Solver() : base("138241-674034")
+        {
+        }
+
+        public override int? SolvePart2(string input) => HowManyDifferentPasswordsWithinRange(input);
+
         public int HowManyDifferentPasswordsWithinRange(string range)
         {
             var (start, rangeLength) = ParseRangeString(range);

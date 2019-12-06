@@ -2,15 +2,15 @@ using NUnit.Framework;
 
 namespace Day4.Tests
 {
-    public class SolverTests
+    public class Day4SolverTests
     {
-        private readonly Solver _sut = new Solver();
+        private readonly Day4Solver sut = new Day4Solver();
 
         [Test]
-        public void HowManyDifferentPasswordsWithinRange_Test()
+        public void Part2ReTest()
         {
             // ACT
-            var solution = _sut.HowManyDifferentPasswordsWithinRange(Day4.Program.Input);
+            var solution = sut.SolvePart2();
 
             // ASSERT
             Assert.AreEqual(1277, solution);

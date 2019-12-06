@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Common
 {
-    public abstract class SolverReadAllText : SolverWithInput<string>
+    public abstract class SolverReadAllText : Solver<string>
     {
         protected override string LoadInput()
         {
