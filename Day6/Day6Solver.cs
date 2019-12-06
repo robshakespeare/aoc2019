@@ -4,7 +4,7 @@ using Common;
 
 namespace Day6
 {
-    public class Day6Solver : Solver
+    public class Day6Solver : SolverReadAllLines
     {
         public override int? SolvePart1(string[] mapLines)
         {

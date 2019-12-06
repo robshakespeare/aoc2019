@@ -11,7 +11,7 @@ namespace Day5.Tests
             const int alreadyVerifiedResult = 9219874;
 
             // ACT
-            var result = Program.SolvePart1();
+            var result = new Program().SolvePart1();
 
             // ASSERT
             result.Should().Be(alreadyVerifiedResult);
@@ -23,7 +23,7 @@ namespace Day5.Tests
             const int alreadyVerifiedResult = 5893654;
 
             // ACT
-            var result = Program.SolvePart2();
+            var result = new Program().SolvePart2();
 
             // ASSERT
             result.Should().Be(alreadyVerifiedResult);
