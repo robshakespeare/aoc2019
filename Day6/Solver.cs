@@ -1,25 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Common.Streams;
 
 namespace Day6
 {
     public class Solver
     {
-        public int WhatIsTheTotalNumberOfDirectAndIndirectOrbits() =>
-            WhatIsTheTotalNumberOfDirectAndIndirectOrbits(StreamUtils.FileToEnumerableOfString("input.txt"));
-
-        public int WhatIsTheTotalNumberOfDirectAndIndirectOrbits(Stream stream) =>
-            WhatIsTheTotalNumberOfDirectAndIndirectOrbits(StreamUtils.StreamToEnumerableOfString(stream));
-
-        public int WhatIsTheTotalNumberOfDirectAndIndirectOrbits(IEnumerable<string> mapLines)
+        public int SolvePart1(IEnumerable<string> mapLines)
         {
+            // What is the total number of direct and indirect orbits?
             var nodeDictionary = BuildHierarchy(mapLines);
-
             var allNodes = nodeDictionary.Values;
-
             return allNodes.Sum(node => node.Depth);
         }
 
@@ -60,10 +50,13 @@ namespace Day6
             var me = nodeDictionary["YOU"];
             var santa = nodeDictionary["SAN"];
 
-            var closestIntersection = me.Parents.Intersect(santa.Parents, new HierarchicalNodeEqualityComparer()).OrderByDescending(x => x.Depth).First();
+            var closestIntersection = me.Parents
+                .Intersect(santa.Parents, new HierarchicalNodeEqualityComparer())
+                .OrderByDescending(x => x.Depth)
+                .First();
 
+            // Note the -1 because its between the objects they are orbiting, not themselves
             var meToIntersection = me.Depth - 1 - closestIntersection.Depth;
-
             var santaToIntersection = santa.Depth - 1 - closestIntersection.Depth;
 
             return meToIntersection + santaToIntersection;

@@ -16,5 +16,15 @@ namespace Day6.Tests
             // ASSERT
             part1Result.Should().Be(171213);
         }
+
+        [Test]
+        public void Part2ReTest()
+        {
+            // ACT
+            var part1Result = Program.SolvePart2(solver);
+
+            // ASSERT
+            part1Result.Should().Be(292);
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using Common.Streams;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -10,7 +9,7 @@ namespace Day6.Tests
         private readonly Solver sut = new Solver();
 
         [Test]
-        public void SpecExampleTest()
+        public void SpecExampleTest_Part1()
         {
             // rs-todo: fix issue with new line conflicts here
             var mapLines = @"COM)B
@@ -26,7 +25,7 @@ J)K
 K)L";
 
             // ACT
-            var result = sut.WhatIsTheTotalNumberOfDirectAndIndirectOrbits(StreamUtils.ToStream(mapLines));
+            var result = sut.SolvePart1(mapLines.Split(Environment.NewLine));
 
             // ASSERT
             result.Should().Be(42);

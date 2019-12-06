@@ -8,6 +8,9 @@ namespace Day6
         private HierarchicalNode? parentNode;
         private readonly IList<HierarchicalNode> childNodes = new List<HierarchicalNode>();
 
+        private bool depthCalculated;
+        private int depth;
+
         public HierarchicalNode(bool isRootNode, string id)
         {
             IsRootNode = isRootNode;
@@ -35,7 +38,21 @@ namespace Day6
 
         public IEnumerable<HierarchicalNode> ChildNodes => childNodes;
 
-        public int Depth => ParentNode?.Depth + 1 ?? 0;
+        public int Depth
+        {
+            get
+            {
+                if (depthCalculated)
+                {
+                    return depth;
+                }
+
+                depth = ParentNode?.Depth + 1 ?? 0;
+                depthCalculated = true;
+
+                return depth;
+            }
+        }
 
         public void AddChild(HierarchicalNode child)
         {
