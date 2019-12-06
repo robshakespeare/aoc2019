@@ -17,7 +17,11 @@ namespace Common
         public void Dispose()
         {
             stopwatch.Stop();
-            Console.WriteLine($"[{name}] time taken (seconds): {stopwatch.Elapsed.TotalSeconds:0.000}");
+
+            ColorConsole.Write($"[{name}] time taken (seconds): {stopwatch.Elapsed.TotalSeconds:0.000}", ConsoleColor.DarkGray);
+
+            Console.WriteLine();
+            Console.WriteLine();
         }
     }
 }

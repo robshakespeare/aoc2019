@@ -4,9 +4,29 @@ using NUnit.Framework;
 
 namespace Day6.Tests
 {
-    public class SolverTests
+    public class Day6SolverTests
     {
-        private readonly Solver sut = new Solver();
+        private readonly Day6Solver sut = new Day6Solver();
+
+        [Test]
+        public void Part1ReTest()
+        {
+            // ACT
+            var part1Result = sut.SolvePart1();
+
+            // ASSERT
+            part1Result.Should().Be(171213);
+        }
+
+        [Test]
+        public void Part2ReTest()
+        {
+            // ACT
+            var part1Result = sut.SolvePart2();
+
+            // ASSERT
+            part1Result.Should().Be(292);
+        }
 
         [Test]
         public void SpecExampleTest_Part1()

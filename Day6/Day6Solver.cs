@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using Common;
 
 namespace Day6
 {
-    public class Solver
+    public class Day6Solver : Solver
     {
-        public int SolvePart1(IEnumerable<string> mapLines)
+        public override int? SolvePart1(string[] mapLines)
         {
             // What is the total number of direct and indirect orbits?
             var nodeDictionary = BuildHierarchy(mapLines);
@@ -40,7 +41,7 @@ namespace Day6
             return node;
         }
 
-        public int SolvePart2(IEnumerable<string> mapLines)
+        public override int? SolvePart2(string[] mapLines)
         {
             // What is the minimum number of orbital transfers required to move from the object YOU are orbiting to the object SAN is orbiting?
             // (Between the objects they are orbiting - not between YOU and SAN.)
