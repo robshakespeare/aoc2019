@@ -27,8 +27,7 @@ namespace Common
             using var _ = new TimingBlock($"Part {partNum}");
             var result = solver();
             Console.Write($"Part {partNum}: ");
-            ColorConsole.Write(result, ConsoleColor.Green);
-            Console.WriteLine();
+            ColorConsole.WriteLine(result, ConsoleColor.Green);
         }
     }
 }

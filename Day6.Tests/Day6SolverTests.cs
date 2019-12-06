@@ -22,10 +22,10 @@ namespace Day6.Tests
         public void Part2ReTest()
         {
             // ACT
-            var part1Result = sut.SolvePart2();
+            var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part1Result.Should().Be(292);
+            part2Result.Should().Be(292);
         }
 
         [Test]

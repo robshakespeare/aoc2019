@@ -18,9 +18,8 @@ namespace Common
         {
             stopwatch.Stop();
 
-            ColorConsole.Write($"[{name}] time taken (seconds): {stopwatch.Elapsed.TotalSeconds:0.000}", ConsoleColor.DarkGray);
+            ColorConsole.WriteLine($"[{name}] time taken (seconds): {stopwatch.Elapsed.TotalSeconds:0.000}", ConsoleColor.DarkGray);
 
-            Console.WriteLine();
             Console.WriteLine();
         }
     }
