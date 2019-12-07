@@ -141,28 +141,28 @@ namespace Common.IntCodes
 
         public int ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(string inputProgram, int[] phaseSettingSequence)
         {
-            var amplifierSignalConnectors = phaseSettingSequence.Select(phaseSetting => new PhaseSignalConnector(phaseSetting))
+            var deviceSignalConnectors = phaseSettingSequence.Select(phaseSetting => new PhaseSignalConnector(phaseSetting))
                 .ToArray();
 
-            amplifierSignalConnectors.First().SetNextValue(0); // Seed input signal of the first amplifier
+            deviceSignalConnectors.First().SetNextValue(0); // Seed input signal of the first device
 
             var finalResults = new int[phaseSettingSequence.Length];
 
             Parallel.ForEach(
-                amplifierSignalConnectors.Select((connector, index) => (connector, index)),
-                amp =>
+                deviceSignalConnectors.Select((connector, index) => (connector, index)),
+                device =>
                 {
-                    var nextAmpIndex = amp.index + 1 == amplifierSignalConnectors.Length ? 0 : amp.index + 1;
-                    var nextAmpConnector = amplifierSignalConnectors[nextAmpIndex];
+                    var nextDeviceIndex = device.index + 1 == deviceSignalConnectors.Length ? 0 : device.index + 1;
+                    var nextDeviceConnector = deviceSignalConnectors[nextDeviceIndex];
 
-                    var result = ParseAndEvaluateWithSignalling(inputProgram, amp.connector.ReceiveNextValue, nextAmpConnector.SetNextValue);
+                    var result = ParseAndEvaluateWithSignalling(inputProgram, device.connector.ReceiveNextValue, nextDeviceConnector.SetNextValue);
 
                     if (result.LastOutputValue == null)
                     {
                         throw new InvalidOperationException("Invalid IntCodeComputer result, expected a LastOutputValue.");
                     }
 
-                    finalResults[amp.index] = result.LastOutputValue.Value;
+                    finalResults[device.index] = result.LastOutputValue.Value;
                 });
 
             return finalResults.Last();
