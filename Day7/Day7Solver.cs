@@ -26,7 +26,7 @@ namespace Day7
                     throw new InvalidOperationException("Invalid IntCodeComputer result, expected a FinalOutput.");
                 }
 
-                signal += result.FinalOutput.Value;
+                signal = result.FinalOutput.Value;
             }
 
             return signal;
