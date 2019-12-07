@@ -52,9 +52,33 @@ namespace Day7
             return signal;
         }
 
+        public int TryPhaseSettingSequencePart2(string inputProgram, int[] phaseSettingSequence)
+        {
+            var signal = 0;
+
+            foreach (var phaseSetting in phaseSettingSequence)
+            {
+                var result = intCodeComputer.ParseAndEvaluate(inputProgram, phaseSetting, signal);
+
+                if (result.FinalOutput == null)
+                {
+                    throw new InvalidOperationException("Invalid IntCodeComputer result, expected a FinalOutput.");
+                }
+
+                signal = result.FinalOutput.Value;
+            }
+
+            return signal;
+        }
+
         public override int? SolvePart2(string inputProgram)
         {
-            return base.SolvePart2(inputProgram);
+            var phaseSettings = (5..10).ToArray();
+
+            return GetAllPossibleCombinations(phaseSettings)
+                .Select(phaseSettingSequence => TryPhaseSettingSequencePart2(inputProgram, phaseSettingSequence))
+                .OrderByDescending(finalOutputSignal => finalOutputSignal)
+                .First();
         }
     }
 }

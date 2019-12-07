@@ -120,6 +120,17 @@ namespace Day7.Tests
         }
 
         [Test]
+        public void GetAllPossibleCombinations_FiveValues_RealWorldTest2()
+        {
+            // ACT
+            var result = sut.GetAllPossibleCombinations((5..10).ToArray());
+
+            // ASSERT
+            result.Length.Should().Be(120); // i.e. 5 factorial
+            ValidateAllPossibleCombinationsAreUnique(result);
+        }
+
+        [Test]
         public void GetAllPossibleCombinations_SixValuesTest()
         {
             // ACT
