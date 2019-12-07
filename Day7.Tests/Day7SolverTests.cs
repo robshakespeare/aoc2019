@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -111,7 +112,7 @@ namespace Day7.Tests
         public void GetAllPossibleCombinations_FiveValues_RealWorldTest()
         {
             // ACT
-            var result = sut.GetAllPossibleCombinations(Enumerable.Range(0, 5).ToArray());
+            var result = sut.GetAllPossibleCombinations((..5).ToArray());
 
             // ASSERT
             result.Length.Should().Be(120); // i.e. 5 factorial
@@ -122,7 +123,7 @@ namespace Day7.Tests
         public void GetAllPossibleCombinations_SixValuesTest()
         {
             // ACT
-            var result = sut.GetAllPossibleCombinations(Enumerable.Range(0, 6).ToArray());
+            var result = sut.GetAllPossibleCombinations((10..16).ToArray());
 
             // ASSERT
             result.Length.Should().Be(720); // i.e. 6 factorial

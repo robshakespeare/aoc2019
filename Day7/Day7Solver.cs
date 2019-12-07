@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Common;
+using Common.Extensions;
 using Common.IntCodes;
 
 namespace Day7
@@ -11,7 +12,7 @@ namespace Day7
 
         public override int? SolvePart1(string inputProgram)
         {
-            var phaseSettings = Enumerable.Range(0, 5).ToArray();
+            var phaseSettings = (..5).ToArray();
 
             return GetAllPossibleCombinations(phaseSettings)
                 .Select(phaseSettingSequence => TryPhaseSettingSequence(inputProgram, phaseSettingSequence))
