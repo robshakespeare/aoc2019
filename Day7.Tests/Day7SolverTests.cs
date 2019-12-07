@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common.Extensions;
+using Common.IntCodes;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -31,21 +32,48 @@ namespace Day7.Tests
             part2Result.Should().Be(58285150);
         }
 
+        /// <remarks>
+        /// First version of the TryPhaseSettingSequence method, before the full implementation of the feedback loop logic!
+        /// Just kept here, just in case its needed again!
+        /// </remarks>
+        private static int TryPhaseSettingSequenceV1(string inputProgram, IEnumerable<int> phaseSettingSequence)
+        {
+            var intCodeComputer = new IntCodeComputer();
+            var signal = 0;
+
+            foreach (var phaseSetting in phaseSettingSequence)
+            {
+                var result = intCodeComputer.ParseAndEvaluate(inputProgram, phaseSetting, signal);
+
+                if (result.LastOutputValue == null)
+                {
+                    throw new InvalidOperationException("Invalid IntCodeComputer result, expected a LastOutputValue.");
+                }
+
+                signal = result.LastOutputValue.Value;
+            }
+
+            return signal;
+        }
+
         [TestCaseSource(nameof(TryPhaseSettingSequenceTestCases))]
         public void TryPhaseSettingSequence_Tests(string inputProgram, int[] inputPhaseSettingSequence, int expectedResultMaxThrusterSignal)
         {
             // ACT
-            var result = sut.TryPhaseSettingSequence(inputProgram, inputPhaseSettingSequence);
+            var result = TryPhaseSettingSequenceV1(inputProgram, inputPhaseSettingSequence);
 
             // ASSERT
             result.Should().Be(expectedResultMaxThrusterSignal);
         }
 
         [TestCaseSource(nameof(TryPhaseSettingSequenceTestCases))]
-        public void TryPhaseSettingSequenceWithFeedbackLoop_Part1_Tests(string inputProgram, int[] inputPhaseSettingSequence, int expectedResultMaxThrusterSignal)
+        public void ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop_Part1_Tests(string inputProgram, int[] inputPhaseSettingSequence,
+            int expectedResultMaxThrusterSignal)
         {
+            var intCodeComputer = new IntCodeComputer();
+
             // ACT
-            var result = sut.TryPhaseSettingSequenceWithFeedbackLoop(inputProgram, inputPhaseSettingSequence);
+            var result = intCodeComputer.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, inputPhaseSettingSequence);
 
             // ASSERT
             result.Should().Be(expectedResultMaxThrusterSignal);
@@ -77,7 +105,7 @@ namespace Day7.Tests
         public void GetAllPossibleCombinations_SingleValueTest()
         {
             // ACT
-            var result = sut.GetAllPossibleCombinations(new [] { 12 });
+            var result = sut.GetAllPossibleCombinations(new[] {12});
 
             // ASSERT
             result.Should().BeEquivalentTo(
@@ -92,7 +120,7 @@ namespace Day7.Tests
         public void GetAllPossibleCombinations_TwoValuesTest()
         {
             // ACT
-            var result = sut.GetAllPossibleCombinations(new [] { 12, 64 });
+            var result = sut.GetAllPossibleCombinations(new[] {12, 64});
 
             // ASSERT
             result.Should().BeEquivalentTo(
@@ -105,7 +133,7 @@ namespace Day7.Tests
         public void GetAllPossibleCombinations_ThreeValuesTest()
         {
             // ACT
-            var result = sut.GetAllPossibleCombinations(new [] { 1, 2, 3 });
+            var result = sut.GetAllPossibleCombinations(new[] {1, 2, 3});
 
             // ASSERT
             result.Should().BeEquivalentTo(
@@ -151,17 +179,20 @@ namespace Day7.Tests
             ValidateAllPossibleCombinationsAreUnique(result);
         }
 
-        [TestCaseSource(nameof(TryPhaseSettingSequenceWithFeedbackLoopPart2TestCases))]
-        public void TryPhaseSettingSequenceWithFeedbackLoop_Part2_Tests(string inputProgram, int[] inputPhaseSettingSequence, int expectedResultMaxThrusterSignal)
+        [TestCaseSource(nameof(ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoopPart2TestCases))]
+        public void ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop_Part2_Tests(string inputProgram, int[] inputPhaseSettingSequence,
+            int expectedResultMaxThrusterSignal)
         {
+            var intCodeComputer = new IntCodeComputer();
+
             // ACT
-            var result = sut.TryPhaseSettingSequenceWithFeedbackLoop(inputProgram, inputPhaseSettingSequence);
+            var result = intCodeComputer.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, inputPhaseSettingSequence);
 
             // ASSERT
             result.Should().Be(expectedResultMaxThrusterSignal);
         }
 
-        public static IEnumerable<TestCaseData> TryPhaseSettingSequenceWithFeedbackLoopPart2TestCases() => new[]
+        public static IEnumerable<TestCaseData> ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoopPart2TestCases() => new[]
         {
             new TestCaseData(
                 "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5",
