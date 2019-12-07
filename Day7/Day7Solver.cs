@@ -11,7 +11,12 @@ namespace Day7
 
         public override int? SolvePart1(string inputProgram)
         {
-            return base.SolvePart1(inputProgram);
+            var phaseSettings = Enumerable.Range(0, 5).ToArray();
+
+            return GetAllPossibleCombinations(phaseSettings)
+                .Select(phaseSettingSequence => TryPhaseSettingSequence(inputProgram, phaseSettingSequence))
+                .OrderByDescending(finalOutputSignal => finalOutputSignal)
+                .First();
         }
 
         public int[][] GetAllPossibleCombinations(int[] values) =>

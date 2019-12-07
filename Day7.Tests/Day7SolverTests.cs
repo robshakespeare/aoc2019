@@ -17,7 +17,7 @@ namespace Day7.Tests
             var part1Result = sut.SolvePart1();
 
             // ASSERT
-            part1Result.Should().Be(null);
+            part1Result.Should().Be(255590);
         }
 
         [Test]
