@@ -41,12 +41,12 @@ namespace Day7
             {
                 var result = intCodeComputer.ParseAndEvaluate(inputProgram, phaseSetting, signal);
 
-                if (result.FinalOutput == null)
+                if (result.LastOutputValue == null)
                 {
                     throw new InvalidOperationException("Invalid IntCodeComputer result, expected a FinalOutput.");
                 }
 
-                signal = result.FinalOutput.Value;
+                signal = result.LastOutputValue.Value;
             }
 
             return signal;
@@ -60,12 +60,12 @@ namespace Day7
             {
                 var result = intCodeComputer.ParseAndEvaluate(inputProgram, phaseSetting, signal);
 
-                if (result.FinalOutput == null)
+                if (result.LastOutputValue == null)
                 {
                     throw new InvalidOperationException("Invalid IntCodeComputer result, expected a FinalOutput.");
                 }
 
-                signal = result.FinalOutput.Value;
+                signal = result.LastOutputValue.Value;
             }
 
             return signal;

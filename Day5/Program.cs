@@ -22,7 +22,7 @@ namespace Day5
                 input,
                 inputSystemId);
 
-            return result.FinalOutput; // i.e. the Diagnostic Code
+            return result.LastOutputValue; // i.e. the Diagnostic Code
         }
     }
 }

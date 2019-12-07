@@ -22,7 +22,7 @@ namespace Common.IntCodes
 
         public Stack<int> Outputs { get; }
 
-        public int? FinalOutput => Outputs.Any() ? Outputs.Peek() : (int?) null;
+        public int? LastOutputValue => Outputs.Any() ? Outputs.Peek() : (int?) null;
 
         /// <summary>
         /// Gets or sets the int code at the specified index.

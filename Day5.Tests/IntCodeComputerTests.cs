@@ -19,7 +19,7 @@ namespace Day5.Tests
                 testInputSystemId);
 
             // ASSERT
-            result.FinalOutput.Should().Be(testInputSystemId);
+            result.LastOutputValue.Should().Be(testInputSystemId);
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace Day5.Tests
 
             // ASSERT
             result[4].Should().Be(99);
-            result.FinalOutput.Should().BeNull();
+            result.LastOutputValue.Should().BeNull();
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Day5.Tests
 
             // ASSERT
             result[4].Should().Be(99);
-            result.FinalOutput.Should().BeNull();
+            result.LastOutputValue.Should().BeNull();
         }
     }
 }
