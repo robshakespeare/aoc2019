@@ -8,7 +8,7 @@ namespace Common.IntCodes
     {
         private readonly int[] intCodes;
 
-        public IntCodeState(int[] intCodes, params int[]? inputValues)
+        public IntCodeState(int[] intCodes, IEnumerable<int>? inputValues)
         {
             InputValues = new Queue<int>(inputValues ?? Array.Empty<int>());
             this.intCodes = intCodes;
@@ -21,6 +21,8 @@ namespace Common.IntCodes
         public int InstructionPointer { get; set; }
 
         public Stack<int> Outputs { get; }
+
+        public int? FinalOutput => Outputs.Any() ? Outputs.Peek() : (int?) null;
 
         /// <summary>
         /// Gets or sets the int code at the specified index.

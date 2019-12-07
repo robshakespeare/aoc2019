@@ -1,17 +1,40 @@
+using System;
 using Common;
+using Common.IntCodes;
 
 namespace Day7
 {
-    public class Day7Solver : SolverReadAllLines
+    public class Day7Solver : SolverReadAllText
     {
-        public override int? SolvePart1(string[] input)
+        private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
+
+        public override int? SolvePart1(string inputProgram)
         {
-            return base.SolvePart1(input);
+            return base.SolvePart1(inputProgram);
         }
 
-        public override int? SolvePart2(string[] input)
+        public int TryPhaseSettingSequence(string inputProgram, int[] phaseSettingSequence)
         {
-            return base.SolvePart2(input);
+            var signal = 0;
+
+            foreach (var phaseSetting in phaseSettingSequence)
+            {
+                var result = intCodeComputer.ParseAndEvaluate(inputProgram, phaseSetting, signal);
+
+                if (result.FinalOutput == null)
+                {
+                    throw new InvalidOperationException("Invalid IntCodeComputer result, expected a FinalOutput.");
+                }
+
+                signal += result.FinalOutput.Value;
+            }
+
+            return signal;
+        }
+
+        public override int? SolvePart2(string inputProgram)
+        {
+            return base.SolvePart2(inputProgram);
         }
     }
 }

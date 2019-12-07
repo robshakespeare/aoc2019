@@ -19,7 +19,7 @@ namespace Day5.Tests
                 testInputSystemId);
 
             // ASSERT
-            result.diagnosticCode.Should().Be(testInputSystemId);
+            result.FinalOutput.Should().Be(testInputSystemId);
         }
 
         [Test]
@@ -31,8 +31,8 @@ namespace Day5.Tests
                 default);
 
             // ASSERT
-            result.intCodeState[4].Should().Be(99);
-            result.diagnosticCode.Should().BeNull();
+            result[4].Should().Be(99);
+            result.FinalOutput.Should().BeNull();
         }
 
         [Test]
@@ -44,8 +44,8 @@ namespace Day5.Tests
                 default);
 
             // ASSERT
-            result.intCodeState[4].Should().Be(99);
-            result.diagnosticCode.Should().BeNull();
+            result[4].Should().Be(99);
+            result.FinalOutput.Should().BeNull();
         }
     }
 }

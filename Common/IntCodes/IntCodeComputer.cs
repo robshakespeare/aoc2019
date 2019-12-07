@@ -1,19 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
-        public IntCodeState Parse(string inputExpression, params int[]? inputValues) => new IntCodeState(
-            inputExpression.Split(',')
+        public IntCodeState Parse(string inputProgram, IEnumerable<int>? inputValues) => new IntCodeState(
+            inputProgram.Split(',')
                 .Select(int.Parse)
                 .ToArray(),
             inputValues);
 
-        public (IntCodeState intCodeState, int? diagnosticCode) ParseAndEvaluate(string inputExpression, params int[]? inputValues)
+        public IntCodeState ParseAndEvaluate(string inputProgram, params int[]? inputValues)
         {
-            var intCodeState = Parse(inputExpression, inputValues);
+            var intCodeState = Parse(inputProgram, inputValues);
 
             Instruction instruction;
             while ((instruction = intCodeState.ReadNextInstruction()).OpCode != 99)
@@ -23,7 +24,7 @@ namespace Common.IntCodes
                 intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             }
 
-            return (intCodeState, intCodeState.Outputs.Any() ? intCodeState.Outputs.Peek() : (int?)null);
+            return intCodeState;
         }
 
         private static int? EvalInstruction(Instruction instruction) =>
