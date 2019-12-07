@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Common;
 using Common.IntCodes;
 
@@ -12,6 +13,19 @@ namespace Day7
         {
             return base.SolvePart1(inputProgram);
         }
+
+        public int[][] GetAllPossibleCombinations(int[] values) =>
+            values.Length == 1
+                ? new[] {values}
+                : values
+                    .SelectMany((value, index) =>
+                    {
+                        var otherValues = values.Where((_, otherIndex) => otherIndex != index).ToArray();
+                        return GetAllPossibleCombinations(otherValues)
+                            .Select(x => x.Prepend(value))
+                            .Select(x => x.ToArray());
+                    })
+                    .ToArray();
 
         public int TryPhaseSettingSequence(string inputProgram, int[] phaseSettingSequence)
         {

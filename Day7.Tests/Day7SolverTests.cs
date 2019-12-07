@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -53,18 +55,78 @@ namespace Day7.Tests
                 65210)
         };
 
-        /*
-        [Test]
-        public void ExampleTest()
+        private static void ValidateAllPossibleCombinationsAreUnique(IEnumerable<int[]> combinations)
         {
-            const string input = @"";
+            var lines = combinations.Select(x => string.Join(",", x)).ToArray();
+            TestContext.WriteLine(string.Join(Environment.NewLine, lines));
+            lines.Should().OnlyHaveUniqueItems();
+        }
 
+        [Test]
+        public void GetAllPossibleCombinations_SingleValueTest()
+        {
             // ACT
-            var result = sut.SolvePart1(input.ReadAllLines());
+            var result = sut.GetAllPossibleCombinations(new [] { 12 });
 
             // ASSERT
-            result.Should().Be(xyz);
+            result.Should().BeEquivalentTo(
+                new object[]
+                {
+                    new[] {12}
+                });
+            ValidateAllPossibleCombinationsAreUnique(result);
         }
-        */
+
+        [Test]
+        public void GetAllPossibleCombinations_TwoValuesTest()
+        {
+            // ACT
+            var result = sut.GetAllPossibleCombinations(new [] { 12, 64 });
+
+            // ASSERT
+            result.Should().BeEquivalentTo(
+                new[] {12, 64},
+                new[] {64, 12});
+            ValidateAllPossibleCombinationsAreUnique(result);
+        }
+
+        [Test]
+        public void GetAllPossibleCombinations_ThreeValuesTest()
+        {
+            // ACT
+            var result = sut.GetAllPossibleCombinations(new [] { 1, 2, 3 });
+
+            // ASSERT
+            result.Should().BeEquivalentTo(
+                new[] {1, 2, 3},
+                new[] {1, 3, 2},
+                new[] {2, 1, 3},
+                new[] {2, 3, 1},
+                new[] {3, 1, 2},
+                new[] {3, 2, 1});
+            ValidateAllPossibleCombinationsAreUnique(result);
+        }
+
+        [Test]
+        public void GetAllPossibleCombinations_FiveValues_RealWorldTest()
+        {
+            // ACT
+            var result = sut.GetAllPossibleCombinations(Enumerable.Range(0, 5).ToArray());
+
+            // ASSERT
+            result.Length.Should().Be(120); // i.e. 5 factorial
+            ValidateAllPossibleCombinationsAreUnique(result);
+        }
+
+        [Test]
+        public void GetAllPossibleCombinations_SixValuesTest()
+        {
+            // ACT
+            var result = sut.GetAllPossibleCombinations(Enumerable.Range(0, 6).ToArray());
+
+            // ASSERT
+            result.Length.Should().Be(720); // i.e. 6 factorial
+            ValidateAllPossibleCombinationsAreUnique(result);
+        }
     }
 }
