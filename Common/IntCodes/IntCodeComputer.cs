@@ -5,15 +5,15 @@ namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
-        public IntCodeState Parse(string input, int inputSystemId) => new IntCodeState(
-            input.Split(',')
+        public IntCodeState Parse(string inputExpression, params int[]? inputValues) => new IntCodeState(
+            inputExpression.Split(',')
                 .Select(int.Parse)
                 .ToArray(),
-            inputSystemId);
+            inputValues);
 
-        public (IntCodeState intCodeState, int? diagnosticCode) ParseAndEvaluate(string input, int inputSystemId)
+        public (IntCodeState intCodeState, int? diagnosticCode) ParseAndEvaluate(string inputExpression, params int[]? inputValues)
         {
-            var intCodeState = Parse(input, inputSystemId);
+            var intCodeState = Parse(inputExpression, inputValues);
 
             Instruction instruction;
             while ((instruction = intCodeState.ReadNextInstruction()).OpCode != 99)
@@ -31,7 +31,7 @@ namespace Common.IntCodes
                 {
                 1 => EvalMathInstruction(instruction),
                 2 => EvalMathInstruction(instruction),
-                3 => EvalTakeInstruction(instruction),
+                3 => EvalInputInstruction(instruction),
                 4 => EvalOutputInstruction(instruction),
                 5 => EvalJumpInstruction(instruction),
                 6 => EvalJumpInstruction(instruction),
@@ -59,12 +59,12 @@ namespace Common.IntCodes
             return null;
         }
 
-        private static int? EvalTakeInstruction(Instruction instruction)
+        private static int? EvalInputInstruction(Instruction instruction)
         {
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
             var addressIndex = instruction.GetParam(0);
-            instruction.IntCodeState[addressIndex] = instruction.IntCodeState.InputSystemId;
+            instruction.IntCodeState[addressIndex] = instruction.IntCodeState.InputValues.Dequeue();
             return null;
         }
 

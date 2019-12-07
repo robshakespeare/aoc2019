@@ -8,15 +8,15 @@ namespace Common.IntCodes
     {
         private readonly int[] intCodes;
 
-        public IntCodeState(int[] intCodes, int inputSystemId)
+        public IntCodeState(int[] intCodes, params int[]? inputValues)
         {
-            InputSystemId = inputSystemId;
+            InputValues = new Queue<int>(inputValues ?? Array.Empty<int>());
             this.intCodes = intCodes;
             InstructionPointer = 0;
             Outputs = new Stack<int>();
         }
 
-        public int InputSystemId { get; }
+        public Queue<int> InputValues { get; }
 
         public int InstructionPointer { get; set; }
 
