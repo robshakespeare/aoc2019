@@ -6,15 +6,22 @@ namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
-        public IntCodeState Parse(string inputProgram, IEnumerable<int>? inputValues) => new IntCodeState(
+        public IntCodeState Parse(string inputProgram, Func<int> getNextInputValue, Action<int>? onNewOutputValue) => new IntCodeState(
             inputProgram.Split(',')
                 .Select(int.Parse)
                 .ToArray(),
-            inputValues);
+            getNextInputValue,
+            onNewOutputValue);
 
         public IntCodeState ParseAndEvaluate(string inputProgram, params int[]? inputValues)
         {
-            var intCodeState = Parse(inputProgram, inputValues);
+            var inputValuesQueue = new Queue<int>(inputValues ?? Array.Empty<int>());
+            return ParseAndEvaluateWithSignalling(inputProgram, () => inputValuesQueue.Dequeue(), null);
+        }
+
+        public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<int> receiveInputValue, Action<int>? sendOutputValue)
+        {
+            var intCodeState = Parse(inputProgram, receiveInputValue, sendOutputValue);
 
             Instruction instruction;
             while ((instruction = intCodeState.ReadNextInstruction()).OpCode != 99)
@@ -65,7 +72,7 @@ namespace Common.IntCodes
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
             var addressIndex = instruction.GetParam(0);
-            var inputValue = instruction.IntCodeState.InputValues.Dequeue();
+            var inputValue = instruction.IntCodeState.GetNextInputValue();
             instruction.IntCodeState[addressIndex] = inputValue;
             return null;
         }
@@ -75,7 +82,9 @@ namespace Common.IntCodes
             // opCode 4 outputs the value of its only parameter.
             // For example, the instruction 4,50 would output the value at address 50.
             var addressIndex = instruction.GetParam(0);
-            instruction.IntCodeState.Outputs.Push(instruction.IntCodeState[addressIndex]);
+            var outputValue = instruction.IntCodeState[addressIndex];
+            instruction.IntCodeState.Outputs.Push(outputValue);
+            instruction.IntCodeState.OnNewOutputValue?.Invoke(outputValue);
             return null;
         }
 

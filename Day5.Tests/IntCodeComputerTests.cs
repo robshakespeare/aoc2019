@@ -6,7 +6,7 @@ namespace Day5.Tests
 {
     public class IntCodeComputerTests
     {
-        private IntCodeComputer sut = new IntCodeComputer();
+        private readonly IntCodeComputer sut = new IntCodeComputer();
 
         [Test]
         public void ProgramThatOutputsWhateverItGetsAsInputThenHalts()

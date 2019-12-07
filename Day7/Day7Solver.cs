@@ -52,6 +52,16 @@ namespace Day7
             return signal;
         }
 
+        public override int? SolvePart2(string inputProgram)
+        {
+            var phaseSettings = (5..10).ToArray();
+
+            return GetAllPossibleCombinations(phaseSettings)
+                .Select(phaseSettingSequence => TryPhaseSettingSequencePart2(inputProgram, phaseSettingSequence))
+                .OrderByDescending(finalOutputSignal => finalOutputSignal)
+                .First();
+        }
+
         public int TryPhaseSettingSequencePart2(string inputProgram, int[] phaseSettingSequence)
         {
             var signal = 0;
@@ -69,16 +79,6 @@ namespace Day7
             }
 
             return signal;
-        }
-
-        public override int? SolvePart2(string inputProgram)
-        {
-            var phaseSettings = (5..10).ToArray();
-
-            return GetAllPossibleCombinations(phaseSettings)
-                .Select(phaseSettingSequence => TryPhaseSettingSequencePart2(inputProgram, phaseSettingSequence))
-                .OrderByDescending(finalOutputSignal => finalOutputSignal)
-                .First();
         }
     }
 }

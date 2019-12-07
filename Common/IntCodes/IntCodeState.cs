@@ -7,16 +7,20 @@ namespace Common.IntCodes
     public class IntCodeState
     {
         private readonly int[] intCodes;
+        private readonly Func<int> getNextInputValue;
 
-        public IntCodeState(int[] intCodes, IEnumerable<int>? inputValues)
+        public IntCodeState(int[] intCodes, Func<int> getNextInputValue, Action<int>? onNewOutputValue)
         {
-            InputValues = new Queue<int>(inputValues ?? Array.Empty<int>());
+            OnNewOutputValue = onNewOutputValue;
             this.intCodes = intCodes;
+            this.getNextInputValue = getNextInputValue;
             InstructionPointer = 0;
             Outputs = new Stack<int>();
         }
 
-        public Queue<int> InputValues { get; }
+        public int GetNextInputValue() => getNextInputValue();
+
+        public Action<int>? OnNewOutputValue { get; }
 
         public int InstructionPointer { get; set; }
 
