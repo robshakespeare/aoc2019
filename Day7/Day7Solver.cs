@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ namespace Day7
             var phaseSettings = (..5).ToArray();
 
             return GetAllPossibleCombinations(phaseSettings)
-                .Select(phaseSettingSequence => TryPhaseSettingSequence(inputProgram, phaseSettingSequence))
+                .Select(phaseSettingSequence => TryPhaseSettingSequenceWithFeedbackLoop(inputProgram, phaseSettingSequence))
                 .OrderByDescending(finalOutputSignal => finalOutputSignal)
                 .First();
         }

@@ -41,6 +41,16 @@ namespace Day7.Tests
             result.Should().Be(expectedResultMaxThrusterSignal);
         }
 
+        [TestCaseSource(nameof(TryPhaseSettingSequenceTestCases))]
+        public void TryPhaseSettingSequenceWithFeedbackLoop_Part1_Tests(string inputProgram, int[] inputPhaseSettingSequence, int expectedResultMaxThrusterSignal)
+        {
+            // ACT
+            var result = sut.TryPhaseSettingSequenceWithFeedbackLoop(inputProgram, inputPhaseSettingSequence);
+
+            // ASSERT
+            result.Should().Be(expectedResultMaxThrusterSignal);
+        }
+
         public static IEnumerable<TestCaseData> TryPhaseSettingSequenceTestCases() => new[]
         {
             new TestCaseData(
@@ -141,8 +151,8 @@ namespace Day7.Tests
             ValidateAllPossibleCombinationsAreUnique(result);
         }
 
-        [TestCaseSource(nameof(TryPhaseSettingSequenceWithFeedbackLoopTestCases))]
-        public void TryPhaseSettingSequenceWithFeedbackLoop_Tests(string inputProgram, int[] inputPhaseSettingSequence, int expectedResultMaxThrusterSignal)
+        [TestCaseSource(nameof(TryPhaseSettingSequenceWithFeedbackLoopPart2TestCases))]
+        public void TryPhaseSettingSequenceWithFeedbackLoop_Part2_Tests(string inputProgram, int[] inputPhaseSettingSequence, int expectedResultMaxThrusterSignal)
         {
             // ACT
             var result = sut.TryPhaseSettingSequenceWithFeedbackLoop(inputProgram, inputPhaseSettingSequence);
@@ -151,7 +161,7 @@ namespace Day7.Tests
             result.Should().Be(expectedResultMaxThrusterSignal);
         }
 
-        public static IEnumerable<TestCaseData> TryPhaseSettingSequenceWithFeedbackLoopTestCases() => new[]
+        public static IEnumerable<TestCaseData> TryPhaseSettingSequenceWithFeedbackLoopPart2TestCases() => new[]
         {
             new TestCaseData(
                 "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5",
