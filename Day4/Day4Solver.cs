@@ -3,9 +3,9 @@ using Common;
 
 namespace Day4
 {
-    public class Day4Solver : SolverStaticInput<string>
+    public class Day4Solver : Solver<string>
     {
-        public Day4Solver() : base("138241-674034")
+        public Day4Solver() : base(new InputLoaderDelegated<string>(() => "138241-674034"))
         {
         }
 

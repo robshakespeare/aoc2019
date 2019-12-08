@@ -3,27 +3,26 @@ using Common;
 
 namespace Day8
 {
-    public class Day8Solver : SolverReadAllText
+    public class Day8Solver : Solver<Image>
     {
-        private static Image CreateImage(string input)
+        public Day8Solver() : base(new InputLoaderDelegated<Image>(LoadInputImage))
+        {
+        }
+
+        private static Image LoadInputImage()
         {
             const int imageWidth = 25;
             const int imageHeight = 6;
 
-            var image = Image.Parse(input, imageWidth, imageHeight);
-            return image;
+            var input = new InputLoaderReadAllText().LoadInput();
+
+            return Image.Parse(input, imageWidth, imageHeight);
         }
 
-        public override int? SolvePart1(string input)
-        {
-            var image = CreateImage(input);
-            return image.GetCorruptionCheckDigit();
-        }
+        public override int? SolvePart1(Image image) => image.GetCorruptionCheckDigit();
 
-        public override int? SolvePart2(string input)
+        public override int? SolvePart2(Image image)
         {
-            var image = CreateImage(input);
-
             // rs-todo: sort out needing to do this!!
             Console.WriteLine($"Decoded image is:{Environment.NewLine}{image.DecodeAndRenderImage()}");
 

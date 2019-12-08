@@ -7,9 +7,9 @@ namespace Common
     {
         private Lazy<TInput> Input { get; }
 
-        protected Solver()
+        protected Solver(IInputLoader<TInput> inputLoader)
         {
-            Input = new Lazy<TInput>(LoadInput);
+            Input = new Lazy<TInput>(inputLoader.LoadInput);
         }
 
         public void Run()
@@ -47,7 +47,5 @@ namespace Common
             Console.WriteLine("Part 2 not yet implemented");
             return null;
         }
-
-        protected abstract TInput LoadInput();
     }
 }
