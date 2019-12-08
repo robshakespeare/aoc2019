@@ -1,17 +1,17 @@
 #addin "Cake.FileHelpers&version=3.2.1"
 
 var target = Argument<string>("target", "CreateDay");
+var day = Argument<string>("day", "");
 var workingDir = Argument<string>("testResultsDir", "./.cake-working/");
 
 Task("CreateDay")
     .Does(() =>
     {
-        string day = null;
-        while (string.IsNullOrWhiteSpace(day))
+        if (string.IsNullOrWhiteSpace(day))
         {
-            Information($"Enter number of the day to create:");
-            day = System.Console.ReadLine();
-        }        
+            Error($"Usage: dotnet cake --day=X");
+            return;
+        }
 
         Information($"Creating files for day {day}...");
 
