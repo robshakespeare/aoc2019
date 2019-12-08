@@ -1,23 +1,24 @@
-﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using Common;
 
 namespace Day1
 {
-    class Program
+    public class Program : SolverReadAllLines
     {
-        static void Main(string[] args)
-        {
-            var result = File.ReadAllLines("input.txt")
-                .Select(long.Parse)
+        public static void Main() => new Program().Run();
+
+        public override int? SolvePart1(string[] input) =>
+            input.Select(int.Parse)
+                .Select(GetRequiredFuel)
+                .Sum();
+
+        public override int? SolvePart2(string[] input) =>
+            input.Select(int.Parse)
                 .SelectMany(GetRequiredFuelPartsForModule)
                 .Sum();
 
-            Console.WriteLine($"Sum of the fuel requirements: {result}");
-        }
-
-        static IEnumerable<long> GetRequiredFuelPartsForModule(long mass)
+        private static IEnumerable<int> GetRequiredFuelPartsForModule(int mass)
         {
             var fuel = GetRequiredFuel(mass);
 
@@ -32,6 +33,6 @@ namespace Day1
         /// To find the fuel required, take its value, divide by three, round down, and subtract 2.
         /// </summary>
         /// <remarks>Note, no need for round down because long division always just takes the whole number part.</remarks>
-        static long GetRequiredFuel(long value) => value / 3 - 2;
+        private static int GetRequiredFuel(int value) => value / 3 - 2;
     }
 }
