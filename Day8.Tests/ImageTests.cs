@@ -65,10 +65,13 @@ namespace Day8.Tests
             var result = sut.DecodeAndRenderImage();
 
             // ASSERT
-            // rs-todo: NormalizeLineEndings extension method, so can do just straight str comparison, and also remove ReadAllLines method, and update all usages, Regex.Replace(originalString, @"\r\n|\n\r|\n|\r", Environment.NewLine)
             result.ReadAllLines().Should().BeEquivalentTo(
                 " █",
                 "█ ");
+
+            var expectedResult = " █\n█ ".NormalizeLineEndings();
+
+            result.Should().Be(expectedResult);
         }
     }
 }
