@@ -5,13 +5,15 @@ using Common;
 
 namespace Day3
 {
-    public class Solver
+    public class Day3Solver : SolverReadAllLines
     {
         /// <summary>
         /// Solves: what is the least number of combined steps the wires must take to reach an intersection.
         /// </summary>
-        public int Solve(string[] wireInputs)
+        public override int? SolvePart2(string[] wireInputs)
         {
+            Console.WriteLine("Solve Part 2 started");
+
             var wires = ParseWires(wireInputs);
 
             var grid = new Dictionary<Vector, List<(Wire wire, int numberOfSteps)>>();

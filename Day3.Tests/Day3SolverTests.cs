@@ -1,9 +1,8 @@
-using System.IO;
 using NUnit.Framework;
 
 namespace Day3.Tests
 {
-    public class SolverTests
+    public class Day3SolverTests
     {
         [TestCase(
             "R8,U5,L5,D3",
@@ -19,28 +18,26 @@ namespace Day3.Tests
             410)]
         public void Solve_Tests(string wire1, string wire2, int expectedResult)
         {
-            var sut = new Solver();
+            var sut = new Day3Solver();
             var wires = new[] {wire1, wire2};
 
             // ACT
-            var result = sut.Solve(wires);
+            var result = sut.SolvePart2(wires);
 
             // ASSERT
             Assert.AreEqual(expectedResult, result);
         }
 
         [Test]
-        public void ActualTest()
+        public void Part2ReTest()
         {
-            var solver = new Solver();
-
-            var wires = File.ReadAllLines("input.txt");
+            var solver = new Day3Solver();
 
             // ACT
-            var result = solver.Solve(wires);
+            var part2Result = solver.SolvePart2();
 
             // ASSERT
-            Assert.AreEqual(19242, result);
+            Assert.AreEqual(19242, part2Result);
         }
     }
 }
