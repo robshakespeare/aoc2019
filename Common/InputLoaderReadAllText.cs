@@ -6,7 +6,7 @@ namespace Common
     {
         public string LoadInput()
         {
-            using var _ = new TimingBlock("Load input (as text)");
+            using var _ = new TimingBlock("Load input as text");
             return File.ReadAllText("input.txt");
         }
     }

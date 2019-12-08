@@ -3,7 +3,7 @@ using Common;
 
 namespace Day8
 {
-    public class Day8Solver : Solver<Image>
+    public class Day8Solver : Solver<Image, int?, string?>
     {
         public Day8Solver() : base(new InputLoaderDelegated<Image>(LoadInputImage))
         {
@@ -21,12 +21,6 @@ namespace Day8
 
         public override int? SolvePart1(Image image) => image.GetCorruptionCheckDigit();
 
-        public override int? SolvePart2(Image image)
-        {
-            // rs-todo: sort out needing to do this!!
-            Console.WriteLine($"Decoded image is:{Environment.NewLine}{image.DecodeAndRenderImage()}");
-
-            return null;
-        }
+        public override string? SolvePart2(Image image) => $"Decoded image is:{Environment.NewLine}{image.DecodeAndRenderImage()}";
     }
 }

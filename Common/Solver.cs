@@ -1,9 +1,10 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Common
 {
-    public abstract class Solver<TInput>
+    public abstract class Solver<TInput, TOutputPart1, TOutputPart2>
     {
         private Lazy<TInput> Input { get; }
 
@@ -20,11 +21,11 @@ namespace Common
                 Trace.WriteLine("Ensured input was loaded. Input type is " + input?.GetType());
             }
 
-            SolvePartTimed(1, SolvePart1);
-            SolvePartTimed(2, SolvePart2);
+            SolvePartTimed(1, () => SolvePart1() as object);
+            SolvePartTimed(2, () => SolvePart2() as object);
         }
 
-        private static void SolvePartTimed(int partNum, Func<int?> solver)
+        private static void SolvePartTimed(int partNum, Func<object?> solver)
         {
             using var _ = new TimingBlock($"Part {partNum}");
             var result = solver();
@@ -32,20 +33,33 @@ namespace Common
             ColorConsole.WriteLine(result, ConsoleColor.Green);
         }
 
-        public int? SolvePart1() => SolvePart1(Input.Value);
+        public TOutputPart1 SolvePart1() => SolvePart1(Input.Value);
 
-        public int? SolvePart2() => SolvePart2(Input.Value);
+        public TOutputPart2 SolvePart2() => SolvePart2(Input.Value);
 
-        public virtual int? SolvePart1(TInput input)
+        [return: MaybeNull]
+        public virtual TOutputPart1 SolvePart1(TInput input)
         {
             Console.WriteLine("Part 1 not yet implemented");
-            return null;
+#pragma warning disable CS8653 // A default expression introduces a null value for a type parameter. Justification: We always wants solutions to be nullable, to support solve methods that have not yet been implemented
+            return default;
+#pragma warning restore CS8653 // A default expression introduces a null value for a type parameter.
         }
 
-        public virtual int? SolvePart2(TInput input)
+        [return: MaybeNull] 
+        public virtual TOutputPart2 SolvePart2(TInput input)
         {
             Console.WriteLine("Part 2 not yet implemented");
-            return null;
+#pragma warning disable CS8653 // A default expression introduces a null value for a type parameter. Justification: We always wants solutions to be nullable, to support solve methods that have not yet been implemented
+            return default;
+#pragma warning restore CS8653 // A default expression introduces a null value for a type parameter.
+        }
+    }
+
+    public abstract class Solver<TInput> : Solver<TInput, int?, int?>
+    {
+        protected Solver(IInputLoader<TInput> inputLoader) : base(inputLoader)
+        {
         }
     }
 }

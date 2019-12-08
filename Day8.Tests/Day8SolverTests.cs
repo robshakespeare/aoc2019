@@ -1,3 +1,4 @@
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -24,19 +25,15 @@ namespace Day8.Tests
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            // rs-todo: should be the decoded string representation of the image
-            part2Result.Should().Be(null);
+            var expectedResult = @"Decoded image is:
+ ██  ████ █  █ █  █  ██  
+█  █ █    █ █  █  █ █  █ 
+█    ███  ██   █  █ █  █ 
+█    █    █ █  █  █ ████ 
+█  █ █    █ █  █  █ █  █ 
+ ██  ████ █  █  ██  █  █ ".NormalizeLineEndings();
 
-            /*
-             * Should be asserting that it equals:
-Decoded image is:
- ██  ████ █  █ █  █  ██
-█  █ █    █ █  █  █ █  █
-█    ███  ██   █  █ █  █
-█    █    █ █  █  █ ████
-█  █ █    █ █  █  █ █  █
- ██  ████ █  █  ██  █  █
-             */
+            part2Result.Should().Be(expectedResult);
         }
     }
 }
