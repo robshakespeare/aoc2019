@@ -1,3 +1,4 @@
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -39,6 +40,35 @@ namespace Day8.Tests
 
             // ASSERT
             result.Should().Be(3 * 2);
+        }
+
+        [Test]
+        public void DecodeImage_Test()
+        {
+            var sut = Image.Parse("0222112222120000", 2, 2);
+
+            // ACT
+            var result = sut.DecodeImage();
+
+            // ASSERT
+            result.Should().BeEquivalentTo(
+                new[] {0, 1},
+                new[] {1, 0});
+        }
+
+        [Test]
+        public void DecodeAndRenderImage_Test()
+        {
+            var sut = Image.Parse("0222112222120000", 2, 2);
+
+            // ACT
+            var result = sut.DecodeAndRenderImage();
+
+            // ASSERT
+            // rs-todo: NormalizeLineEndings extension method, so can do just straight str comparison, and also remove ReadAllLines method, and update all usages, Regex.Replace(originalString, @"\r\n|\n\r|\n|\r", Environment.NewLine)
+            result.ReadAllLines().Should().BeEquivalentTo(
+                " █",
+                "█ ");
         }
     }
 }

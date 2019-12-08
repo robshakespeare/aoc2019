@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using MoreLinq;
@@ -7,6 +8,10 @@ namespace Day8
 {
     public class Image
     {
+        public const int BlackPixel = 0;
+        public const int WhitePixel = 1;
+        public const int TransparentPixel = 2;
+
         public Layer[] Layers { get; }
         public Size ImageSize { get; }
         public int LayerLength { get; }
@@ -51,5 +56,32 @@ namespace Day8
                 new Size(imageWidth, imageHeight), 
                 layerLength);
         }
+
+        public IEnumerable<IEnumerable<int>> DecodeImage()
+        {
+            var resultBuffer = new int[LayerLength];
+
+            for (var pixelIndex = 0; pixelIndex < LayerLength; pixelIndex++)
+            {
+                var pixel = GetFirstNonTransparentPixelLayer(pixelIndex);
+                resultBuffer[pixelIndex] = pixel;
+            }
+
+            return resultBuffer.Batch(ImageSize.Width);
+        }
+
+        public string DecodeAndRenderImage() =>
+            string.Join(
+                Environment.NewLine,
+                DecodeImage()
+                    .Select(line => line.Select(pixel => pixel == WhitePixel ? '█' : ' '))
+                    .Select(line => string.Join("", line)));
+
+        public IEnumerable<int> GetPixelLayers(int pixelIndex) => Layers.Select(layer => layer.Pixels[pixelIndex]);
+
+        public int GetFirstNonTransparentPixelLayer(int pixelIndex) =>
+            GetPixelLayers(pixelIndex)
+                .SkipWhile(pixel => pixel == TransparentPixel)
+                .First();
     }
 }

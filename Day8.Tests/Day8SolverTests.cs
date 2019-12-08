@@ -24,7 +24,19 @@ namespace Day8.Tests
             var part2Result = sut.SolvePart2();
 
             // ASSERT
+            // rs-todo: should be the decoded string representation of the image
             part2Result.Should().Be(null);
+
+            /*
+             * Should be asserting that it equals:
+Decoded image is:
+ ██  ████ █  █ █  █  ██
+█  █ █    █ █  █  █ █  █
+█    ███  ██   █  █ █  █
+█    █    █ █  █  █ ████
+█  █ █    █ █  █  █ █  █
+ ██  ████ █  █  ██  █  █
+             */
         }
     }
 }
