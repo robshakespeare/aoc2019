@@ -31,6 +31,7 @@ namespace Common.IntCodes
             return IntCodeState[absoluteParamIndex];
         }
 
+        // rs-todo: need better names, so obvious which is for write index, and which is for reading, ooo, even better, have write and read methods!!
         /// <summary>
         /// Gets the parameter at the specified zero-based index, relative to this instruction, applying parameter modes to retrieve the actual value.
         /// Updates the `NewInstructionPointer` to include the number of parameters that have been read.

@@ -16,7 +16,7 @@ namespace Common.IntCodes
             this.getNextInputValue = getNextInputValue;
             InstructionPointer = 0;
             RelativeBase = 0;
-            Outputs = new Stack<long>();
+            Outputs = new List<long>();
 
             foreach (var code in intCodes.Select((code, index) => (code, index)))
             {
@@ -32,9 +32,9 @@ namespace Common.IntCodes
 
         public long RelativeBase { get; set; }
 
-        public Stack<long> Outputs { get; }
+        public List<long> Outputs { get; }
 
-        public long? LastOutputValue => Outputs.Any() ? Outputs.Peek() : (long?) null;
+        public long? LastOutputValue => Outputs.Any() ? Outputs.Last() : (long?) null;
 
         /// <summary>
         /// Gets or sets the int code at the specified index.

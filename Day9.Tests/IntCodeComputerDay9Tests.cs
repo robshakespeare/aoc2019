@@ -17,16 +17,17 @@ namespace Day9.Tests
         [Test]
         public void TakesNoInputAndProducesACopyOfItselfAsOutput()
         {
-            // rs-todo: fix!!
+            const string inputProgram = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99";
 
             // ACT
-            var result = sut.ParseAndEvaluate(
-                "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99");
+            var result = sut.ParseAndEvaluate(inputProgram);
 
             LogOutputs(result);
 
             // ASSERT
-            result.LastOutputValue.Should().Be(12);
+            var outputs = string.Join(",", result.Outputs);
+
+            outputs.Should().Be(inputProgram);
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace Day9.Tests
             LogOutputs(result);
 
             // ASSERT
-            result.LastOutputValue.Should().Be(0L);
+            result.LastOutputValue.Should().Be(1125899906842624L);
         }
     }
 }
