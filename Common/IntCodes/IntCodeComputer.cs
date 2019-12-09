@@ -53,10 +53,8 @@ namespace Common.IntCodes
 
         private static long? EvalMathInstruction(Instruction instruction)
         {
-            var param1 = instruction.GetParamUsingMode(0);
-            var param2 = instruction.GetParamUsingMode(1);
-
-            ////var storageIndex = instruction.GetParam(2);
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            var param2 = instruction.GetIntCodeReferencedByParameter(1);
 
             var result = instruction.OpCode switch
                 {
@@ -65,7 +63,7 @@ namespace Common.IntCodes
                 _ => throw new InvalidOperationException("Invalid Math opCode: " + instruction.OpCode)
                 };
 
-            instruction.SetParameterValue(2, result); // rs-todo: this needs doing better!!
+            instruction.SetIntCodeReferencedByParameter(2, result);
             return null;
         }
 
@@ -75,9 +73,7 @@ namespace Common.IntCodes
             // For example, the instruction 3,50 would take an input value and store it at address 50.
             var inputValue = instruction.IntCodeState.GetNextInputValue();
 
-            ////var storageIndex = instruction.GetParam(0);
-            ////instruction.IntCodeState[storageIndex] = inputValue;
-            instruction.SetParameterValue(0, inputValue); // rs-todo: this needs doing better!!
+            instruction.SetIntCodeReferencedByParameter(0, inputValue);
             return null;
         }
 
@@ -85,7 +81,7 @@ namespace Common.IntCodes
         {
             // opCode 4 outputs the value of its only parameter.
             // For example, the instruction 4,50 would output the value at address 50.
-            var outputValue = instruction.GetParamUsingMode(0);
+            var outputValue = instruction.GetIntCodeReferencedByParameter(0);
             instruction.IntCodeState.Outputs.Add(outputValue);
             instruction.IntCodeState.OnNewOutputValue?.Invoke(outputValue);
             return null;
@@ -99,8 +95,8 @@ namespace Common.IntCodes
             // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to
             // the value from the second parameter. Otherwise, it does nothing.
 
-            var param1 = instruction.GetParamUsingMode(0);
-            var param2 = instruction.GetParamUsingMode(1);
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            var param2 = instruction.GetIntCodeReferencedByParameter(1);
 
             switch (instruction.OpCode)
             {
@@ -121,10 +117,8 @@ namespace Common.IntCodes
             // Opcode 8 is equals: if the first parameter is equal to the second parameter,
             // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
 
-            var param1 = instruction.GetParamUsingMode(0);
-            var param2 = instruction.GetParamUsingMode(1);
-
-            ////var storageIndex = instruction.GetParam(2);
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            var param2 = instruction.GetIntCodeReferencedByParameter(1);
 
             var result = instruction.OpCode switch
                 {
@@ -133,14 +127,13 @@ namespace Common.IntCodes
                 _ => 0
                 };
 
-            ////instruction.IntCodeState[storageIndex] = result;
-            instruction.SetParameterValue(2, result); // rs-todo: this needs doing better!!
+            instruction.SetIntCodeReferencedByParameter(2, result);
             return null;
         }
 
         private static long? EvalUpdateRelativeBaseOffset(Instruction instruction)
         {
-            var param1 = instruction.GetParamUsingMode(0);
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
             instruction.IntCodeState.RelativeBase += param1;
             return null;
         }

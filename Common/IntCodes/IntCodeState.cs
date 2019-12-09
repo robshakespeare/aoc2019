@@ -43,7 +43,7 @@ namespace Common.IntCodes
         /// Rather than initialise a stupidly big amount of memory, the codes memory is initialized to the size of the provided intCodes
         /// And any accessing of memory above that range is dynamically added, via the setter, or dynamically added and then retrieved, by the getter.
         /// </remarks>
-        public long this[long index] // rs-todo: [long index, IndexingMode indexingMode]
+        public long this[long index]
         {
             get
             {
