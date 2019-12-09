@@ -56,7 +56,7 @@ namespace Common
         }
     }
 
-    public abstract class Solver<TInput> : Solver<TInput, int?, int?>
+    public abstract class Solver<TInput> : Solver<TInput, long?, long?>
     {
         protected Solver(IInputLoader<TInput> inputLoader) : base(inputLoader)
         {

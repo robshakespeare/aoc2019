@@ -7,10 +7,10 @@ namespace Common.IntCodes
         private readonly ParameterMode[] parameterModes;
 
         public IntCodeState IntCodeState { get; }
-        public int OpCode { get; }
-        public int CurrentInstructionPointer { get; }
+        public long OpCode { get; }
+        public long CurrentInstructionPointer { get; }
 
-        public Instruction(int opCode, IntCodeState intCodeState, ParameterMode[] parameterModes, int instructionPointer)
+        public Instruction(long opCode, IntCodeState intCodeState, ParameterMode[] parameterModes, long instructionPointer)
         {
             OpCode = opCode;
             IntCodeState = intCodeState;
@@ -18,13 +18,13 @@ namespace Common.IntCodes
             CurrentInstructionPointer = instructionPointer;
         }
 
-        public int NewInstructionPointer { get; private set; }
+        public long NewInstructionPointer { get; private set; }
 
         /// <summary>
         /// Gets the parameter at the specified zero-based index, relative to this instruction.
         /// Updates the `NewInstructionPointer` to include the number of parameters that have been read.
         /// </summary>
-        public int GetParam(int paramIndex)
+        public long GetParam(int paramIndex)
         {
             var absoluteParamIndex = CurrentInstructionPointer + 1 + paramIndex; // Note: +1 for reading the opCode
             NewInstructionPointer = Math.Max(NewInstructionPointer, absoluteParamIndex + 1); // Note: +1 to send to next unprocessed instruction
@@ -35,7 +35,7 @@ namespace Common.IntCodes
         /// Gets the parameter at the specified zero-based index, relative to this instruction, applying parameter modes to retrieve the actual value.
         /// Updates the `NewInstructionPointer` to include the number of parameters that have been read.
         /// </summary>
-        public int GetParamUsingMode(int paramIndex)
+        public long GetParamUsingMode(int paramIndex)
         {
             var rawValue = GetParam(paramIndex);
 

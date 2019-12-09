@@ -10,11 +10,11 @@ namespace Day5
 
         public static void Main() => new Program().Run();
 
-        public override int? SolvePart1(string input) => Solve(input, AirConditionerUnitId);
+        public override long? SolvePart1(string input) => Solve(input, AirConditionerUnitId);
 
-        public override int? SolvePart2(string input) => Solve(input, ThermalRadiatorControllerId);
+        public override long? SolvePart2(string input) => Solve(input, ThermalRadiatorControllerId);
 
-        public static int? Solve(string input, int inputSystemId)
+        public static long? Solve(string input, int inputSystemId)
         {
             var intCodeComputer = new IntCodeComputer();
 

@@ -36,10 +36,10 @@ namespace Day7.Tests
         /// First version of the TryPhaseSettingSequence method, before the full implementation of the feedback loop logic!
         /// Just kept here, just in case its needed again!
         /// </remarks>
-        private static int TryPhaseSettingSequenceV1(string inputProgram, IEnumerable<int> phaseSettingSequence)
+        private static long TryPhaseSettingSequenceV1(string inputProgram, IEnumerable<int> phaseSettingSequence)
         {
             var intCodeComputer = new IntCodeComputer();
-            var signal = 0;
+            var signal = 0L;
 
             foreach (var phaseSetting in phaseSettingSequence)
             {

@@ -6,32 +6,32 @@ namespace Common.IntCodes
 {
     public class IntCodeState
     {
-        private readonly int[] intCodes;
-        private readonly Func<int> getNextInputValue;
+        private readonly long[] intCodes;
+        private readonly Func<long> getNextInputValue;
 
-        public IntCodeState(int[] intCodes, Func<int> getNextInputValue, Action<int>? onNewOutputValue)
+        public IntCodeState(long[] intCodes, Func<long> getNextInputValue, Action<long>? onNewOutputValue)
         {
             OnNewOutputValue = onNewOutputValue;
             this.intCodes = intCodes;
             this.getNextInputValue = getNextInputValue;
             InstructionPointer = 0;
-            Outputs = new Stack<int>();
+            Outputs = new Stack<long>();
         }
 
-        public int GetNextInputValue() => getNextInputValue();
+        public long GetNextInputValue() => getNextInputValue();
 
-        public Action<int>? OnNewOutputValue { get; }
+        public Action<long>? OnNewOutputValue { get; }
 
-        public int InstructionPointer { get; set; }
+        public long InstructionPointer { get; set; }
 
-        public Stack<int> Outputs { get; }
+        public Stack<long> Outputs { get; }
 
-        public int? LastOutputValue => Outputs.Any() ? Outputs.Peek() : (int?) null;
+        public long? LastOutputValue => Outputs.Any() ? Outputs.Peek() : (long?) null;
 
         /// <summary>
         /// Gets or sets the int code at the specified index.
         /// </summary>
-        public int this[int index]
+        public long this[long index]
         {
             get => intCodes[index];
             set => intCodes[index] = value;

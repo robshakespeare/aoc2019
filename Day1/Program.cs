@@ -8,12 +8,12 @@ namespace Day1
     {
         public static void Main() => new Program().Run();
 
-        public override int? SolvePart1(string[] input) =>
+        public override long? SolvePart1(string[] input) =>
             input.Select(int.Parse)
                 .Select(GetRequiredFuel)
                 .Sum();
 
-        public override int? SolvePart2(string[] input) =>
+        public override long? SolvePart2(string[] input) =>
             input.Select(int.Parse)
                 .SelectMany(GetRequiredFuelPartsForModule)
                 .Sum();

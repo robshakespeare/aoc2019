@@ -10,7 +10,7 @@ namespace Day3
         /// <summary>
         /// Solves: what is the least number of combined steps the wires must take to reach an intersection.
         /// </summary>
-        public override int? SolvePart2(string[] wireInputs)
+        public override long? SolvePart2(string[] wireInputs)
         {
             Console.WriteLine("Solve Part 2 started");
 
