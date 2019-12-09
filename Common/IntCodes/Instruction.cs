@@ -55,6 +55,12 @@ namespace Common.IntCodes
                 };
         }
 
+        // GetIntCodeReferencedByParameter(int paramIndex)
+        // SetIntCodeReferencedByParameter(int paramIndex, long intCodeValue)
+        // 
+        // StoreValueAtAddressReferencedByParameterValue
+        // WriteValueToAddressReferencedByParameterValue
+        // WriteToAddressReferencedByParameterValue
         public void SetParameterValue(int paramIndex, long value) // rs-todo: hmm, should these not go in IntCodeState, so can never set a value without using paramModes?? At the mo, IntCodeState[this] setter allows bypass of paramMode!!
         {
             var rawValue = GetParamRaw(paramIndex);

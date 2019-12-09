@@ -6,7 +6,7 @@ namespace Common.IntCodes
 {
     public class IntCodeState
     {
-        private readonly SortedList<long,long> intCodes; // The Key is the INDEX of the code, and Value is the actual code.
+        private readonly SortedList<long, long> intCodes; // The Key is the INDEX of the code, and Value is the actual code.
         private readonly Func<long> getNextInputValue;
 
         public IntCodeState(long[] intCodes, Func<long> getNextInputValue, Action<long>? onNewOutputValue)
@@ -43,7 +43,7 @@ namespace Common.IntCodes
         /// Rather than initialise a stupidly big amount of memory, the codes memory is initialized to the size of the provided intCodes
         /// And any accessing of memory above that range is dynamically added, via the setter, or dynamically added and then retrieved, by the getter.
         /// </remarks>
-        public long this[long index]
+        public long this[long index] // rs-todo: [long index, IndexingMode indexingMode]
         {
             get
             {
