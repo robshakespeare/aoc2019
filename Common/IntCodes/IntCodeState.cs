@@ -76,13 +76,16 @@ namespace Common.IntCodes
             var parameterModes = fullOpCode.ToString()
                 .Reverse()
                 .Skip(2)
-                .Select(chr => chr switch // rs-todo: just cast the enum, and then validate its in range!
+                .Select(chr =>
+                {
+                    if (Enum.TryParse<ParameterMode>(chr.ToString(), out var mode) &&
+                        Enum.IsDefined(typeof(ParameterMode), mode))
                     {
-                    '0' => ParameterMode.Positional,
-                    '1' => ParameterMode.Immediate,
-                    '2' => ParameterMode.Relative,
-                    _ => throw new InvalidOperationException("Invalid parameterMode: " + chr)
-                    })
+                        return mode;
+                    }
+
+                    throw new InvalidOperationException("Invalid parameterMode: " + chr);
+                })
                 .ToArray();
 
             return new Instruction(opCode, this, parameterModes, InstructionPointer);
