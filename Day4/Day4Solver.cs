@@ -9,7 +9,7 @@ namespace Day4
         {
         }
 
-        public override int? SolvePart2(string input) => HowManyDifferentPasswordsWithinRange(input);
+        public override long? SolvePart2(string input) => HowManyDifferentPasswordsWithinRange(input);
 
         public int HowManyDifferentPasswordsWithinRange(string range)
         {

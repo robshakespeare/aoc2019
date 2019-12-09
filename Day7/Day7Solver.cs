@@ -9,19 +9,19 @@ namespace Day7
     {
         private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
 
-        public override int? SolvePart1(string inputProgram)
+        public override long? SolvePart1(string inputProgram)
         {
             var phaseSettings = (..5).ToArray();
             return Solve(inputProgram, phaseSettings);
         }
 
-        public override int? SolvePart2(string inputProgram)
+        public override long? SolvePart2(string inputProgram)
         {
             var phaseSettings = (5..10).ToArray();
             return Solve(inputProgram, phaseSettings);
         }
 
-        private int Solve(string inputProgram, int[] phaseSettings) =>
+        private long Solve(string inputProgram, int[] phaseSettings) =>
             GetAllPossibleCombinations(phaseSettings)
                 .Select(phaseSettingSequence => intCodeComputer.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, phaseSettingSequence))
                 .OrderByDescending(finalOutputSignal => finalOutputSignal)

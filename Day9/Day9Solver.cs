@@ -1,17 +1,27 @@
+using System;
 using Common;
+using Common.IntCodes;
 
 namespace Day9
 {
-    public class Day9Solver : SolverReadAllLines
+    public class Day9Solver : SolverReadAllText
     {
-        public override int? SolvePart1(string[] input)
-        {
-            return base.SolvePart1(input);
-        }
+        private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
 
-        public override int? SolvePart2(string[] input)
+        public override long? SolvePart1(string inputProgram) => Solve(inputProgram, 1);
+
+        public override long? SolvePart2(string inputProgram) => Solve(inputProgram, 2);
+
+        private long? Solve(string inputProgram, long inputValue)
         {
-            return base.SolvePart2(input);
+            var result = intCodeComputer.ParseAndEvaluate(inputProgram, inputValue);
+
+            if (result.Outputs.Count != 1)
+            {
+                throw new InvalidOperationException("Expected only one output, but instead got: " + string.Join(",", result.Outputs));
+            }
+
+            return result.LastOutputValue;
         }
     }
 }

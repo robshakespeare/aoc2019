@@ -8,20 +8,20 @@ namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
-        public IntCodeState Parse(string inputProgram, Func<int> getNextInputValue, Action<int>? onNewOutputValue) => new IntCodeState(
+        public IntCodeState Parse(string inputProgram, Func<long> getNextInputValue, Action<long>? onNewOutputValue) => new IntCodeState(
             inputProgram.Split(',')
-                .Select(int.Parse)
+                .Select(long.Parse)
                 .ToArray(),
             getNextInputValue,
             onNewOutputValue);
 
-        public IntCodeState ParseAndEvaluate(string inputProgram, params int[]? inputValues)
+        public IntCodeState ParseAndEvaluate(string inputProgram, params long[]? inputValues)
         {
-            var inputValuesQueue = new Queue<int>(inputValues ?? Array.Empty<int>());
+            var inputValuesQueue = new Queue<long>(inputValues ?? Array.Empty<long>());
             return ParseAndEvaluateWithSignalling(inputProgram, () => inputValuesQueue.Dequeue(), null);
         }
 
-        public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<int> receiveInputValue, Action<int>? sendOutputValue)
+        public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<long> receiveInputValue, Action<long>? sendOutputValue)
         {
             var intCodeState = Parse(inputProgram, receiveInputValue, sendOutputValue);
 
@@ -36,7 +36,7 @@ namespace Common.IntCodes
             return intCodeState;
         }
 
-        private static int? EvalInstruction(Instruction instruction) =>
+        private static long? EvalInstruction(Instruction instruction) =>
             instruction.OpCode switch
                 {
                 1 => EvalMathInstruction(instruction),
@@ -47,16 +47,14 @@ namespace Common.IntCodes
                 6 => EvalJumpInstruction(instruction),
                 7 => EvalRelationalInstruction(instruction),
                 8 => EvalRelationalInstruction(instruction),
+                9 => EvalUpdateRelativeBaseOffset(instruction),
                 _ => throw new InvalidOperationException("Invalid opCode: " + instruction.OpCode)
                 };
 
-        private static int? EvalMathInstruction(Instruction instruction)
+        private static long? EvalMathInstruction(Instruction instruction)
         {
-            var param1 = instruction.GetParamUsingMode(0);
-            var param2 = instruction.GetParamUsingMode(1);
-            var param3 = instruction.GetParam(2);
-
-            var storageIndex = param3;
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            var param2 = instruction.GetIntCodeReferencedByParameter(1);
 
             var result = instruction.OpCode switch
                 {
@@ -65,32 +63,31 @@ namespace Common.IntCodes
                 _ => throw new InvalidOperationException("Invalid Math opCode: " + instruction.OpCode)
                 };
 
-            instruction.IntCodeState[storageIndex] = result;
+            instruction.SetIntCodeReferencedByParameter(2, result);
             return null;
         }
 
-        private static int? EvalInputInstruction(Instruction instruction)
+        private static long? EvalInputInstruction(Instruction instruction)
         {
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
-            var addressIndex = instruction.GetParam(0);
             var inputValue = instruction.IntCodeState.GetNextInputValue();
-            instruction.IntCodeState[addressIndex] = inputValue;
+
+            instruction.SetIntCodeReferencedByParameter(0, inputValue);
             return null;
         }
 
-        private static int? EvalOutputInstruction(Instruction instruction)
+        private static long? EvalOutputInstruction(Instruction instruction)
         {
             // opCode 4 outputs the value of its only parameter.
             // For example, the instruction 4,50 would output the value at address 50.
-            var addressIndex = instruction.GetParam(0);
-            var outputValue = instruction.IntCodeState[addressIndex];
-            instruction.IntCodeState.Outputs.Push(outputValue);
+            var outputValue = instruction.GetIntCodeReferencedByParameter(0);
+            instruction.IntCodeState.Outputs.Add(outputValue);
             instruction.IntCodeState.OnNewOutputValue?.Invoke(outputValue);
             return null;
         }
 
-        private static int? EvalJumpInstruction(Instruction instruction)
+        private static long? EvalJumpInstruction(Instruction instruction)
         {
             // Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to
             // the value from the second parameter. Otherwise, it does nothing.
@@ -98,8 +95,8 @@ namespace Common.IntCodes
             // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to
             // the value from the second parameter. Otherwise, it does nothing.
 
-            var param1 = instruction.GetParamUsingMode(0);
-            var param2 = instruction.GetParamUsingMode(1);
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            var param2 = instruction.GetIntCodeReferencedByParameter(1);
 
             switch (instruction.OpCode)
             {
@@ -112,7 +109,7 @@ namespace Common.IntCodes
             }
         }
 
-        private static int? EvalRelationalInstruction(Instruction instruction)
+        private static long? EvalRelationalInstruction(Instruction instruction)
         {
             // Opcode 7 is less than: if the first parameter is less than the second parameter,
             // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
@@ -120,11 +117,8 @@ namespace Common.IntCodes
             // Opcode 8 is equals: if the first parameter is equal to the second parameter,
             // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
 
-            var param1 = instruction.GetParamUsingMode(0);
-            var param2 = instruction.GetParamUsingMode(1);
-            var param3 = instruction.GetParam(2);
-
-            var storageIndex = param3;
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            var param2 = instruction.GetIntCodeReferencedByParameter(1);
 
             var result = instruction.OpCode switch
                 {
@@ -133,20 +127,27 @@ namespace Common.IntCodes
                 _ => 0
                 };
 
-            instruction.IntCodeState[storageIndex] = result;
+            instruction.SetIntCodeReferencedByParameter(2, result);
+            return null;
+        }
+
+        private static long? EvalUpdateRelativeBaseOffset(Instruction instruction)
+        {
+            var param1 = instruction.GetIntCodeReferencedByParameter(0);
+            instruction.IntCodeState.RelativeBase += param1;
             return null;
         }
 
         #region Signalling, PhaseSettingSequences and FeedbackLoops
 
-        public int ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(string inputProgram, int[] phaseSettingSequence)
+        public long ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(string inputProgram, int[] phaseSettingSequence)
         {
             var deviceSignalConnectors = phaseSettingSequence.Select(phaseSetting => new PhaseSignalConnector(phaseSetting))
                 .ToArray();
 
             deviceSignalConnectors.First().SetNextValue(0); // Seed input signal of the first device
 
-            var finalResults = new int[phaseSettingSequence.Length];
+            var finalResults = new long[phaseSettingSequence.Length];
 
             Parallel.ForEach(
                 deviceSignalConnectors.Select((connector, index) => (connector, index)),
@@ -172,15 +173,15 @@ namespace Common.IntCodes
         {
             private readonly AutoResetEvent waitHandle = new AutoResetEvent(false);
 
-            private int nextValue;
+            private long nextValue;
 
-            public virtual int ReceiveNextValue()
+            public virtual long ReceiveNextValue()
             {
                 waitHandle.WaitOne();
                 return nextValue;
             }
 
-            public void SetNextValue(int value)
+            public void SetNextValue(long value)
             {
                 nextValue = value;
                 waitHandle.Set();
@@ -197,7 +198,7 @@ namespace Common.IntCodes
                 this.phaseSetting = phaseSetting;
             }
 
-            public override int ReceiveNextValue()
+            public override long ReceiveNextValue()
             {
                 if (phaseSettingUsed)
                 {

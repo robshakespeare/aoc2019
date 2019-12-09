@@ -4,7 +4,7 @@ using Common.IntCodes;
 
 namespace Day5.Tests
 {
-    public class IntCodeComputerTests
+    public class IntCodeComputerDay5Tests
     {
         private readonly IntCodeComputer sut = new IntCodeComputer();
 

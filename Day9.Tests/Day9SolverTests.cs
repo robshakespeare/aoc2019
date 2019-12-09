@@ -14,7 +14,7 @@ namespace Day9.Tests
             var part1Result = sut.SolvePart1();
 
             // ASSERT
-            part1Result.Should().Be(null);
+            part1Result.Should().Be(3518157894);
         }
 
         [Test]
@@ -24,21 +24,7 @@ namespace Day9.Tests
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part2Result.Should().Be(null);
+            part2Result.Should().Be(80379);
         }
-
-        /*
-        [Test]
-        public void ExampleTest()
-        {
-            const string input = @"";
-
-            // ACT
-            var result = sut.SolvePart1(input.ReadAllLines());
-
-            // ASSERT
-            result.Should().Be(xyz);
-        }
-        */
     }
 }
