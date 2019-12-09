@@ -6,16 +6,22 @@ namespace Common.IntCodes
 {
     public class IntCodeState
     {
-        private readonly long[] intCodes;
+        private readonly SortedList<long,long> intCodes; // The Key is the INDEX of the code, and Value is the actual code.
         private readonly Func<long> getNextInputValue;
 
         public IntCodeState(long[] intCodes, Func<long> getNextInputValue, Action<long>? onNewOutputValue)
         {
             OnNewOutputValue = onNewOutputValue;
-            this.intCodes = intCodes;
+            this.intCodes = new SortedList<long, long>();
             this.getNextInputValue = getNextInputValue;
             InstructionPointer = 0;
+            RelativeBase = 0;
             Outputs = new Stack<long>();
+
+            foreach (var code in intCodes.Select((code, index) => (code, index)))
+            {
+                this.intCodes.Add(code.index, code.code);
+            }
         }
 
         public long GetNextInputValue() => getNextInputValue();
@@ -24,6 +30,8 @@ namespace Common.IntCodes
 
         public long InstructionPointer { get; set; }
 
+        public long RelativeBase { get; set; }
+
         public Stack<long> Outputs { get; }
 
         public long? LastOutputValue => Outputs.Any() ? Outputs.Peek() : (long?) null;
@@ -31,9 +39,26 @@ namespace Common.IntCodes
         /// <summary>
         /// Gets or sets the int code at the specified index.
         /// </summary>
+        /// <remarks>
+        /// Rather than initialise a stupidly big amount of memory, the codes memory is initialized to the size of the provided intCodes
+        /// And any accessing of memory above that range is dynamically added, via the setter, or dynamically added and then retrieved, by the getter.
+        /// </remarks>
         public long this[long index]
         {
-            get => intCodes[index];
+            get
+            {
+                if (index < 0)
+                {
+                    throw new InvalidOperationException("It is invalid to try to access memory at a negative address");
+                }
+
+                if (intCodes.TryGetValue(index, out var value))
+                {
+                    return value;
+                }
+
+                return intCodes[index] = 0;
+            }
             set => intCodes[index] = value;
         }
 
@@ -43,7 +68,7 @@ namespace Common.IntCodes
         /// <returns></returns>
         public Instruction ReadNextInstruction()
         {
-            var fullOpCode = intCodes[InstructionPointer];
+            var fullOpCode = this[InstructionPointer];
             fullOpCode = Math.Abs(fullOpCode); // Ignore negative numbers
 
             var opCode = fullOpCode % 100; // Get just the tens and units
@@ -51,7 +76,13 @@ namespace Common.IntCodes
             var parameterModes = fullOpCode.ToString()
                 .Reverse()
                 .Skip(2)
-                .Select(chr => chr == '1' ? ParameterMode.Immediate : ParameterMode.Positional)
+                .Select(chr => chr switch // rs-todo: just cast the enum, and then validate its in range!
+                    {
+                    '0' => ParameterMode.Positional,
+                    '1' => ParameterMode.Immediate,
+                    '2' => ParameterMode.Relative,
+                    _ => throw new InvalidOperationException("Invalid parameterMode: " + chr)
+                    })
                 .ToArray();
 
             return new Instruction(opCode, this, parameterModes, InstructionPointer);

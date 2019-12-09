@@ -47,6 +47,7 @@ namespace Common.IntCodes
                 6 => EvalJumpInstruction(instruction),
                 7 => EvalRelationalInstruction(instruction),
                 8 => EvalRelationalInstruction(instruction),
+                9 => EvalUpdateRelativeBaseOffset(instruction),
                 _ => throw new InvalidOperationException("Invalid opCode: " + instruction.OpCode)
                 };
 
@@ -74,6 +75,7 @@ namespace Common.IntCodes
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
             var addressIndex = instruction.GetParam(0);
+            //var addressIndex = instruction.GetParamUsingMode(0); // rs-todo: hmmm
             var inputValue = instruction.IntCodeState.GetNextInputValue();
             instruction.IntCodeState[addressIndex] = inputValue;
             return null;
@@ -84,6 +86,7 @@ namespace Common.IntCodes
             // opCode 4 outputs the value of its only parameter.
             // For example, the instruction 4,50 would output the value at address 50.
             var addressIndex = instruction.GetParam(0);
+            //var addressIndex = instruction.GetParamUsingMode(0); // rs-todo: hmmm
             var outputValue = instruction.IntCodeState[addressIndex];
             instruction.IntCodeState.Outputs.Push(outputValue);
             instruction.IntCodeState.OnNewOutputValue?.Invoke(outputValue);
@@ -134,6 +137,13 @@ namespace Common.IntCodes
                 };
 
             instruction.IntCodeState[storageIndex] = result;
+            return null;
+        }
+
+        private static long? EvalUpdateRelativeBaseOffset(Instruction instruction)
+        {
+            var param1 = instruction.GetParamUsingMode(0);
+            instruction.IntCodeState.RelativeBase += param1;
             return null;
         }
 

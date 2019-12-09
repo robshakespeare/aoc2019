@@ -49,6 +49,7 @@ namespace Common.IntCodes
                 {
                 ParameterMode.Immediate => rawValue,
                 ParameterMode.Positional => IntCodeState[rawValue],
+                ParameterMode.Relative => IntCodeState[IntCodeState.RelativeBase + rawValue],
                 _ => throw new InvalidOperationException("Invalid ParameterMode: " + new { parameterMode, CurrentInstructionPointer, paramIndex })
                 };
         }
