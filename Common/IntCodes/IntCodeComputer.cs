@@ -55,9 +55,8 @@ namespace Common.IntCodes
         {
             var param1 = instruction.GetParamUsingMode(0);
             var param2 = instruction.GetParamUsingMode(1);
-            var param3 = instruction.GetParam(2);
 
-            var storageIndex = param3;
+            ////var storageIndex = instruction.GetParam(2);
 
             var result = instruction.OpCode switch
                 {
@@ -66,7 +65,7 @@ namespace Common.IntCodes
                 _ => throw new InvalidOperationException("Invalid Math opCode: " + instruction.OpCode)
                 };
 
-            instruction.IntCodeState[storageIndex] = result;
+            instruction.SetParameterValue(2, result); // rs-todo: this needs doing better!!
             return null;
         }
 
@@ -74,9 +73,11 @@ namespace Common.IntCodes
         {
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
-            var addressIndex = instruction.GetParam(0);
             var inputValue = instruction.IntCodeState.GetNextInputValue();
-            instruction.IntCodeState[addressIndex] = inputValue;
+
+            ////var storageIndex = instruction.GetParam(0);
+            ////instruction.IntCodeState[storageIndex] = inputValue;
+            instruction.SetParameterValue(0, inputValue); // rs-todo: this needs doing better!!
             return null;
         }
 
@@ -122,9 +123,8 @@ namespace Common.IntCodes
 
             var param1 = instruction.GetParamUsingMode(0);
             var param2 = instruction.GetParamUsingMode(1);
-            var param3 = instruction.GetParam(2);
 
-            var storageIndex = param3;
+            ////var storageIndex = instruction.GetParam(2);
 
             var result = instruction.OpCode switch
                 {
@@ -133,7 +133,8 @@ namespace Common.IntCodes
                 _ => 0
                 };
 
-            instruction.IntCodeState[storageIndex] = result;
+            ////instruction.IntCodeState[storageIndex] = result;
+            instruction.SetParameterValue(2, result); // rs-todo: this needs doing better!!
             return null;
         }
 

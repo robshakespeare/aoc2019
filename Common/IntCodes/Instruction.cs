@@ -24,7 +24,7 @@ namespace Common.IntCodes
         /// Gets the parameter at the specified zero-based index, relative to this instruction.
         /// Updates the `NewInstructionPointer` to include the number of parameters that have been read.
         /// </summary>
-        public long GetParam(int paramIndex)
+        private long GetParamRaw(int paramIndex)
         {
             var absoluteParamIndex = CurrentInstructionPointer + 1 + paramIndex; // Note: +1 for reading the opCode
             NewInstructionPointer = Math.Max(NewInstructionPointer, absoluteParamIndex + 1); // Note: +1 to send to next unprocessed instruction
@@ -36,9 +36,9 @@ namespace Common.IntCodes
         /// Gets the parameter at the specified zero-based index, relative to this instruction, applying parameter modes to retrieve the actual value.
         /// Updates the `NewInstructionPointer` to include the number of parameters that have been read.
         /// </summary>
-        public long GetParamUsingMode(int paramIndex)
+        public long GetParamUsingMode(int paramIndex) // rs-todo: rename to GetParameterValue
         {
-            var rawValue = GetParam(paramIndex);
+            var rawValue = GetParamRaw(paramIndex);
 
             var parameterMode = paramIndex < parameterModes.Length
                 ? parameterModes[paramIndex]
@@ -53,6 +53,30 @@ namespace Common.IntCodes
                 ParameterMode.Relative => IntCodeState[IntCodeState.RelativeBase + rawValue],
                 _ => throw new InvalidOperationException("Invalid ParameterMode: " + new { parameterMode, CurrentInstructionPointer, paramIndex })
                 };
+        }
+
+        public void SetParameterValue(int paramIndex, long value) // rs-todo: hmm, should these not go in IntCodeState, so can never set a value without using paramModes?? At the mo, IntCodeState[this] setter allows bypass of paramMode!!
+        {
+            var rawValue = GetParamRaw(paramIndex);
+
+            var parameterMode = paramIndex < parameterModes.Length
+                ? parameterModes[paramIndex]
+                : ParameterMode.Positional; // Positional is the default, if no mode is provided at this `paramIndex`
+
+            var storageIndex = parameterMode switch
+                {
+                ParameterMode.Positional => rawValue,
+                ParameterMode.Relative => IntCodeState.RelativeBase + rawValue,
+                ParameterMode.Immediate => throw new NotSupportedException("Parameters that an instruction writes to should never be in immediate mode"),
+                _ => throw new InvalidOperationException("Invalid ParameterMode: " + new { parameterMode, CurrentInstructionPointer, paramIndex })
+                };
+
+            IntCodeState[storageIndex] = value;
+            //// Parameters that an instruction writes to will never be in immediate mode
+            //if (parameterMode == ParameterMode.Immediate)
+            //{
+            //    parameterMode
+            //}
         }
     }
 }
