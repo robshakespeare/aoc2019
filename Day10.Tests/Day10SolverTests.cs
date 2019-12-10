@@ -27,7 +27,7 @@ namespace Day10.Tests
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part2Result.Should().Be(null);
+            part2Result.Should().Be(1707);
         }
 
         [Test]

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
@@ -21,6 +22,13 @@ namespace Day10
 
             var asteroids = ParseAsteroidLocations(inputLines);
 
+            var bestLocation = GetBestLocation(asteroids);
+
+            return bestLocation.countOfAsteroidsInLineOfSight;
+        }
+
+        private (Vector asteroid, int countOfAsteroidsInLineOfSight) GetBestLocation(Vector[] asteroids)
+        {
             var bestLocation = asteroids
                 .Select(thisAsteroid =>
                 {
@@ -32,13 +40,70 @@ namespace Day10
                 })
                 .OrderByDescending(x => x.countOfAsteroidsInLineOfSight)
                 .First();
-
-            return bestLocation.countOfAsteroidsInLineOfSight;
+            return (bestLocation.thisAsteroid, bestLocation.countOfAsteroidsInLineOfSight);
         }
 
         public override long? SolvePart2(string[] inputLines)
         {
-            return base.SolvePart2(inputLines);
+            // The laser starts by pointing up and always rotates clockwise, vaporizing any asteroid it hits.
+
+            var asteroids = ParseAsteroidLocations(inputLines);
+
+            var bestLocation = GetBestLocation(asteroids);
+
+            var allOtherAsteroids = asteroids.Where(otherAsteroid => !otherAsteroid.Equals(bestLocation.asteroid)).ToArray();
+
+            var target = FireLaserRoundUntilTargetReached(bestLocation.asteroid, allOtherAsteroids)
+                         ?? throw new InvalidOperationException("No target reached!");
+
+            return Convert.ToInt64(target.X * 100 + target.Y);
+        }
+
+        /// <summary>
+        /// Fires laser round clockwise, 
+        /// </summary>
+        public Vector? FireLaserRoundUntilTargetReached(Vector ourAsteroid, Vector[] allOtherAsteroids, int targetNumber = 200)
+        {
+            var aliveAsteroids = allOtherAsteroids
+                .Select(asteroid =>
+                {
+                    var laserVector = asteroid - ourAsteroid;
+                    return new
+                    {
+                        angle = Vector.AngleBetween(Vector.UpNormal, laserVector.Normal),
+                        laserVector,
+                        distance = laserVector.Length,
+                        location = asteroid
+                    };
+                })
+                .OrderBy(asteroid => asteroid.angle)
+                .ThenBy(asteroid => asteroid.distance)
+                .ToList();
+
+            var asteroidNumber = 0;
+
+            while (aliveAsteroids.Count > 0)
+            {
+                var thisRound = aliveAsteroids.ToArray();
+                var previousHitAngle = -0.1d;
+
+                foreach (var asteroid in thisRound)
+                {
+                    if (asteroid.angle > previousHitAngle)
+                    {
+                        // Hit!
+                        aliveAsteroids.Remove(asteroid);
+                        previousHitAngle = asteroid.angle;
+
+                        if (++asteroidNumber == targetNumber)
+                        {
+                            return asteroid.location;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         public Vector GetNormalBetweenVectors(Vector v1, Vector v2) => (v2 - v1).Normal;
