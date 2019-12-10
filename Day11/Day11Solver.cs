@@ -1,8 +1,8 @@
 using Common;
 
-namespace DayXXX
+namespace Day11
 {
-    public class DayXXXSolver : SolverReadAllLines
+    public class Day11Solver : SolverReadAllLines
     {
         public override long? SolvePart1(string[] input)
         {
