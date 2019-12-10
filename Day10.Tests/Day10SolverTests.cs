@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -25,6 +28,41 @@ namespace Day10.Tests
 
             // ASSERT
             part2Result.Should().Be(null);
+        }
+
+        [Test]
+        public void Part1_TestCase1()
+        {
+            const string input = @".#..#
+.....
+#####
+....#
+...##";
+
+            // ACT
+            var result = sut.SolvePart1(input.ReadAllLines());
+
+            // ASSERT
+            result.Should().Be(8);
+        }
+
+        [Test]
+        public void GetNormalBetweenVectors_Test1()
+        {
+            var vectors = new[]
+            {
+                sut.GetNormalBetweenVectors(new Vector(3, 3), new Vector(0, 0)),
+                sut.GetNormalBetweenVectors(new Vector(3.5, 3.5), new Vector(0, 0)),
+                sut.GetNormalBetweenVectors(new Vector(4, 4), new Vector(0, 0)),
+                sut.GetNormalBetweenVectors(new Vector(10, 10), new Vector(0, 0))
+            };
+
+            foreach (var vector in vectors)
+            {
+                Console.WriteLine(vector);
+            }
+
+            vectors.Distinct().Count().Should().Be(1);
         }
     }
 }
