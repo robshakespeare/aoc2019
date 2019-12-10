@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace Common
 {
@@ -15,6 +16,8 @@ namespace Common
 
         public void Run()
         {
+            PrintTitle();
+
             if (!Input.IsValueCreated)
             {
                 var input = Input.Value;
@@ -53,6 +56,21 @@ namespace Common
 #pragma warning disable CS8653 // A default expression introduces a null value for a type parameter. Justification: We always wants solutions to be nullable, to support solve methods that have not yet been implemented
             return default;
 #pragma warning restore CS8653 // A default expression introduces a null value for a type parameter.
+        }
+
+        private void PrintTitle()
+        {
+            var dayNumRegex = new Regex(@"Day(?<dayNum>\d+)");
+            var fullName = GetType().FullName;
+            Match match;
+
+            if (fullName != null &&
+                (match = dayNumRegex.Match(fullName)).Success &&
+                match.Groups["dayNum"].Success)
+            {
+                var title = $"Day {match.Groups["dayNum"].Value}";
+                ColorConsole.WriteLine(title, ConsoleColor.DarkYellow);
+            }
         }
     }
 
