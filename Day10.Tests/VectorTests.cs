@@ -40,15 +40,6 @@ namespace Day10.Tests
         }
 
         [Test]
-        public void Normal_OfVector_ThenAbsolute_Test()
-        {
-            var sut1 = new Vector(1, 3);
-            var sut2 = new Vector(-2, -6);
-
-            Assert.AreEqual(sut1.Normal.Abs, sut2.Normal.Abs);
-        }
-
-        [Test]
         public void Normal_OfVector_WhenExactlyInLine()
         {
             var sut1 = new Vector(1, 3);

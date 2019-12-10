@@ -24,21 +24,9 @@ namespace Day10
             var bestLocation = asteroids
                 .Select(thisAsteroid =>
                 {
-                    ////var test = asteroids.Where(otherAsteroid => !otherAsteroid.Equals(thisAsteroid))
-                    ////    .Select(otherAsteroid => new {otherAsteroid, norm = GetAbsoluteNormalBetweenVectors(otherAsteroid, thisAsteroid)}.ToString())
-                    ////    .ToArray();
-
                     var groups = asteroids.Where(otherAsteroid => !otherAsteroid.Equals(thisAsteroid))
                         .Select(otherAsteroid => new {otherAsteroid, norm = GetNormalBetweenVectors(thisAsteroid, otherAsteroid)})
                         .GroupBy(x => x.norm);
-
-                    ////var groupsDbg = groups.Select(x => new
-                    ////{
-                    ////    x.Key,
-                    ////    count = x.Count(),
-                    ////    riods = string.Join(", ", x.Select(y => y.otherAsteroid))
-                    ////}.ToString()).ToArray();
-
                     var countOfAsteroidsInLineOfSight = groups.Count();
                     return new {thisAsteroid, countOfAsteroidsInLineOfSight};
                 })

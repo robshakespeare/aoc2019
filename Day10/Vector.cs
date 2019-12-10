@@ -18,10 +18,6 @@ namespace Day10
 
         public double Length => Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2)); // sqrt(vx^2 + vy^2)
 
-        public Vector Abs => new Vector(Math.Abs(X), Math.Abs(Y));
-
-        ////public Vector AbsY => new Vector(X, Math.Abs(Y));
-
         public static Vector operator +(Vector a, Vector b)
             => new Vector(a.X + b.X, a.Y + b.Y);
 
