@@ -1,3 +1,5 @@
+using System;
+using System.Drawing;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -27,18 +29,28 @@ namespace Day10.Tests
             part2Result.Should().Be(null);
         }
 
-        /*
-        [Test]
-        public void ExampleTest()
-        {
-            const string input = @"";
+        //[Test]
+        //public void CalculateAngleBetweenVector_Tests()
+        //{
+        //    // ACT
+        //    var result1 = sut.CalculateAngleBetweenVectors(new PointF(1, 1), new PointF(1, 1));
+        //    var result2 = sut.CalculateAngleBetweenVectors(new PointF(1, 1), new PointF(1, 2));
+        //    var result3 = sut.CalculateAngleBetweenVectors(new PointF(1, 1), new PointF(1, 3));
 
-            // ACT
-            var result = sut.SolvePart1(input.ReadAllLines());
+        //    // ASSERT
+        //    result1.Should().Be(result2);
+        //    result1.Should().Be(result3);
+        //}
 
-            // ASSERT
-            result.Should().Be(xyz);
-        }
-        */
+        //[Test]
+        //public void CalculateAngleBetweenVector_Tests_2()
+        //{
+        //    // ACT
+        //    var result1 = sut.CalculateAngleBetweenVectors(new PointF(2.1f, 2.1f), new PointF(2.2f, 2.2f));
+        //    var result2 = sut.CalculateAngleBetweenVectors(new PointF(3.1f, 3.1f), new PointF(4.1f, 4.1f));
+
+        //    // ASSERT
+        //    result1.Should().Be(result2);
+        //}
     }
 }
