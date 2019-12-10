@@ -7,12 +7,7 @@ namespace Day10
 {
     public class Day10Solver : SolverReadAllLines
     {
-        private static Vector[] ParseAsteroidLocations(IEnumerable<string> inputLines) =>
-            inputLines
-                .SelectMany((line, y) => line.Select((chr, x) => chr == '#' ? new Vector(x, y) : (Vector?)null))
-                .Where(asteroid => asteroid != null)
-                .Select(asteroid => asteroid.Value)
-                .ToArray();
+        public static void Main() => new Day10Solver().Run();
 
         public override long? SolvePart1(string[] inputLines)
         {
@@ -26,6 +21,13 @@ namespace Day10
 
             return bestLocation.countOfAsteroidsInLineOfSight;
         }
+
+        private static Vector[] ParseAsteroidLocations(IEnumerable<string> inputLines) =>
+            inputLines
+                .SelectMany((line, y) => line.Select((chr, x) => chr == '#' ? new Vector(x, y) : (Vector?)null))
+                .Where(asteroid => asteroid != null)
+                .Select(asteroid => asteroid.Value)
+                .ToArray();
 
         private (Vector asteroid, int countOfAsteroidsInLineOfSight) GetBestLocation(Vector[] asteroids)
         {
@@ -42,6 +44,8 @@ namespace Day10
                 .First();
             return (bestLocation.thisAsteroid, bestLocation.countOfAsteroidsInLineOfSight);
         }
+
+        public Vector GetNormalBetweenVectors(Vector v1, Vector v2) => (v2 - v1).Normal;
 
         public override long? SolvePart2(string[] inputLines)
         {
@@ -105,7 +109,5 @@ namespace Day10
 
             return null;
         }
-
-        public Vector GetNormalBetweenVectors(Vector v1, Vector v2) => (v2 - v1).Normal;
     }
 }
