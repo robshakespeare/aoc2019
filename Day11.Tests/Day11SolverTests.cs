@@ -1,3 +1,4 @@
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -24,7 +25,15 @@ namespace Day11.Tests
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part2Result.Should().Be(null);
+            var expectedResult = @"Registration identifier:
+ ███    ██ ███  █  █ █      ██ █  █ ███    
+ █  █    █ █  █ █ █  █       █ █  █ █  █   
+ ███     █ █  █ ██   █       █ █  █ █  █   
+ █  █    █ ███  █ █  █       █ █  █ ███    
+ █  █ █  █ █ █  █ █  █    █  █ █  █ █      
+ ███   ██  █  █ █  █ ████  ██   ██  █      ".NormalizeLineEndings();
+
+            part2Result.Should().Be(expectedResult);
         }
     }
 }
