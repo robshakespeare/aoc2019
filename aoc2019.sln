@@ -38,13 +38,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day7", "Day7\Day7.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day7.Tests", "Day7.Tests\Day7.Tests.csproj", "{63E13663-0C13-48B2-96FF-0CA2E24F78A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day8", "Day8\Day8.csproj", "{9DF07854-F9AF-4D17-B647-5E27432B1CCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day8", "Day8\Day8.csproj", "{9DF07854-F9AF-4D17-B647-5E27432B1CCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day8.Tests", "Day8.Tests\Day8.Tests.csproj", "{77AEFBB3-3CC0-4C3F-BF3E-33A72A6CE0FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day8.Tests", "Day8.Tests\Day8.Tests.csproj", "{77AEFBB3-3CC0-4C3F-BF3E-33A72A6CE0FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tests", "Common.Tests\Common.Tests.csproj", "{3C96CF18-4E5E-4214-A7C8-48D1AAB23B84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Tests", "Common.Tests\Common.Tests.csproj", "{3C96CF18-4E5E-4214-A7C8-48D1AAB23B84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day1.Tests", "Day1.Tests\Day1.Tests.csproj", "{A5D409F3-62AF-4867-8C60-CA1B4C259130}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day1.Tests", "Day1.Tests\Day1.Tests.csproj", "{A5D409F3-62AF-4867-8C60-CA1B4C259130}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day9", "Day9\Day9.csproj", "{94A5E911-667E-4FDE-A992-775C058BF19E}"
 EndProject
@@ -57,6 +57,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day11", "Day11\Day11.csproj", "{9BF99406-D88A-440D-A4D5-6E939E618F3E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day11.Tests", "Day11.Tests\Day11.Tests.csproj", "{4B569BF3-C7F2-416E-B27C-9CDE2872BBB6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day12", "Day12\Day12.csproj", "{5BEC1EE2-10AD-4476-997E-8761F6A6F59A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day12.Tests", "Day12.Tests\Day12.Tests.csproj", "{D8470146-6B63-4607-AFD7-C12C3A019AFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +164,14 @@ Global
 		{4B569BF3-C7F2-416E-B27C-9CDE2872BBB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B569BF3-C7F2-416E-B27C-9CDE2872BBB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B569BF3-C7F2-416E-B27C-9CDE2872BBB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BEC1EE2-10AD-4476-997E-8761F6A6F59A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BEC1EE2-10AD-4476-997E-8761F6A6F59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BEC1EE2-10AD-4476-997E-8761F6A6F59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BEC1EE2-10AD-4476-997E-8761F6A6F59A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8470146-6B63-4607-AFD7-C12C3A019AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8470146-6B63-4607-AFD7-C12C3A019AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8470146-6B63-4607-AFD7-C12C3A019AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8470146-6B63-4607-AFD7-C12C3A019AFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
