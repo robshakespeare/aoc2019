@@ -1,3 +1,5 @@
+using System;
+
 namespace Day12
 {
     public struct Vector
@@ -16,6 +18,8 @@ namespace Day12
         }
 
         public static Vector operator +(Vector a, Vector b) => new Vector(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+
+        public int SumAbsoluteValuesInVector() => Math.Abs(X) + Math.Abs(Y) + Math.Abs(Z);
 
         public override string ToString() => $"<x={X}, y={Y}, z={Z}>";
     }

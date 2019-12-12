@@ -13,7 +13,7 @@ namespace Day12
             var simulator = new Simulator(input);
             simulator.RunSimulation(numberOfSteps);
 
-            return base.SolvePart1(input);
+            return simulator.CalculateTotalEnergyInTheSystem();
         }
 
         public override long? SolvePart2(string input)

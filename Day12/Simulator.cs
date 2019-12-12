@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Common.Extensions;
@@ -10,12 +11,12 @@ namespace Day12
         private static readonly Regex ParseInputLineRegex = new Regex("<x=(?<x>[^,]+), y=(?<y>[^,]+), z=(?<z>[^,]+)>", RegexOptions.Compiled);
 
         private readonly Moon[] moons;
-        private readonly (Moon a, Moon b)[] moonPairs;
+        private readonly (Moon moon, Moon[] otherMoons)[] moonPairings;
 
         public Simulator(string allInputLines)
         {
             moons = ParseInputLines(allInputLines);
-            moonPairs = GetMoonPairs(moons);
+            moonPairings = GetMoonPairings(moons);
         }
 
         public void RunSimulation(int numberOfSteps)
@@ -31,30 +32,29 @@ namespace Day12
                 Environment.NewLine,
                 moons.Select(moon => $"pos={moon.Position}, vel={moon.Velocity}"));
 
+        public long CalculateTotalEnergyInTheSystem() => moons.Sum(moon => moon.CalculateTotalEnergyForMoon());
+
         /// <summary>
         /// Applies the necessary calculations to each moon in the simulation, to update a single step.
         /// </summary>
         public void Update()
         {
-            foreach (var moonPair in moonPairs)
+            foreach (var (moon, velocityChange) in CalculateVelocityChanges())
             {
-                Update(moonPair);
+                moon.Velocity += velocityChange;
+                moon.Position += moon.Velocity;
             }
         }
 
-        public void Update((Moon a, Moon b) moonPair)
-        {
-            var (moonA, moonB) = moonPair;
-
-            var velocityChangeA = CalculateVelocityChange(moonA.Position, moonB.Position);
-            var velocityChangeB = CalculateVelocityChange(moonB.Position, moonA.Position);
-
-            moonA.Velocity += velocityChangeA;
-            moonA.Position += moonA.Velocity;
-
-            moonB.Velocity += velocityChangeB;
-            moonB.Position += moonB.Velocity;
-        }
+        public (Moon moon, Vector velocityChange)[] CalculateVelocityChanges() =>
+            moonPairings
+                .Select(moonPairing => (moonPairing.moon, CalculateVelocityChange(moonPairing.moon, moonPairing.otherMoons)))
+                .ToArray();
+        
+        public Vector CalculateVelocityChange(Moon moon, Moon[] otherMoons) =>
+            otherMoons.Select(x => x.Position).Aggregate(
+                new Vector(),
+                (current, otherPosition) => current + CalculateVelocityChange(moon.Position, otherPosition));
 
         public Vector CalculateVelocityChange(Vector position1, Vector position2) =>
             new Vector(
@@ -77,35 +77,11 @@ namespace Day12
             return 0;
         }
 
-        public static (Moon a, Moon b)[] GetMoonPairs(Moon[] moons)
-        {
-            if (moons.Length != 4)
-            {
-                throw new NotSupportedException("Moon simulator doesn't support anything but 4 moons yet!");
-            }
-
-            // Assuming every neighbor pair.
-            ////return new[]
-            ////{
-            ////    (moons[0], moons[1]),
-            ////    (moons[1], moons[2]),
-            ////    (moons[2], moons[3]),
-            ////    (moons[3], moons[0])
-            ////};
-
-            // Assuming that it means every possible pair, not just every neighbor pair, or every contiguous pair.
-            return new[]
-            {
-                (moons[0], moons[1]),
-                (moons[0], moons[2]),
-                (moons[0], moons[3]),
-
-                (moons[1], moons[2]),
-                (moons[1], moons[3]),
-
-                (moons[2], moons[3])
-            };
-        }
+        public static (Moon moon, Moon[] otherMoons)[] GetMoonPairings(Moon[] moons) =>
+            moons.Select(moon => (
+                    moon,
+                    moons.Where(m => m != moon).ToArray()))
+                .ToArray();
 
         public static Moon[] ParseInputLines(string allInputLines) =>
             allInputLines
