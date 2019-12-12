@@ -2,16 +2,21 @@ using Common;
 
 namespace Day12
 {
-    public class Day12Solver : SolverReadAllLines
+    public class Day12Solver : SolverReadAllText
     {
         public static void Main() => new Day12Solver().Run();
 
-        public override long? SolvePart1(string[] input)
+        public override long? SolvePart1(string input)
         {
+            const int numberOfSteps = 1000;
+
+            var simulator = new Simulator(input);
+            simulator.RunSimulation(numberOfSteps);
+
             return base.SolvePart1(input);
         }
 
-        public override long? SolvePart2(string[] input)
+        public override long? SolvePart2(string input)
         {
             return base.SolvePart2(input);
         }
