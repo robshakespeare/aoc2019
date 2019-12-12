@@ -22,5 +22,16 @@ namespace Day12
         public int SumAbsoluteValuesInVector() => Math.Abs(X) + Math.Abs(Y) + Math.Abs(Z);
 
         public override string ToString() => $"<x={X}, y={Y}, z={Z}>";
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = X;
+                hashCode = (hashCode * 397) ^ Y;
+                hashCode = (hashCode * 397) ^ Z;
+                return hashCode;
+            }
+        }
     }
 }

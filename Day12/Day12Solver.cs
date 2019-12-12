@@ -18,7 +18,8 @@ namespace Day12
 
         public override long? SolvePart2(string input)
         {
-            return base.SolvePart2(input);
+            var simulator = new Simulator(input);
+            return simulator.FindFirstRepeatingStateStepNumber();
         }
     }
 }

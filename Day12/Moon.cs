@@ -5,7 +5,7 @@ namespace Day12
         public Moon(Vector position)
         {
             Position = position;
-            Velocity = new Vector(0 ,0, 0);
+            Velocity = new Vector();
         }
 
         public Vector Position { get; set; }
@@ -18,6 +18,18 @@ namespace Day12
             var kineticEnergy = Velocity.SumAbsoluteValuesInVector();
 
             return potentialEnergy * kineticEnergy;
+        }
+
+        public override string ToString() => $"pos={Position}, vel={Velocity}";
+
+        ////public ulong GetState() => ((ulong)Position.GetHashCode() + int.MaxValue) | (ulong)Velocity.GetHashCode();
+
+        public int GetState()
+        {
+            unchecked
+            {
+                return (Position.GetHashCode() * 397) ^ Velocity.GetHashCode();
+            }
         }
     }
 }

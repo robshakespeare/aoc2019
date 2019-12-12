@@ -72,5 +72,36 @@ pos=<x= 2, y= 2, z=-4>, vel=<x= 0, y=-1, z= 2>
 pos=<x= 3, y=-7, z=-1>, vel=<x= 1, y= 2, z=-2>".NormalizePositionAndVelocityText());
             }
         }
+
+        [Test]
+        public void FindFirstRepeatingStateStepNumber_Test1()
+        {
+            var sut = new Simulator(@"<x=-1, y=0, z=2>
+<x=2, y=-10, z=-7>
+<x=4, y=-8, z=8>
+<x=3, y=5, z=-1>");
+
+            // ACT
+            var result = sut.FindFirstRepeatingStateStepNumber();
+
+            // ASSERT
+            result.Should().Be(2772);
+        }
+
+        [Test]
+        [Ignore("This test takes too long at the moment. Clearly, I might need to find a more efficient way to simulate the universe!")]
+        public void FindFirstRepeatingStateStepNumber_Test2()
+        {
+            var sut = new Simulator(@"<x=-8, y=-10, z=0>
+<x=5, y=5, z=10>
+<x=2, y=-7, z=3>
+<x=9, y=-8, z=-3>");
+
+            // ACT
+            var result = sut.FindFirstRepeatingStateStepNumber();
+
+            // ASSERT
+            result.Should().Be(4686774924);
+        }
     }
 }
