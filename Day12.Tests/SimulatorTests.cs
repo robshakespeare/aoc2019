@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -5,6 +7,15 @@ namespace Day12.Tests
 {
     public class SimulatorTests
     {
+        static SimulatorTests()
+        {
+            Simulator.Logger = msg =>
+            {
+                File.AppendAllText("C:\\aoc.log", msg + Environment.NewLine);
+                TestContext.WriteLine(msg);
+            };
+        }
+
         [Test]
         public void TestCase1_SingleSteps_CheckPositionAndVelocity_AreCalculatedAsExpected()
         {
@@ -89,7 +100,6 @@ pos=<x= 3, y=-7, z=-1>, vel=<x= 1, y= 2, z=-2>".NormalizePositionAndVelocityText
         }
 
         [Test]
-        [Ignore("This test takes too long at the moment. Clearly, I might need to find a more efficient way to simulate the universe!")]
         public void FindFirstRepeatingStateStepNumber_Test2()
         {
             var sut = new Simulator(@"<x=-8, y=-10, z=0>

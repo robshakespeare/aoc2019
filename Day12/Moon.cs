@@ -1,3 +1,5 @@
+using static Day12.Vector;
+
 namespace Day12
 {
     public class Moon
@@ -5,12 +7,19 @@ namespace Day12
         public Moon(Vector position)
         {
             Position = position;
-            Velocity = new Vector();
+            Velocity = new Vector(0, 0, 0);
+
+            InitialPosition = new Vector(position[X], position[Y], position[Z]);
+            InitialVelocity = new Vector(0, 0, 0);
         }
 
         public Vector Position { get; set; }
 
         public Vector Velocity { get; set; }
+
+        public Vector InitialPosition { get; set; }
+
+        public Vector InitialVelocity { get; set; }
 
         public long CalculateTotalEnergyForMoon()
         {
@@ -21,15 +30,5 @@ namespace Day12
         }
 
         public override string ToString() => $"pos={Position}, vel={Velocity}";
-
-        ////public ulong GetState() => ((ulong)Position.GetHashCode() + int.MaxValue) | (ulong)Velocity.GetHashCode();
-
-        public int GetState()
-        {
-            unchecked
-            {
-                return (Position.GetHashCode() * 397) ^ Velocity.GetHashCode();
-            }
-        }
     }
 }
