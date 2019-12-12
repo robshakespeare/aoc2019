@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -7,15 +5,6 @@ namespace Day12.Tests
 {
     public class SimulatorTests
     {
-        static SimulatorTests()
-        {
-            Simulator.Logger = msg =>
-            {
-                File.AppendAllText("C:\\aoc.log", msg + Environment.NewLine);
-                TestContext.WriteLine(msg);
-            };
-        }
-
         [Test]
         public void TestCase1_SingleSteps_CheckPositionAndVelocity_AreCalculatedAsExpected()
         {

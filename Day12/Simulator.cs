@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Common;
 using Common.Extensions;
 using static Day12.Vector;
 
@@ -28,36 +29,28 @@ namespace Day12
             }
         }
 
-        public static Action<string> Logger = Console.WriteLine;
+        /// <summary>
+        /// Applies the necessary calculations to each moon in the simulation, to update a single step.
+        /// </summary>
+        public void Update()
+        {
+            foreach (var componentIndex in new[] {X, Y, Z})
+            {
+                UpdateComponentForAllMoons(componentIndex);
+            }
+        }
 
         public long FindFirstRepeatingStateStepNumber()
         {
             // Find the number of steps which it takes each component to loop
+            // And then get the lowest common multiple of those values, which gives us the number of loops it would have
+            // to loop by until the entire state matched
+
             var xLoop = GetNumberOfStepsToLoop(X);
             var yLoop = GetNumberOfStepsToLoop(Y);
             var zLoop = GetNumberOfStepsToLoop(Z);
 
-            // Use Euclid's algorithm to calculate the greatest common divisor (GCD) of two numbers.
-            long GreatestCommonDivisor(long a, long b)
-            {
-                a = Math.Abs(a);
-                b = Math.Abs(b);
-
-                // Pull out remainders.
-                for (; ; )
-                {
-                    long remainder = a % b;
-                    if (remainder == 0) return b;
-                    a = b;
-                    b = remainder;
-                }
-            }
-
-            // Return the least common multiple (LCM) of two numbers.
-            long LeastCommonMultiple(long a, long b) => a * b / GreatestCommonDivisor(a, b);
-
-            // LCM - get the lowest common multiple!
-            return LeastCommonMultiple(LeastCommonMultiple(xLoop, yLoop), zLoop);
+            return MathUtils.LeastCommonMultiple(xLoop, yLoop, zLoop);
         }
 
         private long GetNumberOfStepsToLoop(in int componentIndex)
@@ -69,14 +62,8 @@ namespace Day12
             {
                 stepNumber++;
 
-                // Update all the moons velocities and positions for this component
-                // rs-todo: this is duplicated below, remove the duplicate
-                foreach (var (moonPairing, velocityChange) in CalculateVelocityChanges(componentIndex))
-                {
-                    var moon = moonPairing.moon;
-                    moon.Velocity[componentIndex] += velocityChange;
-                    moon.Position[componentIndex] += moon.Velocity[componentIndex];
-                }
+                // Update all the moon's velocities and positions for this component
+                UpdateComponentForAllMoons(componentIndex);
 
                 // Check whether it matches the initial state
                 var allMatch = true;
@@ -95,112 +82,34 @@ namespace Day12
             return numberOfStepsUntilLoop.Value;
         }
 
-        ////public long FindFirstRepeatingStateStepNumber()
-        ////{
-        ////    var mutex = new object();
-        ////    var matches = new SortedList<long, bool[]>(); // KEY = StepNumber, VALUE = which components match for position & velocity
-        ////    long? firstRepeatingStateStepNumber = null;
-
-        ////    void AddMatch(long matchStepNumber, int componentIndex)
-        ////    {
-        ////        lock (mutex)
-        ////        {
-        ////            {
-        ////                if (!matches.TryGetValue(matchStepNumber, out var match))
-        ////                {
-        ////                    matches[matchStepNumber] = match = new bool[3];
-        ////                }
-
-        ////                match[componentIndex] = true;
-        ////            }
-
-        ////            // Check for all matches
-        ////            if (firstRepeatingStateStepNumber == null)
-        ////            {
-        ////                foreach (var match in matches)
-        ////                {
-        ////                    if (match.Value[X] && match.Value[Y] && match.Value[Z])
-        ////                    {
-        ////                        firstRepeatingStateStepNumber = match.Key;
-        ////                        return;
-        ////                    }
-        ////                }
-        ////            }
-        ////        }
-        ////    }
-
-        ////    var stopwatch = Stopwatch.StartNew();
-        ////    var lastLogTime = stopwatch.Elapsed;
-
-        ////    Parallel.ForEach(
-        ////        new[] {X, Y, Z},
-        ////        componentIndex =>
-        ////        {
-        ////            long stepNumber = 0;
-        ////            while (firstRepeatingStateStepNumber == null)
-        ////            {
-        ////                stepNumber++;
-        ////                var numMoonMatches = 0;
-
-        ////                foreach (var (moon, velocityChange) in CalculateVelocityChanges(componentIndex))
-        ////                {
-        ////                    moon.Velocity[componentIndex] += velocityChange;
-        ////                    moon.Position[componentIndex] += moon.Velocity[componentIndex];
-
-        ////                    if (moon.Position[componentIndex] == moon.InitialPosition[componentIndex] &&
-        ////                        moon.Velocity[componentIndex] == moon.InitialVelocity[componentIndex])
-        ////                    {
-        ////                        numMoonMatches++;
-        ////                    }
-        ////                }
-
-        ////                if (numMoonMatches == moons.Length)
-        ////                {
-        ////                    AddMatch(stepNumber, componentIndex);
-        ////                }
-
-        ////                if ((stopwatch.Elapsed - lastLogTime).TotalMilliseconds > 250)
-        ////                {
-        ////                    Logger("Finding First Repeating State Step Number. " + new { stepNumber, stopwatch.Elapsed });
-        ////                    lastLogTime = stopwatch.Elapsed;
-        ////                }
-        ////            }
-        ////        });
-
-        ////    return firstRepeatingStateStepNumber ?? -1;
-        ////}
-
         public string BuildPositionAndVelocityText() => string.Join(Environment.NewLine, (IEnumerable<Moon>) moons);
 
         public long CalculateTotalEnergyInTheSystem() => moons.Sum(moon => moon.CalculateTotalEnergyForMoon());
 
         /// <summary>
-        /// Applies the necessary calculations to each moon in the simulation, to update a single step.
+        /// Updates all the moon's velocities and positions for this component, by a single step.
         /// </summary>
-        public void Update()
+        private void UpdateComponentForAllMoons(int componentIndex)
         {
-            foreach (var componentIndex in new[] {X, Y, Z})
+            foreach (var (moonPairing, velocityChange) in CalculateVelocityChanges(componentIndex))
             {
-                foreach (var (moonPairing, velocityChange) in CalculateVelocityChanges(componentIndex))
-                {
-                    var moon = moonPairing.moon;
-                    moon.Velocity[componentIndex] += velocityChange;
-                    moon.Position[componentIndex] += moon.Velocity[componentIndex];
-                }
+                var moon = moonPairing.moon;
+                moon.Velocity[componentIndex] += velocityChange;
+                moon.Position[componentIndex] += moon.Velocity[componentIndex];
             }
         }
 
-        public ((Moon moon, Moon[] otherMoons) moonPairing, int)[] CalculateVelocityChanges(int componentIndex) =>
+        private ((Moon moon, Moon[] otherMoons) moonPairing, int)[] CalculateVelocityChanges(int componentIndex) =>
             moonPairings
                 .Select(moonPairing => (moonPairing, CalculateVelocityChange(moonPairing.moon, moonPairing.otherMoons, componentIndex)))
                 .ToArray();
         
-        public int CalculateVelocityChange(Moon moon, Moon[] otherMoons, int componentIndex) =>
+        private static int CalculateVelocityChange(Moon moon, Moon[] otherMoons, int componentIndex) =>
             otherMoons.Select(x => x.Position).Aggregate(
                 0,
                 (current, otherPosition) => current + CalculateVelocityChange(moon.Position[componentIndex], otherPosition[componentIndex]));
 
-        public int CalculateVelocityChange(int position1, int position2)
+        private static int CalculateVelocityChange(int position1, int position2)
         {
             if (position2 > position1)
             {
@@ -215,20 +124,20 @@ namespace Day12
             return 0;
         }
 
-        public static (Moon moon, Moon[] otherMoons)[] GetMoonPairings(Moon[] moons) =>
+        private static (Moon moon, Moon[] otherMoons)[] GetMoonPairings(Moon[] moons) =>
             moons.Select((moon, moonIndex) => (
                     moon,
                     moons.Where(m => m != moon).ToArray()))
                 .ToArray();
 
-        public static Moon[] ParseInputLines(string allInputLines) =>
+        private static Moon[] ParseInputLines(string allInputLines) =>
             allInputLines
                 .NormalizeLineEndings()
                 .ReadAllLines()
                 .Select(ParseInputLine)
                 .ToArray();
 
-        public static Moon ParseInputLine(string line)
+        private static Moon ParseInputLine(string line)
         {
             var match = ParseInputLineRegex.Match(line);
 
