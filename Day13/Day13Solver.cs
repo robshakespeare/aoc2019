@@ -21,7 +21,7 @@ namespace Day13
     /// </summary>
     public class Day13Solver : SolverReadAllText
     {
-        public static void Main() => new Day13Solver().Play();
+        public static void Main(string[] args) => new Day13Solver().Play(args.FirstOrDefault() == "auto");
 
         private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
 
@@ -72,7 +72,7 @@ namespace Day13
             return new Game(tiles);
         }
 
-        public void Play()
+        public void Play(bool auto)
         {
             Console.CursorVisible = false;
             Console.Clear();
@@ -92,9 +92,7 @@ namespace Day13
                 e.Cancel = true;
             };
 
-#pragma warning disable 8321
             long GetAIPlayerInput()
-#pragma warning restore 8321
             {
                 if (game.PaddlePosition.X < game.BallPosition.X)
                 {
@@ -107,16 +105,10 @@ namespace Day13
                 return 0;
             }
 
-            // ReSharper disable TooWideLocalVariableScope
-            // ReSharper disable RedundantAssignment
             var started = false;
             var clearPrompt = false;
-            // ReSharper restore TooWideLocalVariableScope
-            // ReSharper restore RedundantAssignment
 
-#pragma warning disable 8321
             long GetPlayerInput()
-#pragma warning restore 8321
             {
                 if (!started)
                 {
@@ -190,9 +182,10 @@ namespace Day13
                 }
             }
 
+            var getNextInput = auto ? (Func<long>)GetAIPlayerInput : GetPlayerInput;
             var intCodeState = intCodeComputer.Parse(EnableFreePlay(input));
 
-            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState, GetAIPlayerInput, DisplayOutput))
+            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState, getNextInput, DisplayOutput))
             {
             }
 
