@@ -26,19 +26,5 @@ namespace Day14.Tests
             // ASSERT
             part2Result.Should().Be(null);
         }
-
-        /*
-        [Test]
-        public void ExampleTest()
-        {
-            const string input = @"";
-
-            // ACT
-            var result = sut.SolvePart1(input.ReadAllLines());
-
-            // ASSERT
-            result.Should().Be(xyz);
-        }
-        */
     }
 }
