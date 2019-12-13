@@ -49,18 +49,17 @@ namespace Day13
             EnumUtil.Parse<TileType>(batch[2])
         );
 
-        public static char GetPaintChar(TileType type)
+        public static (char paintChar, ConsoleColor color) GetPaintChar(TileType type)
         {
-            var paintChar = type switch
+            return type switch
                 {
-                TileType.Empty => ' ',
-                TileType.Wall => '█',
-                TileType.Block => '#',
-                TileType.Paddle => '¯',
-                TileType.Ball => 'o',
+                TileType.Empty => (' ', ConsoleColor.Black),
+                TileType.Wall => ('█', ConsoleColor.Gray),
+                TileType.Block => ('#', ConsoleColor.Cyan),
+                TileType.Paddle => ('▀', ConsoleColor.Magenta),
+                TileType.Ball => ('o', ConsoleColor.Yellow),
                 _ => throw new InvalidOperationException("Invalid tileType: " + type)
                 };
-            return paintChar;
         }
 
         public void Update(IList<long> batch)
@@ -68,7 +67,9 @@ namespace Day13
             var (pos, type) = ParseOutputBatch(batch);
 
             Console.SetCursorPosition(pos.X, pos.Y);
-            Console.Write(GetPaintChar(type));
+
+            var paint = GetPaintChar(type);
+            ColorConsole.WriteLine(paint.paintChar, paint.color);
 
             if (type == TileType.Ball)
             {

@@ -8,15 +8,15 @@ namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
+        // Func<long> getNextInputValue, Action<long>? onNewOutputValue
+
         /// <summary>
         /// Parses the specified IntCode computer program, and creates a state object to represent the computer in its initial state.
         /// </summary>
-        public IntCodeState Parse(string inputProgram, Func<long> getNextInputValue, Action<long>? onNewOutputValue) => new IntCodeState(
+        public IntCodeState Parse(string inputProgram) => new IntCodeState(
             inputProgram.Split(',')
                 .Select(long.Parse)
-                .ToArray(),
-            getNextInputValue,
-            onNewOutputValue);
+                .ToArray());
 
         /// <summary>
         /// Parses and then evaluates the specified IntCode computer state until it halts.
@@ -31,14 +31,26 @@ namespace Common.IntCodes
         /// Parses and then evaluates the specified IntCode computer state until it halts, using input and output redirection.
         /// </summary>
         public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<long> receiveInputValue, Action<long>? sendOutputValue) =>
-            Evaluate(Parse(inputProgram, receiveInputValue, sendOutputValue));
+            Evaluate(Parse(inputProgram), receiveInputValue, sendOutputValue);
 
         /// <summary>
         /// Evaluates the specified IntCode computer state until it halts.
         /// </summary>
-        public IntCodeState Evaluate(IntCodeState intCodeState)
+        public IntCodeState Evaluate(IntCodeState intCodeState, Func<long> getNextInputValue, Action<long>? onNewOutputValue)
         {
-            while (EvaluateNextInstruction(intCodeState))
+            while (EvaluateNextInstruction(intCodeState, getNextInputValue, onNewOutputValue))
+            {
+            }
+            return intCodeState;
+        }
+
+        /// <summary>
+        /// Evaluates the specified IntCode computer state until it halts.
+        /// </summary>
+        public IntCodeState EvaluateUntilHaltedOrInputNeeded(IntCodeState intCodeState, Action<long>? onNewOutputValue = null)
+        {
+            while (intCodeState.ReadNextInstruction().OpCode != 3
+                   && EvaluateNextInstruction(intCodeState, () => throw new InvalidOperationException(), onNewOutputValue))
             {
             }
             return intCodeState;
@@ -48,26 +60,27 @@ namespace Common.IntCodes
         /// Evaluates the next instruction in the specified IntCode computer state.
         /// Returns true if the program should continue to be evaluated, otherwise if the program has now halted returns false.
         /// </summary>
-        public bool EvaluateNextInstruction(IntCodeState intCodeState)
+        public bool EvaluateNextInstruction(IntCodeState intCodeState, Func<long> getNextInputValue, Action<long>? onNewOutputValue = null)
         {
             var instruction = intCodeState.ReadNextInstruction();
             if (instruction.OpCode == 99)
             {
+                intCodeState.Halted = true;
                 return false;
             }
 
-            var gotoInstructionPointer = EvalInstruction(instruction);
+            var gotoInstructionPointer = EvalInstruction(instruction, getNextInputValue, onNewOutputValue);
             intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
             return true;
         }
 
-        private static long? EvalInstruction(Instruction instruction) =>
+        private static long? EvalInstruction(Instruction instruction, Func<long> getNextInputValue, Action<long>? onNewOutputValue) =>
             instruction.OpCode switch
                 {
                 1 => EvalMathInstruction(instruction),
                 2 => EvalMathInstruction(instruction),
-                3 => EvalInputInstruction(instruction),
-                4 => EvalOutputInstruction(instruction),
+                3 => EvalInputInstruction(instruction, getNextInputValue),
+                4 => EvalOutputInstruction(instruction, onNewOutputValue),
                 5 => EvalJumpInstruction(instruction),
                 6 => EvalJumpInstruction(instruction),
                 7 => EvalRelationalInstruction(instruction),
@@ -92,23 +105,23 @@ namespace Common.IntCodes
             return null;
         }
 
-        private static long? EvalInputInstruction(Instruction instruction)
+        private static long? EvalInputInstruction(Instruction instruction, Func<long> getNextInputValue)
         {
             // opCode 3 takes a single integer as input and saves it to the address given by its only parameter.
             // For example, the instruction 3,50 would take an input value and store it at address 50.
-            var inputValue = instruction.IntCodeState.GetNextInputValue();
+            var inputValue = getNextInputValue();
 
             instruction.SetIntCodeReferencedByParameter(0, inputValue);
             return null;
         }
 
-        private static long? EvalOutputInstruction(Instruction instruction)
+        private static long? EvalOutputInstruction(Instruction instruction, Action<long>? onNewOutputValue)
         {
             // opCode 4 outputs the value of its only parameter.
             // For example, the instruction 4,50 would output the value at address 50.
             var outputValue = instruction.GetIntCodeReferencedByParameter(0);
             instruction.IntCodeState.Outputs.Add(outputValue);
-            instruction.IntCodeState.OnNewOutputValue?.Invoke(outputValue);
+            onNewOutputValue?.Invoke(outputValue);
             return null;
         }
 

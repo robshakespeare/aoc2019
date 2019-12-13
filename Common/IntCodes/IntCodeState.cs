@@ -7,26 +7,31 @@ namespace Common.IntCodes
     public class IntCodeState
     {
         private readonly SortedList<long, long> intCodes; // The Key is the INDEX of the code, and Value is the actual code.
-        private readonly Func<long> getNextInputValue;
 
-        public IntCodeState(long[] intCodes, Func<long> getNextInputValue, Action<long>? onNewOutputValue)
+        public IntCodeState(long[] intCodes)
+            : this(IntCodeArrayToSortedList(intCodes), new List<long>())
         {
-            OnNewOutputValue = onNewOutputValue;
-            this.intCodes = new SortedList<long, long>();
-            this.getNextInputValue = getNextInputValue;
-            InstructionPointer = 0;
-            RelativeBase = 0;
-            Outputs = new List<long>();
-
-            foreach (var code in intCodes.Select((code, index) => (code, index)))
-            {
-                this.intCodes.Add(code.index, code.code);
-            }
         }
 
-        public long GetNextInputValue() => getNextInputValue();
+        private static SortedList<long, long> IntCodeArrayToSortedList(long[] intCodes)
+        {
+            var result = new SortedList<long, long>();
 
-        public Action<long>? OnNewOutputValue { get; }
+            foreach (var (code, index) in intCodes.Select((code, index) => (code, index)))
+            {
+                result.Add(index, code);
+            }
+
+            return result;
+        }
+
+        private IntCodeState(SortedList<long, long> intCodes, List<long> outputs)
+        {
+            this.intCodes = intCodes;
+            InstructionPointer = 0;
+            RelativeBase = 0;
+            Outputs = outputs;
+        }
 
         public long InstructionPointer { get; set; }
 
@@ -35,6 +40,21 @@ namespace Common.IntCodes
         public List<long> Outputs { get; }
 
         public long? LastOutputValue => Outputs.Any() ? Outputs.Last() : (long?) null;
+
+        public bool Halted { get; set; }
+
+        /// <summary>
+        /// Creates an exact copy of this state. No references are maintained, everything is copied.
+        /// </summary>
+        public IntCodeState Clone() =>
+            new IntCodeState(
+                new SortedList<long, long>(intCodes),
+                Outputs.ToList())
+            {
+                InstructionPointer = InstructionPointer,
+                RelativeBase = RelativeBase,
+                Halted = Halted
+            };
 
         /// <summary>
         /// Gets or sets the int code at the specified index.

@@ -35,6 +35,8 @@ namespace Day13
             return game.InitialTiles.Count(tile => tile.type == TileType.Block);
         }
 
+        ////public override long? SolvePart2(string input) => new Day13Part2Solver(EnableFreePlay(input)).Solve();
+
         public void RenderInitial(Game game)
         {
             Console.WriteLine($"TopLeft: X={game.Left}, Y={game.Top}");
@@ -51,7 +53,7 @@ namespace Day13
             {
                 var paintChar = Game.GetPaintChar(type);
                 var relLocation = pos - game.TopLeft;
-                buffer[relLocation.Y][relLocation.X] = paintChar;
+                buffer[relLocation.Y][relLocation.X] = paintChar.paintChar;
             }
 
             var grid = string.Join(
@@ -202,9 +204,9 @@ namespace Day13
                 }
             }
 
-            var intCodeState = intCodeComputer.Parse(EnableFreePlay(input), GetPlayerInput, DisplayComputerOutput);
+            var intCodeState = intCodeComputer.Parse(EnableFreePlay(input));
 
-            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState))
+            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState, GetPlayerInput, DisplayComputerOutput))
             {
             }
 
