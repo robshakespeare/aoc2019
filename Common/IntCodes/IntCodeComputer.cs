@@ -8,6 +8,9 @@ namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
+        /// <summary>
+        /// Parses the specified IntCode computer program, and creates a state object to represent the computer in its initial state.
+        /// </summary>
         public IntCodeState Parse(string inputProgram, Func<long> getNextInputValue, Action<long>? onNewOutputValue) => new IntCodeState(
             inputProgram.Split(',')
                 .Select(long.Parse)
@@ -15,25 +18,47 @@ namespace Common.IntCodes
             getNextInputValue,
             onNewOutputValue);
 
+        /// <summary>
+        /// Parses and then evaluates the specified IntCode computer state until it halts.
+        /// </summary>
         public IntCodeState ParseAndEvaluate(string inputProgram, params long[]? inputValues)
         {
             var inputValuesQueue = new Queue<long>(inputValues ?? Array.Empty<long>());
             return ParseAndEvaluateWithSignalling(inputProgram, () => inputValuesQueue.Dequeue(), null);
         }
 
-        public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<long> receiveInputValue, Action<long>? sendOutputValue)
+        /// <summary>
+        /// Parses and then evaluates the specified IntCode computer state until it halts, using input and output redirection.
+        /// </summary>
+        public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<long> receiveInputValue, Action<long>? sendOutputValue) =>
+            Evaluate(Parse(inputProgram, receiveInputValue, sendOutputValue));
+
+        /// <summary>
+        /// Evaluates the specified IntCode computer state until it halts.
+        /// </summary>
+        public IntCodeState Evaluate(IntCodeState intCodeState)
         {
-            var intCodeState = Parse(inputProgram, receiveInputValue, sendOutputValue);
-
-            Instruction instruction;
-            while ((instruction = intCodeState.ReadNextInstruction()).OpCode != 99)
+            while (EvaluateNextInstruction(intCodeState))
             {
-                var gotoInstructionPointer = EvalInstruction(instruction);
+            }
+            return intCodeState;
+        }
 
-                intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
+        /// <summary>
+        /// Evaluates the next instruction in the specified IntCode computer state.
+        /// Returns true if the program should continue to be evaluated, otherwise if the program has now halted returns false.
+        /// </summary>
+        public bool EvaluateNextInstruction(IntCodeState intCodeState)
+        {
+            var instruction = intCodeState.ReadNextInstruction();
+            if (instruction.OpCode == 99)
+            {
+                return false;
             }
 
-            return intCodeState;
+            var gotoInstructionPointer = EvalInstruction(instruction);
+            intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
+            return true;
         }
 
         private static long? EvalInstruction(Instruction instruction) =>
