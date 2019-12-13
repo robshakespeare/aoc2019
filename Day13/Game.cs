@@ -49,7 +49,7 @@ namespace Day13
             EnumUtil.Parse<TileType>(batch[2])
         );
 
-        public char GetPaintChar(TileType type)
+        public static char GetPaintChar(TileType type)
         {
             var paintChar = type switch
                 {
@@ -75,8 +75,6 @@ namespace Day13
                 BallPrevPosition = BallPosition;
                 BallPosition = new Vector(pos.X, pos.Y);
                 BallMovement = BallPosition - BallPrevPosition;
-
-                ////Debug.WriteLine("ball movement: " + BallMovement);
             }
             else if (type == TileType.Paddle)
             {

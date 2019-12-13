@@ -49,7 +49,7 @@ namespace Day13
 
             foreach (var (pos, type) in game.InitialTiles)
             {
-                var paintChar = game.GetPaintChar(type);
+                var paintChar = Game.GetPaintChar(type);
                 var relLocation = pos - game.TopLeft;
                 buffer[relLocation.Y][relLocation.X] = paintChar;
             }
@@ -76,22 +76,33 @@ namespace Day13
         public void Play()
         {
             Console.CursorVisible = false;
+            Console.Clear();
+
+            Console.SetCursorPosition(7, 10);
+            Console.Write("Loading...");
 
             var input = File.ReadAllText("input.txt");
             var game = InitializeGame(input);
+            var score = 0L;
+            var abandon = false;
 
-            long GetPlayerInput()
+            Console.CancelKeyPress += (sender, e) =>
             {
-                Thread.Sleep(200);
+                score = 0;
+                abandon = true;
+                e.Cancel = true;
+            };
+
+#pragma warning disable 8321
+            long GetAIPlayerInput()
+#pragma warning restore 8321
+            {
+                Thread.Sleep(100);
 
                 var nextBallPosition = game.BallPosition + game.BallMovement;
 
                 // if ball pos in the next frame is going to be where we are on the X axis, then stay still
                 // otherwise, move closer to its next X pos
-                ////if (nextBallPosition.X == game.PaddlePosition.X)
-                ////{
-                ////    return 0;
-                ////}
 
                 var delta = nextBallPosition.X - game.PaddlePosition.X;
 
@@ -112,17 +123,63 @@ namespace Day13
                 Debug.WriteLine($"{new { playerInput, delta, game.BallPosition, game.BallMovement, nextBallPosition, game.PaddlePosition }}");
 
                 return playerInput;
+            }
 
-                ////return Console.ReadKey(true).Key switch
-                ////{
-                ////    ConsoleKey.LeftArrow => -1,
-                ////    ConsoleKey.RightArrow => 1,
-                ////    _ => 0
-                ////};
+            bool started = false;
+            bool clearPrompt = false;
+
+            long GetPlayerInput()
+            {
+                if (!started)
+                {
+                    started = true;
+
+                    Console.SetCursorPosition(game.Right + 2, 3);
+                    Console.Write("Move: Left / Right arrow keys");
+                    Console.SetCursorPosition(game.Right + 2, 4);
+                    Console.Write("Stay still: Space bar or any other key");
+
+                    Console.SetCursorPosition(game.Right + 2, 6);
+                    Console.Write("Quit: Q or Ctrl+C");
+
+                    Console.SetCursorPosition(game.Right + 2, 8);
+                    Console.Write("Press a key to begin");
+
+                    clearPrompt = true;
+                }
+
+                while (!Console.KeyAvailable && !abandon)
+                {
+                    Thread.Sleep(10);
+                }
+
+                if (clearPrompt)
+                {
+                    Console.SetCursorPosition(game.Right + 2, 8);
+                    Console.Write("                    ");
+                }
+
+                if (abandon)
+                {
+                    return 0;
+                }
+
+                var readKey = Console.ReadKey(true);
+                if (readKey.Key == ConsoleKey.Q)
+                {
+                    score = 0;
+                    abandon = true;
+                    return 0;
+                }
+                return readKey.Key switch
+                    {
+                    ConsoleKey.LeftArrow => -1,
+                    ConsoleKey.RightArrow => 1,
+                    _ => 0
+                    };
             }
 
             var outputs = new List<long>();
-            var score = 0L;
 
             void DisplayComputerOutput(long value)
             {
@@ -134,7 +191,7 @@ namespace Day13
                     {
                         score = outputs[2];
                         Console.SetCursorPosition(game.Right + 2, 1);
-                        Console.Write($"Score: {score.ToString().PadLeft(20)}");
+                        Console.Write($"Score: {score.ToString().PadRight(20)}");
                     }
                     else
                     {
@@ -145,9 +202,14 @@ namespace Day13
                 }
             }
 
-            intCodeComputer.ParseAndEvaluateWithSignalling(EnableFreePlay(input), GetPlayerInput, DisplayComputerOutput);
+            var intCodeState = intCodeComputer.Parse(EnableFreePlay(input), GetPlayerInput, DisplayComputerOutput);
 
-            Console.SetCursorPosition(0, game.Height + 2);
+            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState))
+            {
+            }
+
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
             Console.Write("Final Score: ");
             ColorConsole.WriteLine(score.ToString(), ConsoleColor.Green);
             Console.CursorVisible = true;
