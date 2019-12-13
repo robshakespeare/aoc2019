@@ -8,8 +8,6 @@ namespace Common.IntCodes
 {
     public class IntCodeComputer
     {
-        // Func<long> getNextInputValue, Action<long>? onNewOutputValue
-
         /// <summary>
         /// Parses the specified IntCode computer program, and creates a state object to represent the computer in its initial state.
         /// </summary>
@@ -45,18 +43,6 @@ namespace Common.IntCodes
         }
 
         /// <summary>
-        /// Evaluates the specified IntCode computer state until it halts.
-        /// </summary>
-        public IntCodeState EvaluateUntilHaltedOrInputNeeded(IntCodeState intCodeState, Action<long>? onNewOutputValue = null)
-        {
-            while (intCodeState.ReadNextInstruction().OpCode != 3
-                   && EvaluateNextInstruction(intCodeState, () => throw new InvalidOperationException(), onNewOutputValue))
-            {
-            }
-            return intCodeState;
-        }
-
-        /// <summary>
         /// Evaluates the next instruction in the specified IntCode computer state.
         /// Returns true if the program should continue to be evaluated, otherwise if the program has now halted returns false.
         /// </summary>
@@ -65,7 +51,6 @@ namespace Common.IntCodes
             var instruction = intCodeState.ReadNextInstruction();
             if (instruction.OpCode == 99)
             {
-                intCodeState.Halted = true;
                 return false;
             }
 

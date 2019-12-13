@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Common;
 
@@ -18,10 +17,7 @@ namespace Day13
         public int Height { get; }
         public Vector TopLeft { get; }
 
-        public Vector BallPrevPosition { get; private set; }
         public Vector BallPosition { get; private set; }
-        public Vector BallMovement { get; private set; }
-
         public Vector PaddlePosition { get; private set; }
 
         public Game((Vector pos, TileType type)[] tiles)
@@ -37,8 +33,6 @@ namespace Day13
             Width = Right - Left;
             Height = Bottom - Top;
             TopLeft = new Vector(Top, Left);
-
-            BallPosition = new Vector(19, 18); // Hardcoded! This is so our initial movement will be calculated correctly!
         }
 
         public static (Vector pos, TileType type) ParseOutputBatch(IList<long> batch) =>
@@ -73,9 +67,7 @@ namespace Day13
 
             if (type == TileType.Ball)
             {
-                BallPrevPosition = BallPosition;
                 BallPosition = new Vector(pos.X, pos.Y);
-                BallMovement = BallPosition - BallPrevPosition;
             }
             else if (type == TileType.Paddle)
             {

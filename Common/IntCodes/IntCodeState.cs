@@ -41,21 +41,6 @@ namespace Common.IntCodes
 
         public long? LastOutputValue => Outputs.Any() ? Outputs.Last() : (long?) null;
 
-        public bool Halted { get; set; }
-
-        /// <summary>
-        /// Creates an exact copy of this state. No references are maintained, everything is copied.
-        /// </summary>
-        public IntCodeState Clone() =>
-            new IntCodeState(
-                new SortedList<long, long>(intCodes),
-                Outputs.ToList())
-            {
-                InstructionPointer = InstructionPointer,
-                RelativeBase = RelativeBase,
-                Halted = Halted
-            };
-
         /// <summary>
         /// Gets or sets the int code at the specified index.
         /// </summary>

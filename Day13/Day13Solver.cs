@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -34,8 +33,6 @@ namespace Day13
 
             return game.InitialTiles.Count(tile => tile.type == TileType.Block);
         }
-
-        ////public override long? SolvePart2(string input) => new Day13Part2Solver(EnableFreePlay(input)).Solve();
 
         public void RenderInitial(Game game)
         {
@@ -99,38 +96,27 @@ namespace Day13
             long GetAIPlayerInput()
 #pragma warning restore 8321
             {
-                Thread.Sleep(100);
-
-                var nextBallPosition = game.BallPosition + game.BallMovement;
-
-                // if ball pos in the next frame is going to be where we are on the X axis, then stay still
-                // otherwise, move closer to its next X pos
-
-                var delta = nextBallPosition.X - game.PaddlePosition.X;
-
-                if (nextBallPosition.Y >= game.PaddlePosition.Y)
+                if (game.PaddlePosition.X < game.BallPosition.X)
                 {
-                    return 0;
+                    return 1;
                 }
-
-                var playerInput = delta switch
-                    {
-                    0 => 0,
-                    _ when delta == -1 && game.BallMovement.X == 1 && game.BallMovement.Y == 1 => 0,
-                    _ when delta == 1 && game.BallMovement.X == -1 && game.BallMovement.Y == 1 => 0,
-                    _ when delta < 0 => -1,
-                    _ => 1
-                    };
-
-                Debug.WriteLine($"{new { playerInput, delta, game.BallPosition, game.BallMovement, nextBallPosition, game.PaddlePosition }}");
-
-                return playerInput;
+                if (game.PaddlePosition.X > game.BallPosition.X)
+                {
+                    return -1;
+                }
+                return 0;
             }
 
-            bool started = false;
-            bool clearPrompt = false;
+            // ReSharper disable TooWideLocalVariableScope
+            // ReSharper disable RedundantAssignment
+            var started = false;
+            var clearPrompt = false;
+            // ReSharper restore TooWideLocalVariableScope
+            // ReSharper restore RedundantAssignment
 
+#pragma warning disable 8321
             long GetPlayerInput()
+#pragma warning restore 8321
             {
                 if (!started)
                 {
@@ -183,7 +169,7 @@ namespace Day13
 
             var outputs = new List<long>();
 
-            void DisplayComputerOutput(long value)
+            void DisplayOutput(long value)
             {
                 outputs.Add(value);
 
@@ -206,7 +192,7 @@ namespace Day13
 
             var intCodeState = intCodeComputer.Parse(EnableFreePlay(input));
 
-            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState, GetPlayerInput, DisplayComputerOutput))
+            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState, GetAIPlayerInput, DisplayOutput))
             {
             }
 
