@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Common;
 
@@ -17,6 +18,12 @@ namespace Day13
         public int Height { get; }
         public Vector TopLeft { get; }
 
+        public Vector BallPrevPosition { get; private set; }
+        public Vector BallPosition { get; private set; }
+        public Vector BallMovement { get; private set; }
+
+        public Vector PaddlePosition { get; private set; }
+
         public Game((Vector pos, TileType type)[] tiles)
         {
             InitialTiles = tiles;
@@ -30,6 +37,8 @@ namespace Day13
             Width = Right - Left;
             Height = Bottom - Top;
             TopLeft = new Vector(Top, Left);
+
+            BallPosition = new Vector(19, 18); // Hardcoded! This is so our initial movement will be calculated correctly!
         }
 
         public static (Vector pos, TileType type) ParseOutputBatch(IList<long> batch) =>
@@ -40,36 +49,7 @@ namespace Day13
             EnumUtil.Parse<TileType>(batch[2])
         );
 
-        public void RenderInitial(bool printSize = false)
-        {
-            if (printSize)
-            {
-                Console.WriteLine($"TopLeft: X={Left}, Y={Top}");
-                Console.WriteLine($"BottomRight: X={Right}, Y={Bottom}");
-            }
-
-            // Index 1 is which line, i.e. Y.
-            // Index 2 is which column, i.e. X.
-            var buffer = Enumerable
-                .Range(0, Height)
-                .Select(_ => new string(' ', Width).ToCharArray())
-                .ToArray();
-
-            foreach (var (pos, type) in InitialTiles)
-            {
-                var paintChar = GetPaintChar(type);
-                var relLocation = pos - TopLeft;
-                buffer[relLocation.Y][relLocation.X] = paintChar;
-            }
-
-            var grid = string.Join(
-                Environment.NewLine,
-                buffer.Select(chars => new string(chars.ToArray())));
-
-            Console.WriteLine(grid);
-        }
-
-        private static char GetPaintChar(TileType type)
+        public char GetPaintChar(TileType type)
         {
             var paintChar = type switch
                 {
@@ -83,12 +63,25 @@ namespace Day13
             return paintChar;
         }
 
-        public void RenderPixel(IList<long> batch)
+        public void Update(IList<long> batch)
         {
             var (pos, type) = ParseOutputBatch(batch);
 
             Console.SetCursorPosition(pos.X, pos.Y);
             Console.Write(GetPaintChar(type));
+
+            if (type == TileType.Ball)
+            {
+                BallPrevPosition = BallPosition;
+                BallPosition = new Vector(pos.X, pos.Y);
+                BallMovement = BallPosition - BallPrevPosition;
+
+                ////Debug.WriteLine("ball movement: " + BallMovement);
+            }
+            else if (type == TileType.Paddle)
+            {
+                PaddlePosition = new Vector(pos.X, pos.Y);
+            }
         }
     }
 }
