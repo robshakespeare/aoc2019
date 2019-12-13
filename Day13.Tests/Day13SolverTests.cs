@@ -14,7 +14,7 @@ namespace Day13.Tests
             var part1Result = sut.SolvePart1();
 
             // ASSERT
-            part1Result.Should().Be(null);
+            part1Result.Should().Be(304);
         }
 
         [Test]
@@ -26,19 +26,5 @@ namespace Day13.Tests
             // ASSERT
             part2Result.Should().Be(null);
         }
-
-        /*
-        [Test]
-        public void ExampleTest()
-        {
-            const string input = @"";
-
-            // ACT
-            var result = sut.SolvePart1(input.ReadAllLines());
-
-            // ASSERT
-            result.Should().Be(xyz);
-        }
-        */
     }
 }

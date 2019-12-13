@@ -76,16 +76,7 @@ namespace Common.IntCodes
             var parameterModes = fullOpCode.ToString()
                 .Reverse()
                 .Skip(2)
-                .Select(chr =>
-                {
-                    if (Enum.TryParse<ParameterMode>(chr.ToString(), out var mode) &&
-                        Enum.IsDefined(typeof(ParameterMode), mode))
-                    {
-                        return mode;
-                    }
-
-                    throw new InvalidOperationException("Invalid parameterMode: " + chr);
-                })
+                .Select(EnumUtil.Parse<ParameterMode>)
                 .ToArray();
 
             return new Instruction(opCode, this, parameterModes, InstructionPointer);
