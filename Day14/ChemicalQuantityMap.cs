@@ -21,18 +21,30 @@ namespace Day14
             }
         }
 
-        /// <returns>Returns the amount depleted, if any.</returns>
-        public int DepleteIfAvailable(string chemical, int quantityRequired)
+        public void DepleteIfAvailable(string chemical, ref int quantityRequired)
         {
             if (map.TryGetValue(chemical, out var currentQuantity))
             {
                 var amountDepleted = Math.Min(quantityRequired, currentQuantity);
 
                 map[chemical] = currentQuantity - amountDepleted;
-                return amountDepleted;
-            }
 
-            return 0;
+                quantityRequired -= amountDepleted;
+            }
         }
+
+        //// <returns>Returns the amount depleted, if any.</returns>
+        ////public int DepleteIfAvailable(string chemical, int quantityRequired)
+        ////{
+        ////    if (map.TryGetValue(chemical, out var currentQuantity))
+        ////    {
+        ////        var amountDepleted = Math.Min(quantityRequired, currentQuantity);
+
+        ////        map[chemical] = currentQuantity - amountDepleted;
+        ////        return amountDepleted;
+        ////    }
+
+        ////    return 0;
+        ////}
     }
 }

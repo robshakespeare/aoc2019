@@ -11,11 +11,14 @@ namespace Day14
         public const string ORE = "ORE";
         public const string FUEL = "FUEL";
 
-        // KEY is Output Chemical, VALUE is the full reaction for that Output Chemical
-        private readonly Dictionary<string, Reaction> reactions; 
+        /// <summary>
+        /// Dictionary of all the reactions, where KEY is Output Chemical, VALUE is the full reaction for that Output Chemical.
+        /// </summary>
+        private readonly Dictionary<string, Reaction> reactions;
 
-        
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public NanoFactory(Dictionary<string, Reaction> reactions)
         {
             this.reactions = reactions;
@@ -28,9 +31,18 @@ namespace Day14
         {
             var store = new ChemicalQuantityMap();
             var totalProduce = new ChemicalQuantityMap();
-            Produce(new ChemicalOutput(fuelQuantityRequired, FUEL), fuelQuantityRequired, store, totalProduce);
+            var oreList = new List<int>();
 
-            return totalProduce[ORE];
+            Produce(
+                FUEL, //new ChemicalOutput(fuelQuantityRequired, FUEL),
+                fuelQuantityRequired,
+                store,
+                totalProduce,
+                oreList);
+
+            var oreRequired = oreList.Sum();
+
+            return oreRequired;
 
             // /*
             // * First, pass through, calculating the number of each chemical required
@@ -61,82 +73,123 @@ namespace Day14
             ////return chemicalQuantitiesProduced[ORE];
         }
 
-        private void Produce(in ChemicalOutput chemicalRequired, int amountOfChemicalRequired, /*, int amountRequired*//*New, in decimal factor*/ in ChemicalQuantityMap store, in ChemicalQuantityMap totalProduce)
+        private void Produce(
+            in string chemicalRequired,
+            int amountRequired,
+            in ChemicalQuantityMap store,
+            in ChemicalQuantityMap totalProduce,
+            in List<int> oreList)
         {
-            ////var amountRequired = amountRequiredNew * factor;
+            // First, use any quantity we have remaining for this chemical
+            store.DepleteIfAvailable(chemicalRequired, ref amountRequired);
 
-            var reaction = chemicalRequired.Chemical == ORE
-                ? new Reaction(chemicalRequired)
-                : reactions[chemicalRequired.Chemical];
-            //// rs-todo: KEEP, just don't do runs for now! var numRunsRequired = (int)Math.Ceiling(amountRequired / (decimal) reaction.Output.Quantity);
-
-            var factor = 1m;
-            if (reaction.Output.Quantity != amountOfChemicalRequired)
+            // Only produce more if we need it, otherwise, just exit this method now.
+            if (amountRequired == 0)
             {
-                factor = amountOfChemicalRequired / (decimal)reaction.Output.Quantity;
+                return;
             }
+
+            // Get the reaction that will produce the chemical required
+            var reaction = reactions[chemicalRequired];
+
+            // Run the reaction
+            var numRunsRequired = (int) Math.Ceiling(amountRequired / (decimal) reaction.Output.Quantity);
 
             foreach (var input in reaction.Inputs)
             {
-                // get how much is produced by the reaction that makes the input chemical
-                //var reactionTotal = reactions[input.Chemical].Output.Quantity;
-
-                //var newFactor = input.Quantity / (decimal)reactionTotal;
-
-                //var newFactor = amountRequired / (decimal) input.Quantity;
-
-                Consume(input, factor /*, numRunsRequired, newFactor*/ /*amountRequired * numRunsRequired,*/ /*input.Quantity * numRunsRequired*/, store, totalProduce);
+                if (input.Chemical == ORE)
+                {
+                    oreList.Add(input.Quantity * numRunsRequired);
+                }
+                else
+                {
+                    Produce(input.Chemical, input.Quantity * numRunsRequired, store, totalProduce, oreList);
+                }
             }
 
-            // Add the amount of chemical produced to the "store" and to the list of totals produced
-            var amountProduced = reaction.Output.Quantity; // * numRunsRequired;
+            // Reaction has now produced, so perform updates
+            var amountProduced = reaction.Output.Quantity * numRunsRequired;
 
-            store.IncreaseQuantity(reaction.Output.Chemical, amountProduced);
-            totalProduce.IncreaseQuantity(reaction.Output.Chemical, amountProduced);
+            totalProduce.IncreaseQuantity(chemicalRequired, amountProduced);
+            store.IncreaseQuantity(chemicalRequired, amountProduced - amountRequired);
         }
 
-        private void Consume(in ChemicalInput input, decimal factor, /*, int numRunsRequired, in decimal factor*/ in ChemicalQuantityMap store, in ChemicalQuantityMap totalProduce)
-        {
-            //var amountToConsume = numRunsRequired * (int)Math.Round(input.Quantity * factor);
+        ////private void Produce(in ChemicalOutput chemicalRequired, int amountOfChemicalRequired, /*, int amountRequired*//*New, in decimal factor*/ in ChemicalQuantityMap store, in ChemicalQuantityMap totalProduce)
+        ////{
+        ////    ////var amountRequired = amountRequiredNew * factor;
 
-            var amountRequired = (int)Math.Round(input.Quantity * factor);
+        ////    var reaction = chemicalRequired.Chemical == ORE
+        ////        ? new Reaction(chemicalRequired)
+        ////        : reactions[chemicalRequired.Chemical];
+        ////    //// rs-todo: KEEP, just don't do runs for now! var numRunsRequired = (int)Math.Ceiling(amountRequired / (decimal) reaction.Output.Quantity);
 
-            // first use from store
-            var amountDepleted = store.DepleteIfAvailable(input.Chemical, amountRequired);
-            amountRequired -= amountDepleted;
-            ////amountToProduce -= amountDepleted;
+        ////    var factor = 1m;
+        ////    if (reaction.Output.Quantity != amountOfChemicalRequired)
+        ////    {
+        ////        factor = amountOfChemicalRequired / (decimal)reaction.Output.Quantity;
+        ////    }
 
-            // then, produce any of the left over
-            if (amountRequired > 0)
-            {
-                // rs-todo: are separate ChemicalOutput and Input classes needed?
-                Produce(new ChemicalOutput(input.Quantity, input.Chemical), amountRequired, /*, amountRequired*/ store, totalProduce);
+        ////    foreach (var input in reaction.Inputs)
+        ////    {
+        ////        // get how much is produced by the reaction that makes the input chemical
+        ////        //var reactionTotal = reactions[input.Chemical].Output.Quantity;
 
-                //if (input.Chemical == ORE)
-                //{
-                //    // Ore is a raw material and is not produced by a reaction
-                //    var numberOfOreInputsRequired = (int) Math.Ceiling(amountToProduce / (decimal) input.Quantity);
-                //    var oreRequired = input.Quantity * numberOfOreInputsRequired;
+        ////        //var newFactor = input.Quantity / (decimal)reactionTotal;
 
-                //    store.IncreaseQuantity(ORE, oreRequired);
-                //    totalProduce.IncreaseQuantity(ORE, oreRequired);
-                //}
-                //else
-                //{
-                //    Produce(input.Chemical, amountToProduce, store, totalProduce);
-                //}
+        ////        //var newFactor = amountRequired / (decimal) input.Quantity;
 
-                // use the newly produced chemicals, to complete our consumption
-                amountDepleted = store.DepleteIfAvailable(input.Chemical, amountRequired);
-                amountRequired -= amountDepleted;
-            }
+        ////        Consume(input, factor /*, numRunsRequired, newFactor*/ /*amountRequired * numRunsRequired,*/ /*input.Quantity * numRunsRequired*/, store, totalProduce);
+        ////    }
 
-            // check!
-            if (amountRequired > 0)
-            {
-                throw new InvalidOperationException("Consume should consume all of required!");
-            }
-        }
+        ////    // Add the amount of chemical produced to the "store" and to the list of totals produced
+        ////    var amountProduced = reaction.Output.Quantity; // * numRunsRequired;
+
+        ////    store.IncreaseQuantity(reaction.Output.Chemical, amountProduced);
+        ////    totalProduce.IncreaseQuantity(reaction.Output.Chemical, amountProduced);
+        ////}
+
+        ////private void Consume(in ChemicalInput input, decimal factor, /*, int numRunsRequired, in decimal factor*/ in ChemicalQuantityMap store, in ChemicalQuantityMap totalProduce)
+        ////{
+        ////    //var amountToConsume = numRunsRequired * (int)Math.Round(input.Quantity * factor);
+
+        ////    var amountRequired = (int)Math.Round(input.Quantity * factor);
+
+        ////    // first use from store
+        ////    var amountDepleted = store.DepleteIfAvailable(input.Chemical, amountRequired);
+        ////    amountRequired -= amountDepleted;
+        ////    ////amountToProduce -= amountDepleted;
+
+        ////    // then, produce any of the left over
+        ////    if (amountRequired > 0)
+        ////    {
+        ////        // rs-todo: are separate ChemicalOutput and Input classes needed?
+        ////        Produce(new ChemicalOutput(input.Quantity, input.Chemical), amountRequired, /*, amountRequired*/ store, totalProduce);
+
+        ////        //if (input.Chemical == ORE)
+        ////        //{
+        ////        //    // Ore is a raw material and is not produced by a reaction
+        ////        //    var numberOfOreInputsRequired = (int) Math.Ceiling(amountToProduce / (decimal) input.Quantity);
+        ////        //    var oreRequired = input.Quantity * numberOfOreInputsRequired;
+
+        ////        //    store.IncreaseQuantity(ORE, oreRequired);
+        ////        //    totalProduce.IncreaseQuantity(ORE, oreRequired);
+        ////        //}
+        ////        //else
+        ////        //{
+        ////        //    Produce(input.Chemical, amountToProduce, store, totalProduce);
+        ////        //}
+
+        ////        // use the newly produced chemicals, to complete our consumption
+        ////        amountDepleted = store.DepleteIfAvailable(input.Chemical, amountRequired);
+        ////        amountRequired -= amountDepleted;
+        ////    }
+
+        ////    // check!
+        ////    if (amountRequired > 0)
+        ////    {
+        ////        throw new InvalidOperationException("Consume should consume all of required!");
+        ////    }
+        ////}
 
         //private void EnumerateChemicalTotalsRequired(string chemicalRequired, int timesRequired, Dictionary<string, int> chemicalTotalsRequired)
         //{
