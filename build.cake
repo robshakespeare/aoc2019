@@ -2,7 +2,7 @@
 
 var target = Argument<string>("target", "CreateDay");
 var day = Argument<string>("day", "");
-var workingDir = Argument<string>("testResultsDir", "./.cake-working/");
+var workingDir = Argument<string>("workingDir", "./.cake-working/");
 
 Task("CreateDay")
     .Does(() =>
@@ -27,9 +27,9 @@ Task("CreateDay")
             MoveFile(file, newFilePath);
         }
 
-        foreach(var dir in GetDirectories("./.cake-working/*"))
+        foreach(var dir in GetDirectories("./.cake-working/*/*"))
         {
-            var newDirPath = $"./{dir.GetDirectoryName()}".Replace("XXX", day);
+            var newDirPath = $"./{dir.Segments[dir.Segments.Length-2]}/{dir.GetDirectoryName()}".Replace("XXX", day);
             MoveDirectory(dir, newDirPath);
         }
 
