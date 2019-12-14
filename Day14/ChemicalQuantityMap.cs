@@ -5,11 +5,11 @@ namespace Day14
 {
     public class ChemicalQuantityMap
     {
-        private readonly Dictionary<string, int> map = new Dictionary<string, int>();
+        private readonly Dictionary<string, long> map = new Dictionary<string, long>();
 
-        public int this[string chemical] => map[chemical];
+        public long this[string chemical] => map[chemical];
 
-        public void IncreaseQuantity(string chemical, in int quantity)
+        public void IncreaseQuantity(string chemical, in long quantity)
         {
             if (map.TryGetValue(chemical, out var currentQuantity))
             {
@@ -21,7 +21,7 @@ namespace Day14
             }
         }
 
-        public void DepleteIfAvailable(string chemical, ref int quantityRequired)
+        public void DepleteIfAvailable(string chemical, ref long quantityRequired)
         {
             if (map.TryGetValue(chemical, out var currentQuantity))
             {

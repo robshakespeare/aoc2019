@@ -27,11 +27,11 @@ namespace Day14
         /// <summary>
         /// Calculates the amount of ORE required to reach the specified amount of fuel.
         /// </summary>
-        public long CalculateOreRequired(int fuelQuantityRequired)
+        public long CalculateOreRequired(long fuelQuantityRequired)
         {
             var store = new ChemicalQuantityMap();
             var totalProduce = new ChemicalQuantityMap();
-            var oreList = new List<int>();
+            var oreList = new List<long>();
 
             Produce(
                 FUEL,
@@ -46,10 +46,10 @@ namespace Day14
 
         private void Produce(
             in string chemicalRequired,
-            int amountRequired,
+            long amountRequired,
             in ChemicalQuantityMap store,
             in ChemicalQuantityMap totalProduce,
-            in List<int> oreList)
+            in List<long> oreList)
         {
             // First, use any quantity we have remaining for this chemical
             store.DepleteIfAvailable(chemicalRequired, ref amountRequired);
@@ -64,7 +64,7 @@ namespace Day14
             var reaction = reactions[chemicalRequired];
 
             // Run the reaction
-            var numRunsRequired = (int) Math.Ceiling(amountRequired / (decimal) reaction.Output.Quantity);
+            var numRunsRequired = (long) Math.Ceiling(amountRequired / (decimal) reaction.Output.Quantity);
 
             foreach (var input in reaction.Inputs)
             {
