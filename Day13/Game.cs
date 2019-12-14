@@ -51,7 +51,7 @@ namespace Day13
                 TileType.Wall => ('█', ConsoleColor.Gray),
                 TileType.Block => ('#', ConsoleColor.Cyan),
                 TileType.Paddle => ('▀', ConsoleColor.Magenta),
-                TileType.Ball => ('o', ConsoleColor.Yellow),
+                TileType.Ball => ('●', ConsoleColor.Green),
                 _ => throw new InvalidOperationException("Invalid tileType: " + type)
                 };
         }

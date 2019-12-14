@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Common;
 using Common.IntCodes;
@@ -21,7 +22,7 @@ namespace Day13
     /// </summary>
     public class Day13Solver : SolverReadAllText
     {
-        public static void Main(string[] args) => new Day13Solver().Play(args.FirstOrDefault() == "auto");
+        public static void Main() => new Day13Solver().Play(false);
 
         private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
 
@@ -74,6 +75,7 @@ namespace Day13
 
         public void Play(bool auto)
         {
+            Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             Console.Clear();
 
@@ -94,14 +96,34 @@ namespace Day13
 
             long GetAIPlayerInput()
             {
+                if (Console.KeyAvailable)
+                {
+                    var readKey = Console.ReadKey(true);
+
+                    if (readKey.Key == ConsoleKey.Q)
+                    {
+                        score = 0;
+                        abandon = true;
+                        return 0;
+                    }
+
+                    // Switch off auto solver!
+                    if (auto && readKey.Key == ConsoleKey.S)
+                    {
+                        auto = false;
+                    }
+                }
+
                 if (game.PaddlePosition.X < game.BallPosition.X)
                 {
                     return 1;
                 }
+
                 if (game.PaddlePosition.X > game.BallPosition.X)
                 {
                     return -1;
                 }
+
                 return 0;
             }
 
@@ -114,17 +136,14 @@ namespace Day13
                 {
                     started = true;
 
-                    Console.SetCursorPosition(game.Right + 2, 3);
-                    Console.Write("Move: Left / Right arrow keys");
-                    Console.SetCursorPosition(game.Right + 2, 4);
-                    Console.Write("Stay still: Space bar or any other key");
+                    Write(game.Right + 2, 3, "Move", "Left / Right keys");
+                    Write(game.Right + 2, 4, "Stay still", "Any other key");
+                    Write(game.Right + 2, 5, "Auto move", "A");
+                    Write(game.Right + 2, 6, "Auto solve", "S");
+                    Write(game.Right + 2, 7, "Quit", "Q / Ctrl+C");
 
-                    Console.SetCursorPosition(game.Right + 2, 6);
-                    Console.Write("Quit: Q or Ctrl+C");
-
-                    Console.SetCursorPosition(game.Right + 2, 8);
+                    Console.SetCursorPosition(game.Right + 2, 9);
                     Console.Write("Press a key to begin");
-
                     clearPrompt = true;
                 }
 
@@ -135,8 +154,8 @@ namespace Day13
 
                 if (clearPrompt)
                 {
-                    Console.SetCursorPosition(game.Right + 2, 8);
-                    Console.Write("                    ");
+                    Console.SetCursorPosition(game.Right + 2, 9);
+                    Console.Write("".PadRight(20));
                 }
 
                 if (abandon)
@@ -145,12 +164,27 @@ namespace Day13
                 }
 
                 var readKey = Console.ReadKey(true);
+
                 if (readKey.Key == ConsoleKey.Q)
                 {
                     score = 0;
                     abandon = true;
                     return 0;
                 }
+
+                // Auto move!
+                if (readKey.Key == ConsoleKey.A)
+                {
+                    return GetAIPlayerInput();
+                }
+
+                // Switch to auto solver!
+                if (readKey.Key == ConsoleKey.S)
+                {
+                    auto = true;
+                    return GetAIPlayerInput();
+                }
+
                 return readKey.Key switch
                     {
                     ConsoleKey.LeftArrow => -1,
@@ -170,8 +204,7 @@ namespace Day13
                     if (outputs[0] == -1 && outputs[1] == 0)
                     {
                         score = outputs[2];
-                        Console.SetCursorPosition(game.Right + 2, 1);
-                        Console.Write($"Score: {score.ToString().PadRight(20)}");
+                        Write(game.Right + 2, 1, "Score", score.ToString().PadRight(20));
                     }
                     else
                     {
@@ -182,10 +215,13 @@ namespace Day13
                 }
             }
 
-            var getNextInput = auto ? (Func<long>)GetAIPlayerInput : GetPlayerInput;
             var intCodeState = intCodeComputer.Parse(EnableFreePlay(input));
 
-            while (!abandon && intCodeComputer.EvaluateNextInstruction(intCodeState, getNextInput, DisplayOutput))
+            while (!abandon &&
+                   intCodeComputer.EvaluateNextInstruction(
+                       intCodeState,
+                       auto ? (Func<long>) GetAIPlayerInput : GetPlayerInput,
+                       DisplayOutput))
             {
             }
 
@@ -194,6 +230,13 @@ namespace Day13
             Console.Write("Final Score: ");
             ColorConsole.WriteLine(score.ToString(), ConsoleColor.Green);
             Console.CursorVisible = true;
+        }
+
+        private static void Write(int x, int y, string text, string colorText)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write((text + ':').PadRight(12));
+            ColorConsole.Write(colorText, ConsoleColor.Yellow);
         }
 
         private static string EnableFreePlay(string input)
