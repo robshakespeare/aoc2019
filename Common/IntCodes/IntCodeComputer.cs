@@ -19,10 +19,15 @@ namespace Common.IntCodes
         /// <summary>
         /// Parses and then evaluates the specified IntCode computer state until it halts.
         /// </summary>
-        public IntCodeState ParseAndEvaluate(string inputProgram, params long[]? inputValues)
+        public IntCodeState ParseAndEvaluate(string inputProgram, params long[]? inputValues) => Evaluate(Parse(inputProgram), inputValues);
+
+        /// <summary>
+        /// Evaluates the specified IntCode computer state until it halts.
+        /// </summary>
+        public IntCodeState Evaluate(IntCodeState intCodeState, params long[]? inputValues)
         {
             var inputValuesQueue = new Queue<long>(inputValues ?? Array.Empty<long>());
-            return ParseAndEvaluateWithSignalling(inputProgram, () => inputValuesQueue.Dequeue(), null);
+            return Evaluate(intCodeState, () => inputValuesQueue.Dequeue(), null);
         }
 
         /// <summary>
