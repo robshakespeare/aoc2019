@@ -142,54 +142,54 @@ namespace Day14.Tests
 
             result["FUEL"].Should().BeEquivalentTo(
                 new Reaction(
-                    new ChemicalOutput(1, "FUEL"),
+                    new ChemicalQuantity(1, "FUEL"),
                     new[]
                     {
-                        new ChemicalInput(7, "A"),
-                        new ChemicalInput(1, "E")
+                        new ChemicalQuantity(7, "A"),
+                        new ChemicalQuantity(1, "E")
                     }));
 
             result["A"].Should().BeEquivalentTo(
                 new Reaction(
-                    new ChemicalOutput(10, "A"),
+                    new ChemicalQuantity(10, "A"),
                     new[]
                     {
-                        new ChemicalInput(10, "ORE")
+                        new ChemicalQuantity(10, "ORE")
                     }));
 
             result["B"].Should().BeEquivalentTo(
                 new Reaction(
-                    new ChemicalOutput(1, "B"),
+                    new ChemicalQuantity(1, "B"),
                     new[]
                     {
-                        new ChemicalInput(1, "ORE")
+                        new ChemicalQuantity(1, "ORE")
                     }));
 
             result["C"].Should().BeEquivalentTo(
                 new Reaction(
-                    new ChemicalOutput(1, "C"),
+                    new ChemicalQuantity(1, "C"),
                     new[]
                     {
-                        new ChemicalInput(7, "A"),
-                        new ChemicalInput(1, "B")
+                        new ChemicalQuantity(7, "A"),
+                        new ChemicalQuantity(1, "B")
                     }));
 
             result["D"].Should().BeEquivalentTo(
                 new Reaction(
-                    new ChemicalOutput(1, "D"),
+                    new ChemicalQuantity(1, "D"),
                     new[]
                     {
-                        new ChemicalInput(7, "A"),
-                        new ChemicalInput(1, "C")
+                        new ChemicalQuantity(7, "A"),
+                        new ChemicalQuantity(1, "C")
                     }));
 
             result["E"].Should().BeEquivalentTo(
                 new Reaction(
-                    new ChemicalOutput(1, "E"),
+                    new ChemicalQuantity(1, "E"),
                     new[]
                     {
-                        new ChemicalInput(7, "A"),
-                        new ChemicalInput(1, "D")
+                        new ChemicalQuantity(7, "A"),
+                        new ChemicalQuantity(1, "D")
                     }));
         }
     }

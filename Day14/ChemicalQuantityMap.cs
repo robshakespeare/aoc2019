@@ -32,19 +32,5 @@ namespace Day14
                 quantityRequired -= amountDepleted;
             }
         }
-
-        //// <returns>Returns the amount depleted, if any.</returns>
-        ////public int DepleteIfAvailable(string chemical, int quantityRequired)
-        ////{
-        ////    if (map.TryGetValue(chemical, out var currentQuantity))
-        ////    {
-        ////        var amountDepleted = Math.Min(quantityRequired, currentQuantity);
-
-        ////        map[chemical] = currentQuantity - amountDepleted;
-        ////        return amountDepleted;
-        ////    }
-
-        ////    return 0;
-        ////}
     }
 }
