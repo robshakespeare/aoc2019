@@ -24,21 +24,22 @@ namespace Common
                 Trace.WriteLine("Ensured input was loaded. Input type is " + input?.GetType());
             }
 
-            SolvePartTimed(1, () => SolvePart1() as object);
-            SolvePartTimed(2, () => SolvePart2() as object);
+            SolvePart1();
+            SolvePart2();
         }
 
-        private static void SolvePartTimed(int partNum, Func<object?> solver)
+        private static TOutput SolvePartTimed<TOutput>(int partNum, Func<TOutput> solver)
         {
             using var _ = new TimingBlock($"Part {partNum}");
             var result = solver();
             Console.Write($"Part {partNum}: ");
             ColorConsole.WriteLine(result, ConsoleColor.Green);
+            return result;
         }
 
-        public TOutputPart1 SolvePart1() => SolvePart1(Input.Value);
+        public TOutputPart1 SolvePart1() => SolvePartTimed(1, () => SolvePart1(Input.Value));
 
-        public TOutputPart2 SolvePart2() => SolvePart2(Input.Value);
+        public TOutputPart2 SolvePart2() => SolvePartTimed(2, () => SolvePart2(Input.Value));
 
         [return: MaybeNull]
         public virtual TOutputPart1 SolvePart1(TInput input)
