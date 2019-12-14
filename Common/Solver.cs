@@ -1,21 +1,27 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Common
 {
-    public abstract class Solver<TInput, TOutputPart1, TOutputPart2>
+    public abstract class Solver<TInput, TOutputPart1, TOutputPart2> : SolverBase
     {
         private Lazy<TInput> Input { get; }
 
-        protected Solver(IInputLoader<TInput> inputLoader)
+        protected Solver(InputLoader<TInput> inputLoader)
         {
-            Input = new Lazy<TInput>(inputLoader.LoadInput);
+            Input = new Lazy<TInput>(() =>
+            {
+                inputLoader.DayNumber = GetDayNumber();
+                return inputLoader.LoadInput();
+            });
         }
 
         public void Run()
         {
+            Console.OutputEncoding = Encoding.UTF8;
             PrintTitle();
 
             if (!Input.IsValueCreated)
@@ -61,15 +67,11 @@ namespace Common
 
         private void PrintTitle()
         {
-            var dayNumRegex = new Regex(@"Day(?<dayNum>\d+)");
-            var fullName = GetType().FullName;
-            Match match;
+            var dayNumber = TryGetDayNumber();
 
-            if (fullName != null &&
-                (match = dayNumRegex.Match(fullName)).Success &&
-                match.Groups["dayNum"].Success)
+            if (dayNumber != null)
             {
-                var title = $"Day {match.Groups["dayNum"].Value}";
+                var title = $"Day {dayNumber}";
                 ColorConsole.WriteLine(title, ConsoleColor.DarkYellow);
             }
         }
@@ -77,8 +79,30 @@ namespace Common
 
     public abstract class Solver<TInput> : Solver<TInput, long?, long?>
     {
-        protected Solver(IInputLoader<TInput> inputLoader) : base(inputLoader)
+        protected Solver(InputLoader<TInput> inputLoader) : base(inputLoader)
         {
         }
+    }
+
+    public abstract class SolverBase
+    {
+        private static readonly Regex DayNumRegex = new Regex(@"Day(?<dayNum>\d+)", RegexOptions.Compiled);
+
+        protected int? TryGetDayNumber()
+        {
+            var fullName = GetType().FullName;
+            Match match;
+
+            if (fullName != null &&
+                (match = DayNumRegex.Match(fullName)).Success &&
+                match.Groups["dayNum"].Success)
+            {
+                return int.Parse(match.Groups["dayNum"].Value);
+            }
+
+            return null;
+        }
+
+        protected int GetDayNumber() => TryGetDayNumber() ?? throw new InvalidOperationException("Unable to get day number from type name: " + GetType().FullName);
     }
 }

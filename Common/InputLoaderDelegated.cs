@@ -2,7 +2,7 @@ using System;
 
 namespace Common
 {
-    public class InputLoaderDelegated<TInputValue> : IInputLoader<TInputValue>
+    public class InputLoaderDelegated<TInputValue> : InputLoader<TInputValue>
     {
         private readonly Func<TInputValue> loadInputDelegate;
 
@@ -11,6 +11,6 @@ namespace Common
             this.loadInputDelegate = loadInputDelegate;
         }
 
-        public TInputValue LoadInput() => loadInputDelegate();
+        public override TInputValue LoadInput() => loadInputDelegate();
     }
 }

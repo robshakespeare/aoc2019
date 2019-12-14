@@ -2,12 +2,24 @@ using System.IO;
 
 namespace Common
 {
-    public class InputLoaderReadAllLines : IInputLoader<string[]>
+    public class InputLoaderReadAllLines : InputLoader<string[]>
     {
-        public string[] LoadInput()
+        public InputLoaderReadAllLines(int dayNumber)
+        {
+            DayNumber = dayNumber;
+        }
+
+        /// <summary>
+        /// Warning: be sure set Day Number manually!
+        /// </summary>
+        internal InputLoaderReadAllLines()
+        {
+        }
+
+        public override string[] LoadInput()
         {
             using var _ = new TimingBlock("Load input as lines");
-            return File.ReadAllLines("input.txt");
+            return File.ReadAllLines(GetInputFilePathForCurrentDayRelativeToBin());
         }
     }
 }
