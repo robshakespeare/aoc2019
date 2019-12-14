@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Day6
+namespace AoC.Day6
 {
     public class HierarchicalNodeEqualityComparer : IEqualityComparer<HierarchicalNode>
     {

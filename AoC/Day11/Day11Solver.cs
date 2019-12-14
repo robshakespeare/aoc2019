@@ -4,7 +4,7 @@ using System.Linq;
 using Common;
 using Common.IntCodes;
 
-namespace Day11
+namespace AoC.Day11
 {
     public class Day11Solver : Solver<string, long?, string?>
     {

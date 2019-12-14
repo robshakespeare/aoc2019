@@ -1,6 +1,7 @@
+using AoC.Day4;
 using NUnit.Framework;
 
-namespace Day4.Tests
+namespace AoC.Tests.Day4
 {
     public class Day4SolverTests
     {

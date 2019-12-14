@@ -1,4 +1,4 @@
-namespace Day14
+namespace AoC.Day14
 {
     public struct ChemicalQuantity
     {

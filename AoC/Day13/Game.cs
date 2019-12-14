@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 
-namespace Day13
+namespace AoC.Day13
 {
     public class Game
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Common.Extensions;
 
-namespace Day14
+namespace AoC.Day14
 {
     public class NanoFactory
     {

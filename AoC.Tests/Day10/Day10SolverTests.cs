@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
+using AoC.Day10;
 using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day10.Tests
+namespace AoC.Tests.Day10
 {
     public class Day10SolverTests
     {

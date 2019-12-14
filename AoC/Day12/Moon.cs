@@ -1,6 +1,4 @@
-using static Day12.Vector;
-
-namespace Day12
+namespace AoC.Day12
 {
     public class Moon
     {
@@ -9,7 +7,7 @@ namespace Day12
             Position = position;
             Velocity = new Vector(0, 0, 0);
 
-            InitialPosition = new Vector(position[X], position[Y], position[Z]);
+            InitialPosition = new Vector(position[Vector.X], position[Vector.Y], position[Vector.Z]);
             InitialVelocity = new Vector(0, 0, 0);
         }
 

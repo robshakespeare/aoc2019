@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Day3
+namespace AoC.Day3
 {
     public class Wire
     {

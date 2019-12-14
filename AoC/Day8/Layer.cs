@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace Day8
+namespace AoC.Day8
 {
     public class Layer
     {

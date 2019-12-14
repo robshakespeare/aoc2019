@@ -1,6 +1,6 @@
 using Common;
 
-namespace Day12
+namespace AoC.Day12
 {
     public class Day12Solver : SolverReadAllText
     {

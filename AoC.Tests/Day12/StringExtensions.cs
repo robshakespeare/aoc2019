@@ -1,6 +1,6 @@
 using Common.Extensions;
 
-namespace Day12.Tests
+namespace AoC.Tests.Day12
 {
     public static class StringExtensions
     {

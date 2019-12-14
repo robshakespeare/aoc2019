@@ -1,7 +1,8 @@
+using AoC.Day9;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day9.Tests
+namespace AoC.Tests.Day9
 {
     public class Day9SolverTests
     {

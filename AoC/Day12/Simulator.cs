@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Common;
 using Common.Extensions;
-using static Day12.Vector;
 
-namespace Day12
+namespace AoC.Day12
 {
     public class Simulator
     {
@@ -34,7 +33,7 @@ namespace Day12
         /// </summary>
         public void Update()
         {
-            foreach (var componentIndex in new[] {X, Y, Z})
+            foreach (var componentIndex in new[] {Vector.X, Vector.Y, Vector.Z})
             {
                 UpdateComponentForAllMoons(componentIndex);
             }
@@ -46,9 +45,9 @@ namespace Day12
             // And then get the lowest common multiple of those values, which gives us the number of loops it would have
             // to loop by until the entire state matched
 
-            var xLoop = GetNumberOfStepsToLoop(X);
-            var yLoop = GetNumberOfStepsToLoop(Y);
-            var zLoop = GetNumberOfStepsToLoop(Z);
+            var xLoop = GetNumberOfStepsToLoop(Vector.X);
+            var yLoop = GetNumberOfStepsToLoop(Vector.Y);
+            var zLoop = GetNumberOfStepsToLoop(Vector.Z);
 
             return MathUtils.LeastCommonMultiple(xLoop, yLoop, zLoop);
         }

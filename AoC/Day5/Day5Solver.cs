@@ -1,7 +1,7 @@
 using Common;
 using Common.IntCodes;
 
-namespace Day5
+namespace AoC.Day5
 {
     public class Day5Solver : SolverReadAllText
     {

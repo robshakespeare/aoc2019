@@ -1,8 +1,8 @@
+using Common.IntCodes;
 using FluentAssertions;
 using NUnit.Framework;
-using Common.IntCodes;
 
-namespace Day5.Tests
+namespace AoC.Tests.Day5
 {
     public class IntCodeComputerDay5Tests
     {

@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using AoC.Day4;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day4.Tests
+namespace AoC.Tests.Day4
 {
     public class PasswordCriteriaValidatorTests
     {

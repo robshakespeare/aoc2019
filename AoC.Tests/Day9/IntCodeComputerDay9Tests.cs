@@ -1,9 +1,8 @@
-using System;
 using Common.IntCodes;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day9.Tests
+namespace AoC.Tests.Day9
 {
     public class IntCodeComputerDay9Tests
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Day4
+namespace AoC.Day4
 {
     public class PasswordCriteriaValidator
     {

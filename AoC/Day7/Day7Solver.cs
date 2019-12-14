@@ -3,7 +3,7 @@ using Common;
 using Common.Extensions;
 using Common.IntCodes;
 
-namespace Day7
+namespace AoC.Day7
 {
     public class Day7Solver : SolverReadAllText
     {

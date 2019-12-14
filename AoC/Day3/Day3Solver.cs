@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 
-namespace Day3
+namespace AoC.Day3
 {
     public class Day3Solver : SolverReadAllLines
     {

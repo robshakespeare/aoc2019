@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Day11
+namespace AoC.Day11
 {
     /// <remarks>
     /// The IntCode program will serve as the brain of the robot.

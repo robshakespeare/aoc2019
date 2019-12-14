@@ -1,7 +1,8 @@
+using AoC.Day10;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day10.Tests
+namespace AoC.Tests.Day10
 {
     public class VectorTests
     {

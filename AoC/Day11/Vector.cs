@@ -1,4 +1,4 @@
-namespace Day11
+namespace AoC.Day11
 {
     public struct Vector
     {

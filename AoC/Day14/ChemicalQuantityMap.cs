@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Day14
+namespace AoC.Day14
 {
     public class ChemicalQuantityMap
     {

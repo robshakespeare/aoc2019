@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Day12
+namespace AoC.Day12
 {
     public class Vector
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Day10
+namespace AoC.Day10
 {
     public struct Vector
     {

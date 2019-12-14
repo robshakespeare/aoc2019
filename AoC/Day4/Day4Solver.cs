@@ -1,7 +1,7 @@
 using System.Linq;
 using Common;
 
-namespace Day4
+namespace AoC.Day4
 {
     public class Day4Solver : Solver<string>
     {

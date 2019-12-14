@@ -1,9 +1,10 @@
+using AoC.Day14;
 using FluentAssertions;
 using NUnit.Framework;
 
 // ReSharper disable StringLiteralTypo
 
-namespace Day14.Tests
+namespace AoC.Tests.Day14
 {
     public class NanoFactoryTests
     {

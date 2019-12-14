@@ -1,7 +1,7 @@
 using System;
 using Common;
 
-namespace Day8
+namespace AoC.Day8
 {
     public class Day8Solver : Solver<Image, int?, string?>
     {

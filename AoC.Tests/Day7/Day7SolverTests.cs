@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AoC.Day7;
 using Common.Extensions;
 using Common.IntCodes;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day7.Tests
+namespace AoC.Tests.Day7
 {
     public class Day7SolverTests
     {

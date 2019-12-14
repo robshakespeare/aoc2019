@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -8,7 +7,7 @@ using Common;
 using Common.IntCodes;
 using MoreLinq;
 
-namespace Day13
+namespace AoC.Day13
 {
     /// <summary>
     /// Every three output instructions specify

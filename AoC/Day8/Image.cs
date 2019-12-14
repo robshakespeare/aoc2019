@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using MoreLinq;
 
-namespace Day8
+namespace AoC.Day8
 {
     public class Image
     {

@@ -2,7 +2,7 @@ using System.Linq;
 using Common;
 using Common.IntCodes;
 
-namespace Day2
+namespace AoC.Day2
 {
     public class Day2Solver : SolverReadAllText
     {

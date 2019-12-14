@@ -1,4 +1,4 @@
-namespace Day13
+namespace AoC.Day13
 {
     public enum TileType
     {

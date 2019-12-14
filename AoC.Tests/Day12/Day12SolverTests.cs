@@ -1,7 +1,8 @@
+using AoC.Day12;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day12.Tests
+namespace AoC.Tests.Day12
 {
     public class Day12SolverTests
     {

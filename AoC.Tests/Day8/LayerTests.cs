@@ -1,7 +1,8 @@
+using AoC.Day8;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Day8.Tests
+namespace AoC.Tests.Day8
 {
     public class LayerTests
     {
