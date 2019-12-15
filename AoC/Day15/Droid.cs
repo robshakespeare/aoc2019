@@ -12,56 +12,83 @@ namespace AoC.Day15
         private static readonly IntCodeComputer IntCodeComputer = new IntCodeComputer();
 
         private readonly IntCodeState intCodeState;
-        private readonly Dictionary<Vector, GridState> gridStates = new Dictionary<Vector, GridState>();
         private readonly Dictionary<Vector, int> gridSteps = new Dictionary<Vector, int>(); // KEY is grid location, VALUE is the number of steps from origins
         private readonly Stack<Vector> gridTrail = new Stack<Vector>(); // So we can track backwards, first item out is always our CURRENT position
+        private readonly Dictionary<Vector, Queue<MovementCommand>> gridAvailableCommands = new Dictionary<Vector, Queue<MovementCommand>>();
+        private readonly HashSet<Vector> gridLocationsWithAvailableCommands = new HashSet<Vector>();
 
         private Vector droidPosition;
         private Vector? nextAttemptedDroidPosition;
         private Vector? oxygenSystemPosition;
-        private Queue<MovementCommand> availableCommands = RefreshMovementCommands();
 
         public Droid(IntCodeState intCodeState)
         {
             this.intCodeState = intCodeState;
 
             droidPosition = new Vector(0, 0); // Start at 0,0.  South is +ve Y, East is +ve X (North is -ve Y, West is -ve X)
-            gridSteps.Add(droidPosition, 0); // We have taken zero steps at our starting location
+            VisitGridLocationForFirstTime(droidPosition, 0); // Note: we have taken zero steps at our starting location
             gridTrail.Push(droidPosition);
         }
 
-        public (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) Explore()
+        public Dictionary<Vector, GridState> GridStates { get; } = new Dictionary<Vector, GridState>();
+
+        private void VisitGridLocationForFirstTime(Vector location, int newStepNumber)
+        {
+            gridSteps.Add(location, newStepNumber);
+            gridAvailableCommands.Add(location, BuildAvailableMovementCommands());
+            gridLocationsWithAvailableCommands.Add(location);
+        }
+
+        public (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) ExploreAndSolve()
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             Console.Clear();
 
-            var explore = true;
-
-            while (explore && IntCodeComputer.EvaluateNextInstruction(intCodeState, GetNextInput, OnNewOutputValue))
+            try
             {
-                explore = oxygenSystemPosition == null;
+                Explore();
+                return Solve();
+            }
+            finally
+            {
+                RestoreCursorPosition();
+            }
+        }
+
+        private void Explore()
+        {
+            while (gridLocationsWithAvailableCommands.Count > 0 &&
+                   IntCodeComputer.EvaluateNextInstruction(intCodeState, GetNextInput, OnNewOutputValue))
+            {
+            }
+        }
+
+        private (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) Solve()
+        {
+            // rs-todo: spread the oxygen, recording the number of iterative spreads to fill the valid parts of the grid
+
+            RestoreCursorPosition();
+
+            if (oxygenSystemPosition == null)
+            {
+                throw new InvalidOperationException("Oxygen System not found!");
             }
 
+            Console.Write("Oxygen System found. Number of steps: ");
+            var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPosition.Value];
+            ColorConsole.WriteLine(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
+
+            return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value);
+        }
+
+        private static void RestoreCursorPosition()
+        {
             Console.SetCursorPosition(0, 100);
             Console.CursorVisible = true;
-
-            if (oxygenSystemPosition != null)
-            {
-                Console.Write("Oxygen System found. Number of steps: ");
-
-                var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPosition.Value];
-                ColorConsole.WriteLine(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
-
-                return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value);
-            }
-
-            throw new InvalidOperationException("Oxygen System not found!");
         }
 
         private Vector GetNextAttemptedDroidPosition() => nextAttemptedDroidPosition ?? throw new InvalidOperationException("nextAttemptedDroidPosition not available!");
-
-        private GridState GetGridState(Vector gridLocation) => gridStates.TryGetValue(gridLocation, out var state) ? state : GridState.Unexplored;
 
         private long GetNextInput()
         {
@@ -70,21 +97,17 @@ namespace AoC.Day15
             // If next move takes us to an unexplored area, then try go there (send input to computer).
             // If next move takes us to a wall, don't go there.
             // If next move takes us to an explored area, don't go there.
+
+            var availableCommands = gridAvailableCommands[droidPosition];
+
             if (availableCommands.Count > 0)
             {
                 var nextCommand = availableCommands.Dequeue();
                 nextAttemptedDroidPosition = droidPosition + nextCommand.MovementVector;
-
-                var nextAttemptedPositionGridState = GetGridState(GetNextAttemptedDroidPosition());
-
-                return nextAttemptedPositionGridState == GridState.Unexplored
-                    ? nextCommand.Value // Next grid state is unexplored area, then try go there (send input to computer)
-                    : GetNextInput(); // Next grid state is either a wall or somewhere we've been and tracked back from, so don't go there, and try next input
+                return nextCommand.Value;
             }
 
             // If we run out of possible moves, then track back one, and repeat
-            availableCommands = RefreshMovementCommands();
-
             var currentPosition = gridTrail.Pop();
             nextAttemptedDroidPosition = gridTrail.Pop();
             var movementBack = GetNextAttemptedDroidPosition() - currentPosition;
@@ -102,21 +125,23 @@ namespace AoC.Day15
                 {
                     Render(droidPosition, droidPosition.Equals(new Vector(0, 0)) ? 'X' : '.');
 
+                    if (gridAvailableCommands[droidPosition].Count == 0)
+                    {
+                        gridLocationsWithAvailableCommands.Remove(droidPosition);
+                    }
+
                     var newStepNumber = gridSteps[droidPosition] + 1;
                     droidPosition = GetNextAttemptedDroidPosition();
                     nextAttemptedDroidPosition = default;
 
-                    gridStates[droidPosition] = GridState.Explored;
+                    GridStates[droidPosition] = GridState.Explored;
                     gridTrail.Push(droidPosition);
 
                     // Record our number of steps if we haven't been here yet
                     if (!gridSteps.ContainsKey(droidPosition))
                     {
-                        gridSteps.Add(droidPosition, newStepNumber);
+                        VisitGridLocationForFirstTime(droidPosition, newStepNumber);
                     }
-
-                    // We reached a new location, so refresh our available commands
-                    availableCommands = RefreshMovementCommands();
 
                     // If we found the oxygen system, woo hoo, job done
                     if (replyCode == ReplyCode.MovedAndFoundOxygenSystem)
@@ -129,7 +154,7 @@ namespace AoC.Day15
                 }
                 default:
                 {
-                    gridStates[GetNextAttemptedDroidPosition()] = GridState.Wall;
+                    GridStates[GetNextAttemptedDroidPosition()] = GridState.Wall;
                     Render(GetNextAttemptedDroidPosition(), '█');
                     nextAttemptedDroidPosition = default;
                     break;
@@ -146,7 +171,7 @@ namespace AoC.Day15
             Console.Write(chr);
         }
 
-        private static Queue<MovementCommand> RefreshMovementCommands() => new Queue<MovementCommand>(MovementCommand.PossibleCommands);
+        private static Queue<MovementCommand> BuildAvailableMovementCommands() => new Queue<MovementCommand>(MovementCommand.PossibleCommands);
 
         public static Droid Create()
         {
