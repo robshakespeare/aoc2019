@@ -39,7 +39,7 @@ namespace AoC.Day15
             gridLocationsWithAvailableCommands.Add(location);
         }
 
-        public (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) ExploreAndSolve()
+        public (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition, long iterationsToFillWithOxygen) ExploreAndSolve()
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
@@ -64,7 +64,7 @@ namespace AoC.Day15
             }
         }
 
-        private (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) Solve()
+        private (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition, long iterationsToFillWithOxygen) Solve()
         {
             if (oxygenSystemPosition == null)
             {
@@ -72,20 +72,27 @@ namespace AoC.Day15
             }
 
             // rs-todo: spread the oxygen, recording the number of iterative spreads to fill the valid parts of the grid
+            var oxygenSystem = new OxygenSystem(oxygenSystemPosition.Value);
+            var iterationsToFillWithOxygen = oxygenSystem.FillAndSolve();
 
             // Display final outputs, and return
             RestoreCursorPosition();
-            Console.Write("Oxygen System found. Number of steps: ");
+            Console.Write(" Oxygen System found. Number of steps: ");
             var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPosition.Value];
-            ColorConsole.WriteLine(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
+            ColorConsole.Write(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
 
-            return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value);
+            Console.Write(" || Number of minutes to fill with oxygen: ");
+            ColorConsole.WriteLine(iterationsToFillWithOxygen, ConsoleColor.Green);
+
+            Console.ReadKey(true);
+
+            return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value, iterationsToFillWithOxygen);
         }
 
         private static void RestoreCursorPosition()
         {
-            Console.SetCursorPosition(0, 100);
             Console.CursorVisible = true;
+            Console.SetCursorPosition(0, 101);
         }
 
         private Vector GetNextAttemptedDroidPosition() => nextAttemptedDroidPosition ?? throw new InvalidOperationException("nextAttemptedDroidPosition not available!");
@@ -187,7 +194,6 @@ namespace AoC.Day15
 
     public enum GridState
     {
-        Unexplored,
         Wall,
         Explored
     }
