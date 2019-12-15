@@ -2,6 +2,6 @@ namespace AoC
 {
     public class Program
     {
-        public static void Main() => Day15.Droid.Create().ExploreAndSolve();
+        public static void Main() => new Day16.Day16Solver().Run();
     }
 }
