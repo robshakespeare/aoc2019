@@ -66,15 +66,15 @@ namespace AoC.Day15
 
         private (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) Solve()
         {
-            // rs-todo: spread the oxygen, recording the number of iterative spreads to fill the valid parts of the grid
-
-            RestoreCursorPosition();
-
             if (oxygenSystemPosition == null)
             {
                 throw new InvalidOperationException("Oxygen System not found!");
             }
 
+            // rs-todo: spread the oxygen, recording the number of iterative spreads to fill the valid parts of the grid
+
+            // Display final outputs, and return
+            RestoreCursorPosition();
             Console.Write("Oxygen System found. Number of steps: ");
             var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPosition.Value];
             ColorConsole.WriteLine(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
@@ -123,7 +123,12 @@ namespace AoC.Day15
                 case ReplyCode.Moved:
                 case ReplyCode.MovedAndFoundOxygenSystem:
                 {
-                    Render(droidPosition, droidPosition.Equals(new Vector(0, 0)) ? 'X' : '.');
+                    Render(droidPosition, droidPosition.Equals(new Vector(0, 0)) ? 'S' : '.');
+
+                    if (oxygenSystemPosition != null)
+                    {
+                        Render(oxygenSystemPosition.Value, 'X');
+                    }
 
                     if (gridAvailableCommands[droidPosition].Count == 0)
                     {
