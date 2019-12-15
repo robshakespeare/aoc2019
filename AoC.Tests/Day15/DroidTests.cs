@@ -16,6 +16,7 @@ namespace AoC.Tests.Day15
 
             // ASSERT
             result.numOfStepsToReachOxygenSystem.Should().Be(366);
+            result.numOfStepsToReachOxygenSystem.Should().Be(384);
         }
     }
 }

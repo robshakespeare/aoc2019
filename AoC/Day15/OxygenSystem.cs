@@ -53,10 +53,11 @@ namespace AoC.Day15
             return iterationsToFillWithOxygen;
         }
 
-        private Vector[] GetNextEdges(IEnumerable<Vector> edges)
-        {
-            // Move north/east/south/west, to any explorable space, which doesn't yet have oxygen in it
-            return edges
+        /// <summary>
+        /// Move north/east/south/west, to any explorable space, which doesn't yet have oxygen in it.
+        /// </summary>
+        private Vector[] GetNextEdges(IEnumerable<Vector> edges) =>
+            edges
                 .SelectMany(edge => new[]
                 {
                     edge + MovementCommand.North.MovementVector,
@@ -67,7 +68,6 @@ namespace AoC.Day15
                 .Where(nextPos => gridStates[nextPos] == GridState.Explored)
                 .Where(nextPos => !oxygenLocations.Contains(nextPos))
                 .ToArray();
-        }
 
         private void Render(Vector location, char chr)
         {
