@@ -6,7 +6,7 @@ namespace AoC.Tests.Day15
 {
     public class DroidTests
     {
-        private readonly Droid sut = Droid.Create();
+        private readonly Droid sut = Droid.Create(true);
 
         [Test]
         public void Test()
@@ -16,7 +16,7 @@ namespace AoC.Tests.Day15
 
             // ASSERT
             result.numOfStepsToReachOxygenSystem.Should().Be(366);
-            result.numOfStepsToReachOxygenSystem.Should().Be(384);
+            result.iterationsToFillWithOxygen.Should().Be(384);
         }
     }
 }

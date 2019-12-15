@@ -11,6 +11,7 @@ namespace AoC.Day15
         private static readonly IntCodeComputer IntCodeComputer = new IntCodeComputer();
 
         private readonly IntCodeState intCodeState;
+        private readonly bool disablePlotting;
         private readonly Dictionary<Vector, int> gridSteps = new Dictionary<Vector, int>(); // KEY is grid location, VALUE is the number of steps from origins
         private readonly Stack<Vector> gridTrail = new Stack<Vector>(); // So we can track backwards, first item out is always our CURRENT position
         private readonly Dictionary<Vector, Queue<MovementCommand>> gridAvailableCommands = new Dictionary<Vector, Queue<MovementCommand>>();
@@ -21,9 +22,10 @@ namespace AoC.Day15
         private Vector? nextAttemptedDroidPosition;
         private Vector? oxygenSystemPosition;
 
-        public Droid(IntCodeState intCodeState)
+        public Droid(IntCodeState intCodeState, bool disablePlotting)
         {
             this.intCodeState = intCodeState;
+            this.disablePlotting = disablePlotting;
 
             droidPosition = new Vector(0, 0); // Start at 0,0.  South is +ve Y, East is +ve X (North is -ve Y, West is -ve X)
             VisitGridLocationForFirstTime(droidPosition, 0); // Note: we have taken zero steps at our starting location
@@ -39,9 +41,12 @@ namespace AoC.Day15
 
         public (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition, long iterationsToFillWithOxygen) ExploreAndSolve()
         {
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.CursorVisible = false;
-            Console.Clear();
+            if (!disablePlotting)
+            {
+                Console.OutputEncoding = Encoding.UTF8;
+                Console.CursorVisible = false;
+                Console.Clear();
+            }
 
             try
             {
@@ -64,28 +69,29 @@ namespace AoC.Day15
 
         private (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition, long iterationsToFillWithOxygen) Solve()
         {
-            if (oxygenSystemPosition == null)
-            {
-                throw new InvalidOperationException("Oxygen System not found!");
-            }
-
-            var oxygenSystem = new OxygenSystem(oxygenSystemPosition.Value, Offset, gridStates);
+            var oxygenSystemPos = oxygenSystemPosition ?? throw new InvalidOperationException("Oxygen System not found!");
+            var oxygenSystem = new OxygenSystem(oxygenSystemPos, Offset, gridStates, disablePlotting);
             var iterationsToFillWithOxygen = oxygenSystem.FillAndSolve();
 
             // Display final outputs, and return
             RestoreCursorPosition();
             Console.Write(" Oxygen System found. Number of steps: ");
-            var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPosition.Value];
+            var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPos];
             ColorConsole.Write(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
 
             Console.Write(" || Number of minutes to fill with oxygen: ");
             ColorConsole.WriteLine(iterationsToFillWithOxygen, ConsoleColor.Green);
 
-            return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value, iterationsToFillWithOxygen);
+            return (numOfStepsToReachOxygenSystem, oxygenSystemPos, iterationsToFillWithOxygen);
         }
 
-        private static void RestoreCursorPosition()
+        private void RestoreCursorPosition()
         {
+            if (disablePlotting)
+            {
+                return;
+            }
+
             Console.CursorVisible = true;
             Console.SetCursorPosition(0, 101);
         }
@@ -171,8 +177,13 @@ namespace AoC.Day15
 
         private static readonly Vector Offset = new Vector(80, 80);
 
-        private static void Render(Vector location, char chr)
+        private void Render(Vector location, char chr)
         {
+            if (disablePlotting)
+            {
+                return;
+            }
+
             var pos = location + Offset;
             Console.SetCursorPosition(pos.X, pos.Y);
             Console.Write(chr);
@@ -180,10 +191,10 @@ namespace AoC.Day15
 
         private static Queue<MovementCommand> BuildAvailableMovementCommands() => new Queue<MovementCommand>(MovementCommand.PossibleCommands);
 
-        public static Droid Create()
+        public static Droid Create(bool disablePlotting = false)
         {
             var inputProgram = new InputLoaderReadAllText(15).LoadInput();
-            return new Droid(IntCodeComputer.Parse(inputProgram));
+            return new Droid(IntCodeComputer.Parse(inputProgram), disablePlotting);
         }
     }
 }

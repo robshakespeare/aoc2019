@@ -9,17 +9,20 @@ namespace AoC.Day15
         private readonly Vector oxygenSystemPosition;
         private readonly Vector renderOffset;
         private readonly Dictionary<Vector, GridState> gridStates;
+        private readonly bool disablePlotting;
         private readonly HashSet<Vector> oxygenLocations = new HashSet<Vector>();
         private readonly int numberOfLocationsToFill;
 
         public OxygenSystem(
             Vector oxygenSystemPosition,
             Vector renderOffset,
-            Dictionary<Vector, GridState> gridStates)
+            Dictionary<Vector, GridState> gridStates,
+            bool disablePlotting)
         {
             this.oxygenSystemPosition = oxygenSystemPosition;
             this.renderOffset = renderOffset;
             this.gridStates = gridStates;
+            this.disablePlotting = disablePlotting;
             numberOfLocationsToFill = this.gridStates.Values.Count(state => state == GridState.Explored);
             
             AddOxygenLocation(oxygenSystemPosition);
@@ -71,6 +74,11 @@ namespace AoC.Day15
 
         private void Render(Vector location, char chr)
         {
+            if (disablePlotting)
+            {
+                return;
+            }
+
             var pos = location + renderOffset;
             Console.SetCursorPosition(pos.X, pos.Y);
             Console.Write(chr);
