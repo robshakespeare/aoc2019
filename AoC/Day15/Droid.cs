@@ -16,6 +16,7 @@ namespace AoC.Day15
         private readonly Stack<Vector> gridTrail = new Stack<Vector>(); // So we can track backwards, first item out is always our CURRENT position
         private readonly Dictionary<Vector, Queue<MovementCommand>> gridAvailableCommands = new Dictionary<Vector, Queue<MovementCommand>>();
         private readonly HashSet<Vector> gridLocationsWithAvailableCommands = new HashSet<Vector>();
+        private readonly Dictionary<Vector, GridState> gridStates = new Dictionary<Vector, GridState>();
 
         private Vector droidPosition;
         private Vector? nextAttemptedDroidPosition;
@@ -29,8 +30,6 @@ namespace AoC.Day15
             VisitGridLocationForFirstTime(droidPosition, 0); // Note: we have taken zero steps at our starting location
             gridTrail.Push(droidPosition);
         }
-
-        public Dictionary<Vector, GridState> GridStates { get; } = new Dictionary<Vector, GridState>();
 
         private void VisitGridLocationForFirstTime(Vector location, int newStepNumber)
         {
@@ -71,8 +70,7 @@ namespace AoC.Day15
                 throw new InvalidOperationException("Oxygen System not found!");
             }
 
-            // rs-todo: spread the oxygen, recording the number of iterative spreads to fill the valid parts of the grid
-            var oxygenSystem = new OxygenSystem(oxygenSystemPosition.Value);
+            var oxygenSystem = new OxygenSystem(oxygenSystemPosition.Value, Offset, gridStates);
             var iterationsToFillWithOxygen = oxygenSystem.FillAndSolve();
 
             // Display final outputs, and return
@@ -83,8 +81,6 @@ namespace AoC.Day15
 
             Console.Write(" || Number of minutes to fill with oxygen: ");
             ColorConsole.WriteLine(iterationsToFillWithOxygen, ConsoleColor.Green);
-
-            Console.ReadKey(true);
 
             return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value, iterationsToFillWithOxygen);
         }
@@ -146,7 +142,7 @@ namespace AoC.Day15
                     droidPosition = GetNextAttemptedDroidPosition();
                     nextAttemptedDroidPosition = default;
 
-                    GridStates[droidPosition] = GridState.Explored;
+                    gridStates[droidPosition] = GridState.Explored;
                     gridTrail.Push(droidPosition);
 
                     // Record our number of steps if we haven't been here yet
@@ -166,7 +162,7 @@ namespace AoC.Day15
                 }
                 default:
                 {
-                    GridStates[GetNextAttemptedDroidPosition()] = GridState.Wall;
+                    gridStates[GetNextAttemptedDroidPosition()] = GridState.Wall;
                     Render(GetNextAttemptedDroidPosition(), '█');
                     nextAttemptedDroidPosition = default;
                     break;
