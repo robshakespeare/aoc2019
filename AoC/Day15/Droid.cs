@@ -30,7 +30,7 @@ namespace AoC.Day15
             gridTrail.Push(droidPosition);
         }
 
-        public void Explore()
+        public (int numOfStepsToReachOxygenSystem, Vector oxygenSystemPosition) Explore()
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
@@ -49,8 +49,14 @@ namespace AoC.Day15
             if (oxygenSystemPosition != null)
             {
                 Console.Write("Oxygen System found. Number of steps: ");
-                ColorConsole.WriteLine(gridSteps[oxygenSystemPosition.Value].ToString(), ConsoleColor.Green);
+
+                var numOfStepsToReachOxygenSystem = gridSteps[oxygenSystemPosition.Value];
+                ColorConsole.WriteLine(numOfStepsToReachOxygenSystem, ConsoleColor.Green);
+
+                return (numOfStepsToReachOxygenSystem, oxygenSystemPosition.Value);
             }
+
+            throw new InvalidOperationException("Oxygen System not found!");
         }
 
         private Vector GetNextAttemptedDroidPosition() => nextAttemptedDroidPosition ?? throw new InvalidOperationException("nextAttemptedDroidPosition not available!");
@@ -94,7 +100,7 @@ namespace AoC.Day15
                 case ReplyCode.Moved:
                 case ReplyCode.MovedAndFoundOxygenSystem:
                 {
-                    Render(droidPosition, '.');
+                    Render(droidPosition, droidPosition.Equals(new Vector(0, 0)) ? 'X' : '.');
 
                     var newStepNumber = gridSteps[droidPosition] + 1;
                     droidPosition = GetNextAttemptedDroidPosition();
