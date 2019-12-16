@@ -39,19 +39,8 @@ namespace AoC.Day16
                         .ToReadonlyArray());
         }
 
-        public IReadOnlyList<int> Clean2(
-            IReadOnlyList<int> signal,
-            int numOfPhases = DefaultNumberOfPhases)
-        {
-            var patterns = patternGenerator.GeneratePatterns2(signal.Count);
-            return Enumerable
-                .Range(0, numOfPhases)
-                .Aggregate(
-                    signal,
-                    (currentSignal, _) => patterns
-                        .Select(pattern => RunPattern2(currentSignal, pattern))
-                        .ToReadonlyArray());
-        }
+        private static int RunPattern(IReadOnlyList<int> signal, IEnumerable<(int value, int index)> pattern) =>
+            Math.Abs(pattern.Select(p => signal[p.index] * p.value).Sum() % 10);
 
         public string RealClean(string inputSignal)
         {
@@ -69,10 +58,17 @@ namespace AoC.Day16
             return string.Join("", resultSignal.Take(8));
         }
 
-        private static int RunPattern(IReadOnlyList<int> signal, IEnumerable<(int value, int index)> pattern) =>
-            Math.Abs(pattern.Select(p => signal[p.index] * p.value).Sum() % 10);
-
-        private static int RunPattern2(IReadOnlyList<int> signal, IEnumerable<int> pattern) =>
-            pattern.Select(index => signal[index]).Sum() % 10;
+        public IReadOnlyList<int> Clean2(
+            IReadOnlyList<int> signal,
+            int numOfPhases = DefaultNumberOfPhases) =>
+            Enumerable
+                .Range(0, numOfPhases)
+                .Aggregate(
+                    signal,
+                    (currentSignal, _) =>
+                        Enumerable
+                            .Range(0, signal.Count)
+                            .Select(numToSkip => currentSignal.Skip(numToSkip).Sum() % 10)
+                            .ToReadonlyArray());
     }
 }
