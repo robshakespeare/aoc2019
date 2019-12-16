@@ -2,16 +2,19 @@ using Common;
 
 namespace AoC.Day16
 {
-    public class Day16Solver : SolverReadAllText
+    public class Day16Solver : Solver<string, string?, string?>
     {
-        public override long? SolvePart1(string input)
+        private static readonly SignalCleaner SignalCleaner = new SignalCleaner();
+
+        public Day16Solver() : base(new InputLoaderReadAllText(16))
         {
-            return base.SolvePart1(input);
         }
 
-        public override long? SolvePart2(string input)
+        public override string? SolvePart1(string inputSignal) => SignalCleaner.Clean(inputSignal, 100);
+
+        public override string? SolvePart2(string inputSignal)
         {
-            return base.SolvePart2(input);
+            return base.SolvePart2(inputSignal);
         }
     }
 }
