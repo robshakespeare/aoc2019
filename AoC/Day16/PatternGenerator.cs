@@ -19,13 +19,13 @@ namespace AoC.Day16
             this.basePattern = basePattern;
         }
 
-        public IReadOnlyCollection<IReadOnlyList<int>> GeneratePatterns(int inputLength) =>
+        public IReadOnlyCollection<IReadOnlyCollection<(int value, int index)>> GeneratePatterns(int inputLength) =>
             Enumerable
                 .Range(1, inputLength)
                 .Select(elementNumber => GeneratePattern(elementNumber, inputLength))
                 .ToReadonlyArray();
 
-        private IReadOnlyList<int> GeneratePattern(int elementNumber, int inputLength)
+        private IReadOnlyCollection<(int value, int index)> GeneratePattern(int elementNumber, int inputLength)
         {
             var expandedBasePattern = ExpandBasePattern(elementNumber);
 
@@ -36,10 +36,14 @@ namespace AoC.Day16
                 .SelectMany(x => x)
                 .Skip(1)
                 .Take(inputLength)
+                .Select((value, index) => (value, index))
+                .Where(x => x.value != 0)
                 .ToReadonlyArray();
         }
 
         private IReadOnlyCollection<int> ExpandBasePattern(int elementNumber) =>
-            basePattern.SelectMany(i => Enumerable.Repeat(i, elementNumber)).ToReadonlyArray();
+            basePattern
+                .SelectMany(x => Enumerable.Repeat(x, elementNumber))
+                .ToReadonlyArray();
     }
 }
