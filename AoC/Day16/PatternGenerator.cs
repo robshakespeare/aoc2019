@@ -23,7 +23,7 @@ namespace AoC.Day16
             Enumerable
                 .Range(1, inputLength)
                 .Select(elementNumber => GeneratePattern(elementNumber, inputLength))
-                .ToReadonlyArray();
+                .ToReadOnlyArray();
 
         private IReadOnlyCollection<(int value, int index)> GeneratePattern(int elementNumber, int inputLength)
         {
@@ -38,12 +38,12 @@ namespace AoC.Day16
                 .Take(inputLength)
                 .Select((value, index) => (value, index))
                 .Where(x => x.value != 0)
-                .ToReadonlyArray();
+                .ToReadOnlyArray();
         }
 
         private IReadOnlyCollection<int> ExpandBasePattern(int elementNumber) =>
             basePattern
                 .SelectMany(x => Enumerable.Repeat(x, elementNumber))
-                .ToReadonlyArray();
+                .ToReadOnlyArray();
     }
 }

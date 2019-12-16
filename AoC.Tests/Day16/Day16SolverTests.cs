@@ -18,15 +18,14 @@ namespace AoC.Tests.Day16
             part1Result.Should().Be("58100105");
         }
 
-        [Test]
-        //[Ignore("rs-todo: needs optimizing!")]
+        //[Test] // NOTE: ignored, because it takes ~2 seconds
         public void Part2ReTest()
         {
             // ACT
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part2Result.Should().Be(null);
+            part2Result.Should().Be("41781287");
         }
     }
 }

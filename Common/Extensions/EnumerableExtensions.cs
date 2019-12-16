@@ -6,6 +6,6 @@ namespace Common.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static IReadOnlyList<TSource> ToReadonlyArray<TSource>(this IEnumerable<TSource> source) => Array.AsReadOnly(source.ToArray());
+        public static IReadOnlyList<TSource> ToReadOnlyArray<TSource>(this IEnumerable<TSource> source) => Array.AsReadOnly(source.ToArray());
     }
 }
