@@ -2,6 +2,6 @@ namespace AoC
 {
     public class Program
     {
-        public static void Main() => new Day16.Day16Solver().Run();
+        public static void Main() => new Day17.Day17Solver().Run();
     }
 }
