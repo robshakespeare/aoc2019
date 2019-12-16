@@ -32,7 +32,7 @@ namespace AoC.Tests.Day16
         public void Clean_TestCase2()
         {
             // ACT
-            var result = Sut.Clean("80871224585914546619083218645595", 100);
+            var result = Sut.Clean("80871224585914546619083218645595");
 
             // ASSERT
             result.Should().Be("24176176");
@@ -42,7 +42,7 @@ namespace AoC.Tests.Day16
         public void Clean_TestCase3()
         {
             // ACT
-            var result = Sut.Clean("19617804207202209144916044189917", 100);
+            var result = Sut.Clean("19617804207202209144916044189917");
 
             // ASSERT
             result.Should().Be("73745418");
@@ -52,7 +52,7 @@ namespace AoC.Tests.Day16
         public void Clean_TestCase4()
         {
             // ACT
-            var result = Sut.Clean("69317163492948606335995924319873", 100);
+            var result = Sut.Clean("69317163492948606335995924319873");
 
             // ASSERT
             result.Should().Be("52432133");

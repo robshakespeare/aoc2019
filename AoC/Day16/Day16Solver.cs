@@ -10,11 +10,8 @@ namespace AoC.Day16
         {
         }
 
-        public override string? SolvePart1(string inputSignal) => SignalCleaner.Clean(inputSignal, 100);
+        public override string? SolvePart1(string inputSignal) => SignalCleaner.Clean(inputSignal);
 
-        public override string? SolvePart2(string inputSignal)
-        {
-            return base.SolvePart2(inputSignal);
-        }
+        public override string? SolvePart2(string inputSignal) => SignalCleaner.RealClean(inputSignal);
     }
 }
