@@ -45,5 +45,12 @@ namespace AoC.Day16
             basePattern
                 .SelectMany(x => Enumerable.Repeat(x, elementNumber))
                 .ToReadonlyArray();
+
+        // where each int is the index
+        public IReadOnlyCollection<IReadOnlyCollection<int>> GeneratePatterns2(int inputLength) =>
+            Enumerable
+                .Range(0, inputLength)
+                .Select(elementIndex => Enumerable.Range(elementIndex, inputLength - elementIndex).ToReadonlyArray())
+                .ToReadonlyArray();
     }
 }

@@ -25,7 +25,9 @@ namespace AoC.Day16
                 .Select(c => int.Parse(c.ToString()))
                 .ToReadonlyArray();
 
-        public IReadOnlyList<int> Clean(IReadOnlyList<int> signal, int numOfPhases = DefaultNumberOfPhases)
+        public IReadOnlyList<int> Clean(
+            IReadOnlyList<int> signal,
+            int numOfPhases = DefaultNumberOfPhases)
         {
             var patterns = patternGenerator.GeneratePatterns(signal.Count);
             return Enumerable
@@ -37,6 +39,20 @@ namespace AoC.Day16
                         .ToReadonlyArray());
         }
 
+        public IReadOnlyList<int> Clean2(
+            IReadOnlyList<int> signal,
+            int numOfPhases = DefaultNumberOfPhases)
+        {
+            var patterns = patternGenerator.GeneratePatterns2(signal.Count);
+            return Enumerable
+                .Range(0, numOfPhases)
+                .Aggregate(
+                    signal,
+                    (currentSignal, _) => patterns
+                        .Select(pattern => RunPattern2(currentSignal, pattern))
+                        .ToReadonlyArray());
+        }
+
         public string RealClean(string inputSignal)
         {
             const int inputRepetitions = 10000;
@@ -45,12 +61,18 @@ namespace AoC.Day16
             var messageOffset = int.Parse(string.Join("", signal.Take(7)));
 
             var fullSignal = Enumerable.Repeat(signal, inputRepetitions).SelectMany(x => x).ToReadonlyArray();
-            var resultSignal = Clean(fullSignal);
 
-            return string.Join("", resultSignal.Skip(messageOffset).Take(8));
+            var signalToProcess = fullSignal.Skip(messageOffset).ToReadonlyArray();
+
+            var resultSignal = Clean2(signalToProcess);
+
+            return string.Join("", resultSignal.Take(8));
         }
 
         private static int RunPattern(IReadOnlyList<int> signal, IEnumerable<(int value, int index)> pattern) =>
             Math.Abs(pattern.Select(p => signal[p.index] * p.value).Sum() % 10);
+
+        private static int RunPattern2(IReadOnlyList<int> signal, IEnumerable<int> pattern) =>
+            pattern.Select(index => signal[index]).Sum() % 10;
     }
 }
