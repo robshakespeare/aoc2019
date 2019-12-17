@@ -97,10 +97,56 @@ namespace AoC.Day17
 
             var commands = TraceSegments(position, heading, grid).ToReadOnlyArray();
 
-            Console.WriteLine(string.Join(Environment.NewLine, commands.Select(seg => $"{seg.turn}{seg.move}")));
+            var commandString = string.Join(",", commands.Select(seg => $"{seg.turn}{seg.move}"));
 
-            return null; // rs-todo: find pattern within the list of commands, then set addressZero to 2, provide the inputs, and go until we have an output, or we finish??
+            Console.WriteLine("Command string: " + commandString);
+
+            // find pattern within the list of commands
+            var patternTokens = PatternFinder.FindFirstMatchingPattern(commandString);
+            if (patternTokens == null)
+            {
+                throw new InvalidOperationException("Unable to find pattern!");
+            }
+
+            var functionId = new Queue<string>(new[] {"A", "B", "C"});
+            var patternTokensWithId = patternTokens
+                .Select(patternToken => new
+                {
+                    patternToken,
+                    functionId = functionId.Dequeue(),
+                    transcodedPatternToken = TranscodePatternToken(patternToken)
+                })
+                .ToArray();
+
+            // convert main command to the corresponding letters
+            commandString = patternTokensWithId.Aggregate(commandString, (current, token) => current.Replace(token.patternToken, token.functionId));
+
+            Console.WriteLine("Translated pattern command string: " + commandString);
+            foreach (var patternTokenWithId in patternTokensWithId)
+            {
+                Console.WriteLine($"Token {patternTokenWithId.functionId}: {patternTokenWithId.transcodedPatternToken}");
+            }
+
+            // Build inputs
+            var inputs =
+                Encode(commandString)
+                    .Concat(Encode(patternTokensWithId[0].transcodedPatternToken))
+                    .Concat(Encode(patternTokensWithId[1].transcodedPatternToken))
+                    .Concat(Encode(patternTokensWithId[2].transcodedPatternToken))
+                    .Concat(Encode("n"))
+                    .ToArray();
+
+            // set addressZero to 2, provide the inputs, and go until we have an output, or we finish??
+            var intCodeState = IntCodeComputer.Evaluate(SeedProgram(inputProgram, 2), inputs);
+
+            Console.WriteLine("Outputs: " + string.Join(", ", intCodeState.Outputs));
+
+            return intCodeState.LastOutputValue;
         }
+
+        private static string TranscodePatternToken(string patternToken) => patternToken.Replace("R", "R,").Replace("L", "L,");
+
+        public long[] Encode(string s) => s.ToCharArray().Select(c => (long)c).Append(10).ToArray();
 
         private static readonly Dictionary<Vector, (Vector direction, char turn)[]> NextPossibleDirections = new Dictionary<Vector, (Vector nextDirection, char turn)[]>
         {
@@ -110,7 +156,7 @@ namespace AoC.Day17
             {WestNormal, new[] {(NorthNormal, 'R'), (SouthNormal, 'L')}}
         };
 
-        private IEnumerable<(char turn, int move)> TraceSegments(Vector position, Vector direction, IReadOnlyDictionary<Vector, char> grid)
+        private static IEnumerable<(char turn, int move)> TraceSegments(Vector position, Vector direction, IReadOnlyDictionary<Vector, char> grid)
         {
             while (true)
             {
