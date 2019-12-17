@@ -18,7 +18,7 @@ namespace AoC.Day11
         {
             var robot = new Robot();
 
-            intCodeComputer.ParseAndEvaluateWithSignalling(
+            intCodeComputer.ParseAndEvaluate(
                 inputProgram,
                 robot.GetCurrentPanelColor,
                 robot.ProcessNextCommand);
@@ -31,7 +31,7 @@ namespace AoC.Day11
             var robot = new Robot();
             robot.PaintedGrid[robot.Location] = Robot.White; // The starting location is ALREADY painted white.
 
-            intCodeComputer.ParseAndEvaluateWithSignalling(
+            intCodeComputer.ParseAndEvaluate(
                 inputProgram,
                 robot.GetCurrentPanelColor,
                 robot.ProcessNextCommand);

@@ -66,7 +66,7 @@ namespace AoC.Day17
                 }
             }
 
-            IntCodeComputer.ParseAndEvaluateWithSignalling(inputProgram, () => 0, HandleOutput);
+            IntCodeComputer.ParseAndEvaluate(inputProgram, () => 0, HandleOutput);
             return (lines, grid);
         }
 

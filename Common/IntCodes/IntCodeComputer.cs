@@ -33,11 +33,11 @@ namespace Common.IntCodes
         /// <summary>
         /// Parses and then evaluates the specified IntCode computer state until it halts, using input and output redirection.
         /// </summary>
-        public IntCodeState ParseAndEvaluateWithSignalling(string inputProgram, Func<long> receiveInputValue, Action<long>? sendOutputValue) =>
+        public IntCodeState ParseAndEvaluate(string inputProgram, Func<long> receiveInputValue, Action<long>? sendOutputValue) =>
             Evaluate(Parse(inputProgram), receiveInputValue, sendOutputValue);
 
         /// <summary>
-        /// Evaluates the specified IntCode computer state until it halts.
+        /// Evaluates the specified IntCode computer state until it halts, using input and output redirection.
         /// </summary>
         public IntCodeState Evaluate(IntCodeState intCodeState, Func<long> getNextInputValue, Action<long>? onNewOutputValue)
         {
@@ -48,7 +48,7 @@ namespace Common.IntCodes
         }
 
         /// <summary>
-        /// Evaluates the next instruction in the specified IntCode computer state.
+        /// Evaluates the next instruction in the specified IntCode computer state, using input and output redirection.
         /// Returns true if the program should continue to be evaluated, otherwise if the program has now halted returns false.
         /// </summary>
         public bool EvaluateNextInstruction(IntCodeState intCodeState, Func<long> getNextInputValue, Action<long>? onNewOutputValue = null)
@@ -184,7 +184,7 @@ namespace Common.IntCodes
                     var nextDeviceIndex = device.index + 1 == deviceSignalConnectors.Length ? 0 : device.index + 1;
                     var nextDeviceConnector = deviceSignalConnectors[nextDeviceIndex];
 
-                    var result = ParseAndEvaluateWithSignalling(inputProgram, device.connector.ReceiveNextValue, nextDeviceConnector.SetNextValue);
+                    var result = ParseAndEvaluate(inputProgram, device.connector.ReceiveNextValue, nextDeviceConnector.SetNextValue);
 
                     if (result.LastOutputValue == null)
                     {
