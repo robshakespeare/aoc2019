@@ -139,7 +139,8 @@ namespace AoC.Day17
             // set addressZero to 2, provide the inputs, and go until we have an output, or we finish??
             var intCodeState = IntCodeComputer.Evaluate(SeedProgram(inputProgram, 2), inputs);
 
-            Console.WriteLine("Outputs: " + string.Join(", ", intCodeState.Outputs));
+            Console.WriteLine("Outputs: ");
+            Console.Write(Encoding.ASCII.GetString(intCodeState.Outputs.Where(x => x < 128).Select(x => (byte)x).ToArray()));
 
             return intCodeState.LastOutputValue;
         }
