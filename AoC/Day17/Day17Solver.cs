@@ -10,14 +10,38 @@ namespace AoC.Day17
 {
     public class Day17Solver : SolverReadAllText
     {
-        private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
+        private static readonly IntCodeComputer IntCodeComputer = new IntCodeComputer();
 
         private static readonly Vector NorthNormal = new Vector(0, -1);
         private static readonly Vector SouthNormal = new Vector(0, 1);
         private static readonly Vector EastNormal = new Vector(1, 0);
         private static readonly Vector WestNormal = new Vector(-1, 0);
 
+        /// <summary>
+        /// Solve part 1.
+        /// </summary>
         public override long? SolvePart1(string inputProgram)
+        {
+            var (lines, grid) = BuildInitialGrid(inputProgram);
+
+            var intersections = grid
+                .Where(p => p.Value == '#')
+                .Where(p => new[] {p.Key + NorthNormal, p.Key + SouthNormal, p.Key + EastNormal, p.Key + WestNormal}
+                                .Select(s => grid.TryGetValue(s, out var sc) && sc == '#')
+                                .Count(hasScaffold => hasScaffold) > 2)
+                .ToDictionary(i => i.Key);
+
+            foreach (var intersection in intersections)
+            {
+                lines[intersection.Key.Y][intersection.Key.X] = 'O';
+            }
+
+            DisplayLines(lines);
+
+            return intersections.Sum(intersection => intersection.Key.X * intersection.Key.Y);
+        }
+
+        private static (List<StringBuilder> lines, Dictionary<Vector, char> grid) BuildInitialGrid(string inputProgram)
         {
             var lines = new List<StringBuilder>();
             var grid = new Dictionary<Vector, char>();
@@ -34,28 +58,16 @@ namespace AoC.Day17
                 else
                 {
                     var outputChar = (char) outputValue;
-                    grid.Add(new Vector(lineBuffer.Length, lines.Count), outputChar);
+                    if (outputChar != '.')
+                    {
+                        grid.Add(new Vector(lineBuffer.Length, lines.Count), outputChar);
+                    }
                     lineBuffer.Append(outputChar);
                 }
             }
 
-            intCodeComputer.ParseAndEvaluateWithSignalling(inputProgram, () => 0, HandleOutput);
-
-            var intersections = grid
-                .Where(p => p.Value == '#')
-                .Where(p => new[] {p.Key + NorthNormal, p.Key + SouthNormal, p.Key + EastNormal, p.Key + WestNormal}
-                                .Select(s => grid.TryGetValue(s, out var sc) && sc == '#')
-                                .Count(hasScaffold => hasScaffold) > 2)
-                .ToReadOnlyArray();
-
-            foreach (var intersection in intersections)
-            {
-                lines[intersection.Key.Y][intersection.Key.X] = 'O';
-            }
-
-            DisplayLines(lines);
-
-            return intersections.Sum(intersection => intersection.Key.X * intersection.Key.Y);
+            IntCodeComputer.ParseAndEvaluateWithSignalling(inputProgram, () => 0, HandleOutput);
+            return (lines, grid);
         }
 
         private static void DisplayLines(IEnumerable<StringBuilder> lines)
@@ -66,9 +78,66 @@ namespace AoC.Day17
             }
         }
 
-        public override long? SolvePart2(string input)
+        private static IntCodeState SeedProgram(string inputProgram, int addressZeroOverrideValue)
         {
-            return base.SolvePart2(input);
+            var intCodeState = IntCodeComputer.Parse(inputProgram);
+            intCodeState[0] = addressZeroOverrideValue;
+            return intCodeState;
+        }
+
+        /// <summary>
+        /// Solve part 2.
+        /// </summary>
+        public override long? SolvePart2(string inputProgram)
+        {
+            var (_, grid) = BuildInitialGrid(inputProgram);
+
+            var heading = NorthNormal;
+            var position = grid.Single(x => x.Value == '^').Key;
+
+            var commands = TraceSegments(position, heading, grid).ToReadOnlyArray();
+
+            Console.WriteLine(string.Join(Environment.NewLine, commands.Select(seg => $"{seg.turn}{seg.move}")));
+
+            return null; // rs-todo: find pattern within the list of commands, then set addressZero to 2, provide the inputs, and go until we have an output, or we finish??
+        }
+
+        private static readonly Dictionary<Vector, (Vector direction, char turn)[]> NextPossibleDirections = new Dictionary<Vector, (Vector nextDirection, char turn)[]>
+        {
+            {NorthNormal, new[] {(EastNormal, 'R'), (WestNormal, 'L')}},
+            {SouthNormal, new[] {(EastNormal, 'L'), (WestNormal, 'R')}},
+            {EastNormal, new[] {(NorthNormal, 'L'), (SouthNormal, 'R')}},
+            {WestNormal, new[] {(NorthNormal, 'R'), (SouthNormal, 'L')}}
+        };
+
+        private IEnumerable<(char turn, int move)> TraceSegments(Vector position, Vector direction, IReadOnlyDictionary<Vector, char> grid)
+        {
+            while (true)
+            {
+                // Find next piece of floor
+                var nextMove = NextPossibleDirections[direction]
+                    .Select(next => new { next.direction, next.turn, nextPos = position + next.direction })
+                    .SingleOrDefault(next => grid.TryGetValue(next.nextPos, out var nextPiece) && nextPiece == '#');
+
+                // If no next piece, then we're done tracing
+                if (nextMove == null)
+                {
+                    yield break;
+                }
+
+                // Turn to find next piece of floor
+                direction = nextMove.direction;
+
+                // Move across floor until reach end
+                var forwardCount = 0;
+                while (grid.TryGetValue(position + direction, out var nextPieceInLine) && nextPieceInLine == '#')
+                {
+                    position += direction;
+                    forwardCount++;
+                }
+
+                yield return (nextMove.turn, forwardCount);
+            }
         }
     }
 }
