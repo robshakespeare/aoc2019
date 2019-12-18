@@ -44,7 +44,12 @@ namespace AoC.Day18
                 throw new InvalidOperationException("Our location not found!");
             }
 
-            return (new Grid(grid, doors, keys), position.Value);
+            return (
+                new Grid(
+                    grid,
+                    new Dictionary<char, Vector>(doors.OrderBy(x => x.Key)),
+                    new Dictionary<char, Vector>(keys.OrderBy(x => x.Key))),
+                position.Value);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace AoC
 
             Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File(LogFilePath)
+                .WriteTo.File(LogFilePath, fileSizeLimitBytes: 50000000, rollOnFileSizeLimit: true, retainedFileCountLimit: 50)
                 .CreateLogger();
         }
     }

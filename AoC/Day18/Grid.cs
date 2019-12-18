@@ -19,7 +19,9 @@ namespace AoC.Day18
             this.keys = keys;
         }
 
-        public int NumberOfKeys => keys.Count;
+        public int NumberOfKeysRemaining => keys.Count;
+
+        public string KeysRemaining => string.Join("", keys.Keys);
 
         public bool IsKey(Vector location, out char key) => grid.TryGetValue(location, out key) && IsKey(key);
 

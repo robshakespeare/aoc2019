@@ -81,7 +81,7 @@ namespace AoC.Tests.Day18
             result.Should().Be(81);
         }
 
-        ////[Test] // rs-todo: Part1ReTest
+        [Test]
         public void Part1ReTest()
         {
             // ACT

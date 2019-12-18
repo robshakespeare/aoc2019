@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Common;
 using static AoC.Logging;
@@ -7,6 +9,15 @@ namespace AoC.Day18
 {
     public class Day18Solver : SolverReadAllText
     {
+        private Stopwatch stopwatch;
+        private TimeSpan? lastLogTime;
+
+        public Day18Solver()
+        {
+            stopwatch = Stopwatch.StartNew();
+            lastLogTime = null;
+        }
+
         public override long? SolvePart1(string input)
         {
             // For each state:
@@ -17,25 +28,56 @@ namespace AoC.Day18
             var (initialGrid, initialPosition) = GridParser.Parse(input);
 
             var numberOfStepsToCollectAllKeys = new List<int>();
+            var alreadyExploring = new HashSet<(Vector position, int numberOfSteps, string keysRemaining)>();
+            var minNumberOfStepsToCollectAllKeys = int.MaxValue;
 
             Explore(
                 initialGrid,
                 initialPosition,
                 0,
-                initialGrid.NumberOfKeys,
-                numberOfStepsToCollectAllKeys);
+                initialGrid.NumberOfKeysRemaining,
+                numberOfStepsToCollectAllKeys,
+                ref minNumberOfStepsToCollectAllKeys,
+                alreadyExploring);
 
             return numberOfStepsToCollectAllKeys.Min();
         }
 
-        private static void Explore(
-            Grid grid,
+        private void Explore(Grid grid,
             Vector position,
             int numberOfSteps,
             int numberOfKeysToFind,
-            List<int> numberOfStepsToCollectAllKeys)
+            List<int> numberOfStepsToCollectAllKeys,
+            ref int minNumberOfStepsToCollectAllKeys,
+            HashSet<(Vector position, int numberOfSteps, string keysRemaining)> alreadyExploring)
         {
-            Logger.Debug($"Explore: {new { position, numberOfSteps, numberOfKeysToFind, numberOfKeysRemaining = grid.NumberOfKeys }}");
+            var keysRemaining = grid.KeysRemaining;
+            var explorerId = (position, numberOfSteps, keysRemaining);
+            if (alreadyExploring.Contains(explorerId))
+            {
+                Logger.Information("Exploration skipped: " + new { explorerId.position, explorerId.numberOfSteps, keysRemaining, numKeysRemaining = explorerId.keysRemaining.Length });
+                return;
+            }
+            alreadyExploring.Add(explorerId);
+
+            if (lastLogTime == null || (stopwatch.Elapsed - lastLogTime.Value).TotalSeconds > 10)
+            {
+                var info = new
+                {
+                    numTimesAllKeysFound = numberOfStepsToCollectAllKeys.Count,
+                    numberOfKeysToFind,
+                    alreadyExploringCount = alreadyExploring.Count,
+                    stopwatch.Elapsed,
+                    minNumberOfStepsToCollectAllKeys
+                };
+                Logger.Debug($"State: {info}");
+                lastLogTime = stopwatch.Elapsed;
+            }
+
+            if (grid.NumberOfKeysRemaining <= 4)
+            {
+                Logger.Debug($"Explore: {new { position, numberOfSteps, numberOfKeysToFind, grid.NumberOfKeysRemaining, keysRemaining }}");
+            }
 
             var explorer = new Explorer(grid, position, numberOfSteps);
 
@@ -54,13 +96,22 @@ namespace AoC.Day18
                 var childGrid = grid.Clone();
                 childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
 
-                if (childGrid.NumberOfKeys == 0)
+                if (childGrid.NumberOfKeysRemaining == 0)
                 {
+                    Logger.Information("numberOfStepsToCollectAllKeys found: " + keyFound.numberOfSteps);
                     numberOfStepsToCollectAllKeys.Add(keyFound.numberOfSteps);
+                    minNumberOfStepsToCollectAllKeys = Math.Min(minNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
                 }
                 else
                 {
-                    Explore(childGrid, keyFound.location, keyFound.numberOfSteps, numberOfKeysToFind, numberOfStepsToCollectAllKeys);
+                    Explore(
+                        childGrid,
+                        keyFound.location,
+                        keyFound.numberOfSteps,
+                        numberOfKeysToFind,
+                        numberOfStepsToCollectAllKeys,
+                        ref minNumberOfStepsToCollectAllKeys,
+                        alreadyExploring);
                 }
             }
         }
