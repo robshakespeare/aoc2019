@@ -18,6 +18,7 @@ namespace AoC.Day18
 
         public IReadOnlyList<(char key, int numberOfSteps, Vector location)> KeysFound => keysFound.ToReadOnlyArray();
 
+        public Vector InitialPosition { get; }
         public int InitialNumberOfSteps { get; }
 
         /// <remarks>
@@ -27,6 +28,7 @@ namespace AoC.Day18
         {
             this.grid = grid;
             this.position = position;
+            InitialPosition = position;
             InitialNumberOfSteps = numberOfSteps;
 
             VisitGridLocationForFirstTime(position, numberOfSteps); // Note: our initial number of steps is just what it was to reach our current position
@@ -51,11 +53,14 @@ namespace AoC.Day18
             {
                 var nextMovement = GetNextMovementVector();
 
-                PerformNextMovement(nextMovement);
+                if (nextMovement != null)
+                {
+                    PerformNextMovement(nextMovement.Value);
+                }
             }
         }
 
-        private Vector GetNextMovementVector()
+        private Vector? GetNextMovementVector()
         {
             // Decide next move:
 
@@ -67,6 +72,11 @@ namespace AoC.Day18
             if (availableCommands.Count > 0)
             {
                 var nextCommand = availableCommands.Dequeue();
+                if (availableCommands.Count == 0)
+                {
+                    gridLocationsWithAvailableCommands.Remove(position);
+                }
+
                 var nextPosition = position + nextCommand.MovementVector;
                 var isValidMove = grid.IsAvailableLocation(nextPosition) && !IsVisited(nextPosition);
 
@@ -75,6 +85,12 @@ namespace AoC.Day18
 
             // If we run out of possible moves, then track back one, and repeat
             var currentPosition = gridTrail.Pop();
+
+            if (currentPosition.Equals(InitialPosition) && gridTrail.Count == 0)
+            {
+                return null;
+            }
+
             var nextBackTrackPosition = gridTrail.Pop();
             var movementBack = nextBackTrackPosition - currentPosition;
             return movementBack;
@@ -82,11 +98,6 @@ namespace AoC.Day18
 
         private void PerformNextMovement(Vector nextMovement)
         {
-            if (gridAvailableCommands[position].Count == 0)
-            {
-                gridLocationsWithAvailableCommands.Remove(position);
-            }
-
             var newStepNumber = gridSteps[position] + 1;
             position += nextMovement;
 
@@ -106,7 +117,12 @@ namespace AoC.Day18
             if (grid.IsKey(position, out var key))
             {
                 keysFound.Add((key, newStepNumber, position)); // store key, number of steps and location
+
                 gridAvailableCommands[position].Clear(); // force a back-track
+                if (gridAvailableCommands[position].Count == 0)
+                {
+                    gridLocationsWithAvailableCommands.Remove(position);
+                }
             }
         }
     }

@@ -21,6 +21,20 @@ namespace AoC.Tests.Day18
         }
 
         [Test]
+        public void Part1_TestCase2()
+        {
+            // ACT
+            var result = sut.SolvePart1(@"########################
+#f.D.E.e.C.b.A.@.a.B.c.#
+######################.#
+#d.....................#
+########################");
+
+            // ASSERT
+            result.Should().Be(86);
+        }
+
+        [Test]
         public void Part1ReTest()
         {
             // ACT
