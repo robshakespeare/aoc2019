@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common;
+using static AoC.Logging;
 
 namespace AoC.Day18
 {
@@ -17,13 +18,25 @@ namespace AoC.Day18
 
             var numberOfStepsToCollectAllKeys = new List<int>();
 
-            Explore(initialGrid, initialPosition, 0, numberOfStepsToCollectAllKeys);
+            Explore(
+                initialGrid,
+                initialPosition,
+                0,
+                initialGrid.NumberOfKeys,
+                numberOfStepsToCollectAllKeys);
 
             return numberOfStepsToCollectAllKeys.Min();
         }
 
-        private static void Explore(Grid grid, Vector position, int numberOfSteps, List<int> numberOfStepsToCollectAllKeys)
+        private static void Explore(
+            Grid grid,
+            Vector position,
+            int numberOfSteps,
+            int numberOfKeysToFind,
+            List<int> numberOfStepsToCollectAllKeys)
         {
+            Logger.Debug($"Explore: {new { position, numberOfSteps, numberOfKeysToFind, numberOfKeysRemaining = grid.NumberOfKeys }}");
+
             var explorer = new Explorer(grid, position, numberOfSteps);
 
             explorer.Explore();
@@ -47,7 +60,7 @@ namespace AoC.Day18
                 }
                 else
                 {
-                    Explore(childGrid, keyFound.location, keyFound.numberOfSteps, numberOfStepsToCollectAllKeys);
+                    Explore(childGrid, keyFound.location, keyFound.numberOfSteps, numberOfKeysToFind, numberOfStepsToCollectAllKeys);
                 }
             }
         }

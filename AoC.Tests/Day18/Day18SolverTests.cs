@@ -35,6 +35,53 @@ namespace AoC.Tests.Day18
         }
 
         [Test]
+        public void Part1_TestCase3()
+        {
+            // ACT
+            var result = sut.SolvePart1(@"########################
+#...............b.C.D.f#
+#.######################
+#.....@.a.B.c.d.A.e.F.g#
+########################");
+
+            // ASSERT
+            result.Should().Be(132);
+        }
+
+        [Test]
+        public void Part1_TestCase4()
+        {
+            // ACT
+            var result = sut.SolvePart1(@"#################
+#i.G..c...e..H.p#
+########.########
+#j.A..b...f..D.o#
+########@########
+#k.E..a...g..B.n#
+########.########
+#l.F..d...h..C.m#
+#################");
+
+            // ASSERT
+            result.Should().Be(136);
+        }
+
+        [Test]
+        public void Part1_TestCase5()
+        {
+            // ACT
+            var result = sut.SolvePart1(@"########################
+#@..............ac.GI.b#
+###d#e#f################
+###A#B#C################
+###g#h#i################
+########################");
+
+            // ASSERT
+            result.Should().Be(81);
+        }
+
+        ////[Test] // rs-todo: Part1ReTest
         public void Part1ReTest()
         {
             // ACT
@@ -44,7 +91,7 @@ namespace AoC.Tests.Day18
             part1Result.Should().Be(null);
         }
 
-        [Test]
+        ////[Test] // rs-todo: Part2ReTest
         public void Part2ReTest()
         {
             // ACT
