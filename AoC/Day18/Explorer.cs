@@ -6,6 +6,7 @@ namespace AoC.Day18
     public class Explorer
     {
         private Vector position;
+        private readonly QuickState state;
 
         private readonly Grid grid;
         private readonly Dictionary<Vector, int> gridSteps = new Dictionary<Vector, int>(); // KEY is grid location, VALUE is the number of steps from origins
@@ -24,10 +25,11 @@ namespace AoC.Day18
         /// <remarks>
         /// Note that the `numberOfSteps` if the number of steps to reach the current position.
         /// </remarks>
-        public Explorer(Grid grid, Vector position, int numberOfSteps)
+        public Explorer(Grid grid, Vector position, int numberOfSteps, QuickState state)
         {
             this.grid = grid;
             this.position = position;
+            this.state = state;
             InitialPosition = position;
             InitialNumberOfSteps = numberOfSteps;
 
@@ -118,6 +120,16 @@ namespace AoC.Day18
             {
                 keysFound.Add((key, newStepNumber, position)); // store key, number of steps and location
 
+                gridAvailableCommands[position].Clear(); // force a back-track
+                if (gridAvailableCommands[position].Count == 0)
+                {
+                    gridLocationsWithAvailableCommands.Remove(position);
+                }
+            }
+
+            // don't bother continuing if we're over known shortest distance!
+            if (newStepNumber > state.MinNumberOfStepsToCollectAllKeys)
+            {
                 gridAvailableCommands[position].Clear(); // force a back-track
                 if (gridAvailableCommands[position].Count == 0)
                 {

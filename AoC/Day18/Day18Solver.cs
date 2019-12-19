@@ -1,15 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Threading.Tasks;
 using Common;
 using static AoC.Logging;
 
 namespace AoC.Day18
 {
+    public class QuickState
+    {
+        public int MinNumberOfStepsToCollectAllKeys { get; set; }
+    }
+
     public class Day18Solver : SolverReadAllText
     {
-        private Stopwatch stopwatch;
+        private readonly Stopwatch stopwatch;
         private TimeSpan? lastLogTime;
 
         public Day18Solver()
@@ -27,59 +31,64 @@ namespace AoC.Day18
 
             var (initialGrid, initialPosition) = GridParser.Parse(input);
 
-            var numberOfStepsToCollectAllKeys = new List<int>();
-            var alreadyExploring = new HashSet<(Vector position, int numberOfSteps, string keysRemaining)>();
-            var minNumberOfStepsToCollectAllKeys = int.MaxValue;
+            ////var alreadyExploring = new HashSet<(Vector position, int numberOfSteps, string keysRemaining)>();
+            var state = new QuickState
+            {
+                MinNumberOfStepsToCollectAllKeys = int.MaxValue
+            };
 
             Explore(
                 initialGrid,
                 initialPosition,
                 0,
                 initialGrid.NumberOfKeysRemaining,
-                numberOfStepsToCollectAllKeys,
-                ref minNumberOfStepsToCollectAllKeys,
-                alreadyExploring);
+                true,
+                state);
+                ////alreadyExploring);
 
-            return numberOfStepsToCollectAllKeys.Min();
+            return state.MinNumberOfStepsToCollectAllKeys;
         }
 
         private void Explore(Grid grid,
             Vector position,
             int numberOfSteps,
             int numberOfKeysToFind,
-            List<int> numberOfStepsToCollectAllKeys,
-            ref int minNumberOfStepsToCollectAllKeys,
-            HashSet<(Vector position, int numberOfSteps, string keysRemaining)> alreadyExploring)
+            bool isFirstLevel,
+            QuickState state)
         {
-            var keysRemaining = grid.KeysRemaining;
-            var explorerId = (position, numberOfSteps, keysRemaining);
-            if (alreadyExploring.Contains(explorerId))
+            if (numberOfSteps >= state.MinNumberOfStepsToCollectAllKeys)
             {
-                Logger.Information("Exploration skipped: " + new { explorerId.position, explorerId.numberOfSteps, keysRemaining, numKeysRemaining = explorerId.keysRemaining.Length });
                 return;
             }
-            alreadyExploring.Add(explorerId);
+
+            ////var keysRemaining = grid.KeysRemaining;
+            ////var explorerId = (position, numberOfSteps, keysRemaining);
+            ////if (alreadyExploring.Contains(explorerId))
+            ////{
+            ////    Logger.Information("Exploration skipped: " + new { explorerId.position, explorerId.numberOfSteps, keysRemaining, numKeysRemaining = explorerId.keysRemaining.Length });
+            ////    return;
+            ////}
+            ////alreadyExploring.Add(explorerId);
 
             if (lastLogTime == null || (stopwatch.Elapsed - lastLogTime.Value).TotalSeconds > 10)
             {
                 var info = new
                 {
-                    numTimesAllKeysFound = numberOfStepsToCollectAllKeys.Count,
                     numberOfKeysToFind,
-                    alreadyExploringCount = alreadyExploring.Count,
+                    ////alreadyExploringCount = alreadyExploring.Count,
                     stopwatch.Elapsed,
-                    minNumberOfStepsToCollectAllKeys
+                    state.MinNumberOfStepsToCollectAllKeys
                 };
                 Logger.Debug($"State: {info}");
                 lastLogTime = stopwatch.Elapsed;
             }
 
-            if (grid.NumberOfKeysRemaining <= 4)
-            {
-                Logger.Debug($"Explore: {new { position, numberOfSteps, numberOfKeysToFind, grid.NumberOfKeysRemaining, keysRemaining }}");
-            }
+            ////if (grid.NumberOfKeysRemaining <= 4)
+            ////{
+            ////    Logger.Debug($"Explore: {new { position, numberOfSteps, numberOfKeysToFind, grid.NumberOfKeysRemaining, keysRemaining }}");
+            ////}
 
-            var explorer = new Explorer(grid, position, numberOfSteps);
+            var explorer = new Explorer(grid, position, numberOfSteps, state);
 
             explorer.Explore();
 
@@ -91,27 +100,54 @@ namespace AoC.Day18
             //       > we should reset our "explored" paths
             //       > use that key to unlock its door
             //       > Note: if no paths, then there's no keys left, so store this route's number of steps, and DON'T recurse
-            foreach (var keyFound in keysFound)
+            if (isFirstLevel)
             {
-                var childGrid = grid.Clone();
-                childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
+                Parallel.ForEach(
+                    keysFound,
+                    keyFound =>
+                    {
+                        var childGrid = grid.Clone();
+                        childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
 
-                if (childGrid.NumberOfKeysRemaining == 0)
+                        if (childGrid.NumberOfKeysRemaining == 0)
+                        {
+                            Logger.Information("numberOfStepsToCollectAllKeys found: " + keyFound.numberOfSteps);
+                            state.MinNumberOfStepsToCollectAllKeys = Math.Min(state.MinNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
+                        }
+                        else if (keyFound.numberOfSteps < state.MinNumberOfStepsToCollectAllKeys)
+                        {
+                            Explore(
+                                childGrid,
+                                keyFound.location,
+                                keyFound.numberOfSteps,
+                                numberOfKeysToFind,
+                                false,
+                                state);
+                        }
+                    });
+            }
+            else
+            {
+                foreach (var keyFound in keysFound)
                 {
-                    Logger.Information("numberOfStepsToCollectAllKeys found: " + keyFound.numberOfSteps);
-                    numberOfStepsToCollectAllKeys.Add(keyFound.numberOfSteps);
-                    minNumberOfStepsToCollectAllKeys = Math.Min(minNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
-                }
-                else
-                {
-                    Explore(
-                        childGrid,
-                        keyFound.location,
-                        keyFound.numberOfSteps,
-                        numberOfKeysToFind,
-                        numberOfStepsToCollectAllKeys,
-                        ref minNumberOfStepsToCollectAllKeys,
-                        alreadyExploring);
+                    var childGrid = grid.Clone();
+                    childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
+
+                    if (childGrid.NumberOfKeysRemaining == 0)
+                    {
+                        Logger.Information("numberOfStepsToCollectAllKeys found: " + keyFound.numberOfSteps);
+                        state.MinNumberOfStepsToCollectAllKeys = Math.Min(state.MinNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
+                    }
+                    else if (keyFound.numberOfSteps < state.MinNumberOfStepsToCollectAllKeys)
+                    {
+                        Explore(
+                            childGrid,
+                            keyFound.location,
+                            keyFound.numberOfSteps,
+                            numberOfKeysToFind,
+                            false,
+                            state);
+                    }
                 }
             }
         }
