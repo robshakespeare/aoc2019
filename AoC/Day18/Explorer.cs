@@ -18,15 +18,15 @@ namespace AoC.Day18
         /// <remarks>
         /// Note that the `numberOfSteps` if the number of steps to reach the current position.
         /// </remarks>
-        public Explorer(Grid grid, Vector position, int numberOfSteps, Part1Result part1Result)
+        public Explorer(Grid grid, Vector position, Part1Result part1Result)
         {
             this.grid = grid;
             this.part1Result = part1Result;
             InitialPosition = position;
-            InitialNumberOfSteps = numberOfSteps;
+            InitialNumberOfSteps = 0;
         }
 
-        public IEnumerable<(char key, int numberOfSteps, Vector location)> Explore()
+        public List<(char key, int numberOfSteps, Vector location)> Explore()
         {
             var edges = new[] { InitialPosition };
             gridSteps[InitialPosition] = InitialNumberOfSteps;

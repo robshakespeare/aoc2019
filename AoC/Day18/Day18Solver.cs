@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Common;
@@ -33,7 +34,11 @@ namespace AoC.Day18
 
             var (initialGrid, initialPosition) = GridParser.Parse(input);
 
-            var cache = new ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char>();
+            var cacheBranches = new ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char>();
+
+            // KEY is position in grid combined with remaining keys, VALUE is the next reachable keys found from that location
+            var cacheKeysFound = new ConcurrentDictionary<(Vector position, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>>();
+
             var part1Result = new Part1Result();
 
             Explore(
@@ -43,7 +48,8 @@ namespace AoC.Day18
                 initialGrid.NumberOfKeysRemaining,
                 true,
                 part1Result,
-                cache);
+                cacheBranches,
+                cacheKeysFound);
 
             return part1Result.MinNumberOfStepsToCollectAllKeys;
         }
@@ -54,18 +60,11 @@ namespace AoC.Day18
             int numberOfKeysToFind,
             bool isFirstLevel,
             Part1Result part1Result,
-            ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char> cache)
+            ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char> cacheBranches,
+            ConcurrentDictionary<(Vector position, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>> cacheKeysFound)
         {
             if (numberOfSteps >= part1Result.MinNumberOfStepsToCollectAllKeys)
             {
-                return;
-            }
-
-            var keysRemaining = grid.KeysRemaining;
-            var explorerId = (position, numberOfSteps, keysRemaining);
-            if (cache.TryAdd(explorerId, 'y') == false) // TryAdd returns false if the key already exists
-            {
-                ////Logger.Information("Exploration skipped: " + explorerId);
                 return;
             }
 
@@ -74,7 +73,7 @@ namespace AoC.Day18
                 var info = new
                 {
                     numberOfKeysToFind,
-                    cacheCount = cache.Count,
+                    cacheKeysFoundCount = cacheKeysFound.Count,
                     stopwatch.Elapsed,
                     part1Result.MinNumberOfStepsToCollectAllKeys
                 };
@@ -82,9 +81,29 @@ namespace AoC.Day18
                 lastLogTime = stopwatch.Elapsed;
             }
 
-            var explorer = new Explorer(grid, position, numberOfSteps, part1Result);
+            var keysRemaining = grid.KeysRemaining;
 
-            var keysFound = explorer.Explore(); // .OrderBy(x => x.numberOfSteps); // rs-todo: ????
+            var branchId = (position, numberOfSteps, keysRemaining);
+            if (cacheBranches.TryAdd(branchId, 'y') == false) // TryAdd returns false if the key already exists
+            {
+                return;
+            }
+
+            List<(char key, int numberOfSteps, Vector location)> keysFound;
+            var explorerId = (position, keysRemaining);
+            if (cacheKeysFound.TryGetValue(explorerId, out var keysFoundCached))
+            {
+                keysFound = keysFoundCached;
+            }
+            else
+            {
+                var explorer = new Explorer(grid, position, part1Result);
+
+                keysFound = explorer.Explore();
+
+                // cache it!
+                cacheKeysFound.TryAdd(explorerId, keysFound);
+            }
 
             // Then, for each path, we need to repeat that, which will be exponential, but hopefully not too resource intensive
             //   > each path was to a key, before we recurse:
@@ -94,6 +113,8 @@ namespace AoC.Day18
             //       > Note: if no paths, then there's no keys left, so store this route's number of steps, and DON'T recurse
             void ProcessChild((char key, int numberOfSteps, Vector location) keyFound)
             {
+                var totalStepsSoFar = keyFound.numberOfSteps + numberOfSteps;
+
                 var childGrid = grid.CloneWithRefToGrid();
                 childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
 
@@ -102,16 +123,16 @@ namespace AoC.Day18
                     var prevMinSteps = part1Result.MinNumberOfStepsToCollectAllKeys;
                     lock (mutex)
                     {
-                        part1Result.MinNumberOfStepsToCollectAllKeys = Math.Min(part1Result.MinNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
+                        part1Result.MinNumberOfStepsToCollectAllKeys = Math.Min(part1Result.MinNumberOfStepsToCollectAllKeys, totalStepsSoFar);
                     }
                     if (prevMinSteps != part1Result.MinNumberOfStepsToCollectAllKeys)
                     {
                         Logger.Information("New `Number Of Steps To Collect All Keys` found: " + part1Result.MinNumberOfStepsToCollectAllKeys);
                     }
                 }
-                else if (keyFound.numberOfSteps < part1Result.MinNumberOfStepsToCollectAllKeys)
+                else if (totalStepsSoFar < part1Result.MinNumberOfStepsToCollectAllKeys)
                 {
-                    Explore(childGrid, keyFound.location, keyFound.numberOfSteps, numberOfKeysToFind, false, part1Result, cache);
+                    Explore(childGrid, keyFound.location, totalStepsSoFar, numberOfKeysToFind, false, part1Result, cacheBranches, cacheKeysFound);
                 }
             }
 

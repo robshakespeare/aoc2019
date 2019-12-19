@@ -49,6 +49,7 @@ namespace AoC.Tests.Day18
         }
 
         [Test]
+        [Ignore("takes too long!")]
         public void Part1_TestCase4()
         {
             // ACT
@@ -82,16 +83,17 @@ namespace AoC.Tests.Day18
         }
 
         [Test]
+        [Ignore("takes too long!")]
         public void Part1ReTest()
         {
             // ACT
             var part1Result = sut.SolvePart1();
 
             // ASSERT
-            part1Result.Should().Be(null);
+            part1Result.Should().Be(3646);
         }
 
-        ////[Test] // rs-todo: Part2ReTest
+        [Test]
         public void Part2ReTest()
         {
             // ACT
