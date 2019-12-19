@@ -1,20 +1,23 @@
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using static AoC.Logging;
 
 namespace AoC.Day18
 {
-    public class QuickState
+    public class Part1Result
     {
-        public int MinNumberOfStepsToCollectAllKeys { get; set; }
+        public int MinNumberOfStepsToCollectAllKeys { get; set; } = int.MaxValue;
     }
 
     public class Day18Solver : SolverReadAllText
     {
         private readonly Stopwatch stopwatch;
         private TimeSpan? lastLogTime;
+        private readonly object mutex = new object();
 
         public Day18Solver()
         {
@@ -31,11 +34,8 @@ namespace AoC.Day18
 
             var (initialGrid, initialPosition) = GridParser.Parse(input);
 
-            ////var alreadyExploring = new HashSet<(Vector position, int numberOfSteps, string keysRemaining)>();
-            var state = new QuickState
-            {
-                MinNumberOfStepsToCollectAllKeys = int.MaxValue
-            };
+            var cache = new ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char>();
+            var part1Result = new Part1Result();
 
             Explore(
                 initialGrid,
@@ -43,10 +43,10 @@ namespace AoC.Day18
                 0,
                 initialGrid.NumberOfKeysRemaining,
                 true,
-                state);
-                ////alreadyExploring);
+                part1Result,
+                cache);
 
-            return state.MinNumberOfStepsToCollectAllKeys;
+            return part1Result.MinNumberOfStepsToCollectAllKeys;
         }
 
         private void Explore(Grid grid,
@@ -54,45 +54,40 @@ namespace AoC.Day18
             int numberOfSteps,
             int numberOfKeysToFind,
             bool isFirstLevel,
-            QuickState state)
+            Part1Result part1Result,
+            ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char> cache)
         {
-            if (numberOfSteps >= state.MinNumberOfStepsToCollectAllKeys)
+            if (numberOfSteps >= part1Result.MinNumberOfStepsToCollectAllKeys)
             {
                 return;
             }
 
-            ////var keysRemaining = grid.KeysRemaining;
-            ////var explorerId = (position, numberOfSteps, keysRemaining);
-            ////if (alreadyExploring.Contains(explorerId))
-            ////{
-            ////    Logger.Information("Exploration skipped: " + new { explorerId.position, explorerId.numberOfSteps, keysRemaining, numKeysRemaining = explorerId.keysRemaining.Length });
-            ////    return;
-            ////}
-            ////alreadyExploring.Add(explorerId);
+            var keysRemaining = grid.KeysRemaining;
+            var explorerId = (position, numberOfSteps, keysRemaining);
+            if (cache.TryAdd(explorerId, 'y') == false) // TryAdd returns false if the key already exists
+            {
+                ////Logger.Information("Exploration skipped: " + explorerId);
+                return;
+            }
 
             if (lastLogTime == null || (stopwatch.Elapsed - lastLogTime.Value).TotalSeconds > 10)
             {
                 var info = new
                 {
                     numberOfKeysToFind,
-                    ////alreadyExploringCount = alreadyExploring.Count,
+                    cacheCount = cache.Count,
                     stopwatch.Elapsed,
-                    state.MinNumberOfStepsToCollectAllKeys
+                    part1Result.MinNumberOfStepsToCollectAllKeys
                 };
-                Logger.Debug($"State: {info}");
+                Logger.Information($"State: {info}");
                 lastLogTime = stopwatch.Elapsed;
             }
 
-            ////if (grid.NumberOfKeysRemaining <= 4)
-            ////{
-            ////    Logger.Debug($"Explore: {new { position, numberOfSteps, numberOfKeysToFind, grid.NumberOfKeysRemaining, keysRemaining }}");
-            ////}
-
-            var explorer = new Explorer(grid, position, numberOfSteps, state);
+            var explorer = new Explorer(grid, position, numberOfSteps, part1Result);
 
             explorer.Explore();
 
-            var keysFound = explorer.KeysFound;
+            var keysFound = explorer.KeysFound.OrderBy(x => x.numberOfSteps);
 
             // Then, for each path, we need to repeat that, which will be exponential, but hopefully not too resource intensive
             //   > each path was to a key, before we recurse:
@@ -100,54 +95,41 @@ namespace AoC.Day18
             //       > we should reset our "explored" paths
             //       > use that key to unlock its door
             //       > Note: if no paths, then there's no keys left, so store this route's number of steps, and DON'T recurse
+            void ProcessChild((char key, int numberOfSteps, Vector location) keyFound)
+            {
+                var childGrid = grid.CloneWithRefToGrid();
+                childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
+
+                if (childGrid.NumberOfKeysRemaining == 0)
+                {
+                    var prevMinSteps = part1Result.MinNumberOfStepsToCollectAllKeys;
+                    lock (mutex)
+                    {
+                        part1Result.MinNumberOfStepsToCollectAllKeys = Math.Min(part1Result.MinNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
+                    }
+                    if (prevMinSteps != part1Result.MinNumberOfStepsToCollectAllKeys)
+                    {
+                        Logger.Information("New `Number Of Steps To Collect All Keys` found: " + part1Result.MinNumberOfStepsToCollectAllKeys);
+                    }
+                }
+                else if (keyFound.numberOfSteps < part1Result.MinNumberOfStepsToCollectAllKeys)
+                {
+                    Explore(childGrid, keyFound.location, keyFound.numberOfSteps, numberOfKeysToFind, false, part1Result, cache);
+                }
+            }
+
             if (isFirstLevel)
             {
                 Parallel.ForEach(
                     keysFound,
-                    keyFound =>
-                    {
-                        var childGrid = grid.Clone();
-                        childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
-
-                        if (childGrid.NumberOfKeysRemaining == 0)
-                        {
-                            Logger.Information("numberOfStepsToCollectAllKeys found: " + keyFound.numberOfSteps);
-                            state.MinNumberOfStepsToCollectAllKeys = Math.Min(state.MinNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
-                        }
-                        else if (keyFound.numberOfSteps < state.MinNumberOfStepsToCollectAllKeys)
-                        {
-                            Explore(
-                                childGrid,
-                                keyFound.location,
-                                keyFound.numberOfSteps,
-                                numberOfKeysToFind,
-                                false,
-                                state);
-                        }
-                    });
+                    new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                    ProcessChild);
             }
             else
             {
                 foreach (var keyFound in keysFound)
                 {
-                    var childGrid = grid.Clone();
-                    childGrid.PickUpKeyAndUnlockDoor(keyFound.location);
-
-                    if (childGrid.NumberOfKeysRemaining == 0)
-                    {
-                        Logger.Information("numberOfStepsToCollectAllKeys found: " + keyFound.numberOfSteps);
-                        state.MinNumberOfStepsToCollectAllKeys = Math.Min(state.MinNumberOfStepsToCollectAllKeys, keyFound.numberOfSteps);
-                    }
-                    else if (keyFound.numberOfSteps < state.MinNumberOfStepsToCollectAllKeys)
-                    {
-                        Explore(
-                            childGrid,
-                            keyFound.location,
-                            keyFound.numberOfSteps,
-                            numberOfKeysToFind,
-                            false,
-                            state);
-                    }
+                    ProcessChild(keyFound);
                 }
             }
         }

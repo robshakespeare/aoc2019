@@ -68,7 +68,7 @@ namespace AoC.Day18
             }
         }
 
-        public Grid Clone() => new Grid(
+        public Grid CloneWithRefToGrid() => new Grid(
             new Dictionary<Vector, char>(grid),
             new Dictionary<char, Vector>(doors),
             new Dictionary<char, Vector>(keys));
