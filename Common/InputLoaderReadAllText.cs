@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace Common
@@ -20,6 +21,17 @@ namespace Common
         {
             using var _ = new TimingBlock("Load input as text");
             return File.ReadAllText(GetInputFilePathForCurrentDayRelativeToBin()).TrimEnd();
+        }
+
+        public string LoadInputSeparatePart2()
+        {
+            using var _ = new TimingBlock("Load separate part 2 input as text");
+
+            var filePath = Path.Combine(
+                Path.GetDirectoryName(GetInputFilePathForCurrentDayRelativeToBin()) ?? throw new InvalidOperationException(),
+                "input-part-2.txt");
+
+            return File.ReadAllText(filePath).Trim();
         }
     }
 }

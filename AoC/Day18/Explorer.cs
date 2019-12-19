@@ -12,24 +12,27 @@ namespace AoC.Day18
 
         private readonly List<(char key, int numberOfSteps, Vector location)> keysFound = new List<(char key, int numberOfSteps, Vector location)>();
 
-        public Vector InitialPosition { get; }
+        public IReadOnlyList<Vector> InitialPositions { get; }
         public int InitialNumberOfSteps { get; }
 
         /// <remarks>
         /// Note that the `numberOfSteps` if the number of steps to reach the current position.
         /// </remarks>
-        public Explorer(Grid grid, Vector position, Part1Result part1Result)
+        public Explorer(Grid grid, IReadOnlyList<Vector> positions, Part1Result part1Result)
         {
             this.grid = grid;
             this.part1Result = part1Result;
-            InitialPosition = position;
+            InitialPositions = positions;
             InitialNumberOfSteps = 0;
         }
 
         public List<(char key, int numberOfSteps, Vector location)> Explore()
         {
-            var edges = new[] { InitialPosition };
-            gridSteps[InitialPosition] = InitialNumberOfSteps;
+            var edges = InitialPositions;
+            foreach (var initialPosition in InitialPositions)
+            {
+                gridSteps[initialPosition] = InitialNumberOfSteps;
+            }
             var numberOfSteps = InitialNumberOfSteps;
 
             // spread out, through available spaces, recording the number of iterative spreads to any keys
@@ -38,7 +41,7 @@ namespace AoC.Day18
             {
                 numberOfSteps++;
                 edges = GetNextEdges(edges);
-                stop = edges.Length == 0;
+                stop = edges.Count == 0;
 
                 foreach (var edge in edges)
                 {

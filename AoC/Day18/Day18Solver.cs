@@ -32,18 +32,18 @@ namespace AoC.Day18
             //   > do this by brute force exploring, keeping any path that leads to a key, and rejecting any path that doesn't lead to a key
             //   > use the exploration algorithm from Day 16, important part is back tracking, so we don't cover the same paths or end in a loop
 
-            var (initialGrid, initialPosition) = GridParser.Parse(input);
+            var (initialGrid, initialPositions) = GridParser.Parse(input);
 
-            var cacheBranches = new ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char>();
+            var cacheBranches = new ConcurrentDictionary<(string positionId, int numberOfSteps, string keysRemaining), char>();
 
             // KEY is position in grid combined with remaining keys, VALUE is the next reachable keys found from that location
-            var cacheKeysFound = new ConcurrentDictionary<(Vector position, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>>();
+            var cacheKeysFound = new ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>>();
 
             var part1Result = new Part1Result();
 
             Explore(
                 initialGrid,
-                initialPosition,
+                initialPositions,
                 0,
                 initialGrid.NumberOfKeysRemaining,
                 true,
@@ -55,13 +55,13 @@ namespace AoC.Day18
         }
 
         private void Explore(Grid grid,
-            Vector position,
+            IReadOnlyList<Vector> positions,
             int numberOfSteps,
             int numberOfKeysToFind,
             bool isFirstLevel,
             Part1Result part1Result,
-            ConcurrentDictionary<(Vector position, int numberOfSteps, string keysRemaining), char> cacheBranches,
-            ConcurrentDictionary<(Vector position, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>> cacheKeysFound)
+            ConcurrentDictionary<(string positionId, int numberOfSteps, string keysRemaining), char> cacheBranches,
+            ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>> cacheKeysFound)
         {
             if (numberOfSteps >= part1Result.MinNumberOfStepsToCollectAllKeys)
             {
@@ -83,21 +83,22 @@ namespace AoC.Day18
 
             var keysRemaining = grid.KeysRemaining;
 
-            var branchId = (position, numberOfSteps, keysRemaining);
+            var positionId = string.Join("", positions);
+            var branchId = (positionId, numberOfSteps, keysRemaining);
             if (cacheBranches.TryAdd(branchId, 'y') == false) // TryAdd returns false if the key already exists
             {
                 return;
             }
 
             List<(char key, int numberOfSteps, Vector location)> keysFound;
-            var explorerId = (position, keysRemaining);
+            var explorerId = (positionId, keysRemaining);
             if (cacheKeysFound.TryGetValue(explorerId, out var keysFoundCached))
             {
                 keysFound = keysFoundCached;
             }
             else
             {
-                var explorer = new Explorer(grid, position, part1Result);
+                var explorer = new Explorer(grid, positions, part1Result);
 
                 keysFound = explorer.Explore();
 

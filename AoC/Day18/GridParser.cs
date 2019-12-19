@@ -7,12 +7,12 @@ namespace AoC.Day18
 {
     public static class GridParser
     {
-        public static (Grid grid, Vector startingPosition) Parse(string input)
+        public static (Grid grid, IReadOnlyList<Vector> startingPositions) Parse(string input)
         {
             var grid = new Dictionary<Vector, char>();
             var doors = new Dictionary<char, Vector>();
             var keys = new Dictionary<char, Vector>();
-            Vector? position = null;
+            List<Vector> positions = new List<Vector>();
 
             foreach (var tile in input
                 .ReadAllLines()
@@ -20,7 +20,7 @@ namespace AoC.Day18
             {
                 if (tile.piece == '@') // @ means our position
                 {
-                    position = tile.position;
+                    positions.Add(tile.position);
                     grid.Add(tile.position, '.'); // We can move here
                 }
                 else
@@ -39,9 +39,9 @@ namespace AoC.Day18
                 }
             }
 
-            if (position == null)
+            if (positions.Count == 0)
             {
-                throw new InvalidOperationException("Our location not found!");
+                throw new InvalidOperationException("Our location(s) not found!");
             }
 
             return (
@@ -49,7 +49,7 @@ namespace AoC.Day18
                     grid,
                     new Dictionary<char, Vector>(doors.OrderBy(x => x.Key)),
                     new Dictionary<char, Vector>(keys.OrderBy(x => x.Key))),
-                position.Value);
+                positions);
         }
     }
 }
