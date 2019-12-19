@@ -9,7 +9,7 @@ namespace Common.IntCodes
         private readonly SortedList<long, long> intCodes; // The Key is the INDEX of the code, and Value is the actual code.
 
         public IntCodeState(long[] intCodes)
-            : this(IntCodeArrayToSortedList(intCodes), new List<long>())
+            : this(IntCodeArrayToSortedList(intCodes))
         {
         }
 
@@ -25,13 +25,15 @@ namespace Common.IntCodes
             return result;
         }
 
-        private IntCodeState(SortedList<long, long> intCodes, List<long> outputs)
+        private IntCodeState(SortedList<long, long> intCodes)
         {
             this.intCodes = intCodes;
             InstructionPointer = 0;
             RelativeBase = 0;
-            Outputs = outputs;
+            Outputs = new List<long>();
         }
+
+        public IntCodeState CloneWithReset() => new IntCodeState(new SortedList<long, long>(intCodes));
 
         public long InstructionPointer { get; set; }
 
