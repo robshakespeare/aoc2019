@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using static AoC.Logging;
@@ -85,9 +84,7 @@ namespace AoC.Day18
 
             var explorer = new Explorer(grid, position, numberOfSteps, part1Result);
 
-            explorer.Explore();
-
-            var keysFound = explorer.KeysFound.OrderBy(x => x.numberOfSteps);
+            var keysFound = explorer.Explore(); // .OrderBy(x => x.numberOfSteps); // rs-todo: ????
 
             // Then, for each path, we need to repeat that, which will be exponential, but hopefully not too resource intensive
             //   > each path was to a key, before we recurse:
