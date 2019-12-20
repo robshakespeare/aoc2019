@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common.Extensions;
+using static AoC.Logging;
 
 namespace AoC.Day20
 {
@@ -26,6 +27,26 @@ namespace AoC.Day20
         public bool IsEndTile(Vector position) => position.Equals(EndTile);
 
         public Vector PerformPart1WarpIfApplicable(Vector position) => portals.TryGetValue(position, out var warp) ? warp.PerformWarp(position) : position;
+
+        public (Vector postion, int level, string route) PerformPart2WarpIfApplicable(Vector position, int level, string route, string lastPortal)
+        {
+            if (portals.TryGetValue(position, out var warp))
+            {
+                // when at the outermost level, outer labeled portals are effectively walls
+                // also, do not travel through the portal we have just come through!
+                var ignoreWarp = (level == Part2.Part2Explorer.OutermostLevel && warp.PortalTilesOuter.Contains(position)) ||
+                                 warp.Label == lastPortal;
+
+                if (!ignoreWarp)
+                {
+                    var warpResult = warp.PerformWarpPart2(position, level, route);
+                    Logger.Debug("Warped: " + warpResult);
+                    return warpResult;
+                }
+            }
+
+            return (position, level, route);
+        }
 
         public static Grid Create(string input)
         {

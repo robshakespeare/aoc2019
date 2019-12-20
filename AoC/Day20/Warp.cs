@@ -28,11 +28,32 @@ namespace AoC.Day20
         }
 
         public Vector PerformWarp(Vector position) =>
-            position switch{
+            position switch
+                {
                 _ when PortalTilesOuter.Contains(position) => EntryExitPointInner,
                 _ when PortalTilesInner.Contains(position) => EntryExitPointOuter,
                 _ => throw new InvalidOperationException($"Position {position} is not valid for warp {Label}")
                 };
+
+        /// <remarks>
+        /// Outer portals take us down a level, i.e. -1
+        /// Inner portals take us up a level, i.e. +1
+        /// </remarks>
+        public (Vector postion, int level, string route) PerformWarpPart2(Vector position, int level, string route) =>
+            position switch
+                {
+                _ when PortalTilesOuter.Contains(position) => (EntryExitPointInner, level - 1, UpdateRoute(route)),
+                _ when PortalTilesInner.Contains(position) => (EntryExitPointOuter, level + 1, UpdateRoute(route)),
+                _ => throw new InvalidOperationException($"Position {position} is not valid for warp {Label}")
+                };
+
+        private string UpdateRoute(string route)
+        {
+            var lastPortal = GetLastPortalFromRoute(route);
+            return $"{route}, {lastPortal} > {Label}";
+        }
+
+        public static string GetLastPortalFromRoute(string route) => $"{route[route.Length - 2]}{route[route.Length - 1]}";
 
         public override string ToString() => Label;
     }

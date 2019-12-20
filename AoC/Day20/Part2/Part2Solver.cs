@@ -1,20 +1,20 @@
 using System;
-using System.Linq;
 
 namespace AoC.Day20.Part2
 {
     public static class Part2Solver
     {
-        public static long SolvePart2(string input)
+        public static long? SolvePart2(string input)
         {
-            throw new NotImplementedException("rs-todo!");
+            var grid = Grid.Create(input);
+            var explorer = new Part2Explorer(grid);
 
-            ////var grid = Grid.Create(input);
-            ////var explorer = new Explorer(grid);
+            var result = explorer.Explore();
 
-            ////var stepCountForPaths = explorer.Explore();
+            Console.WriteLine($"Number of steps: {result?.numberOfSteps}");
+            Console.WriteLine($"Route: {result?.route}");
 
-            ////return stepCountForPaths.Min();
+            return result?.numberOfSteps;
         }
     }
 }
