@@ -1,4 +1,4 @@
-namespace AoC.Day18
+namespace AoC.Day20
 {
     public class MovementCommand
     {

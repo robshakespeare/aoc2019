@@ -19,7 +19,7 @@ namespace Common
         public override string LoadInput()
         {
             using var _ = new TimingBlock("Load input as text");
-            return File.ReadAllText(GetInputFilePathForCurrentDayRelativeToBin()).Trim();
+            return File.ReadAllText(GetInputFilePathForCurrentDayRelativeToBin()).TrimEnd();
         }
     }
 }

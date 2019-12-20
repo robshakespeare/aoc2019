@@ -1,3 +1,4 @@
+using System.Linq;
 using Common;
 
 namespace AoC.Day20
@@ -6,7 +7,12 @@ namespace AoC.Day20
     {
         public override long? SolvePart1(string input)
         {
-            return base.SolvePart1(input);
+            var grid = Grid.Create(input);
+            var explorer = new Explorer(grid);
+
+            var stepCountForPaths = explorer.Explore();
+
+            return stepCountForPaths.Min();
         }
 
         public override long? SolvePart2(string input)
