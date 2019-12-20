@@ -1,4 +1,4 @@
-namespace AoC.Day20
+namespace AoC.Day20.Part1
 {
     public struct Vector
     {

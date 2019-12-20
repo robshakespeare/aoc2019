@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace AoC.Day20
+namespace AoC.Day20.Part1
 {
     /// <summary>
     /// The positions of a warp are the positions where one can enter/exit, and its corresponding exit point.
