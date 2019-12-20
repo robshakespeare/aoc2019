@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Common.Extensions;
 
-namespace AoC.Day20.Part1
+namespace AoC.Day20
 {
     public class Grid
     {
         private readonly Dictionary<Vector, char> tiles;
-        private readonly Dictionary<Vector, Warp> warps; // KEY is the warp's entry/point, VALUE is the warp object itself
+        private readonly Dictionary<Vector, Warp> portals; // KEY is the warp's portal tiles, VALUE is the warp object itself
 
         public Vector StartTile { get; }
         public Vector EndTile { get; }
 
-        public Grid(Dictionary<Vector, char> tiles, Dictionary<Vector, Warp> warps, Vector startTile, Vector endTile)
+        public Grid(Dictionary<Vector, char> tiles, Dictionary<Vector, Warp> portals, Vector startTile, Vector endTile)
         {
             this.tiles = tiles;
-            this.warps = warps;
+            this.portals = portals;
             StartTile = startTile;
             EndTile = endTile;
         }
@@ -25,9 +25,7 @@ namespace AoC.Day20.Part1
 
         public bool IsEndTile(Vector position) => position.Equals(EndTile);
 
-        public Warp? GetWarpIfApplicable(Vector position) => warps.TryGetValue(position, out var warp) ? warp : null;
-
-        public Vector PerformWarpIfApplicable(Vector position) => warps.TryGetValue(position, out var warp) ? warp.PerformWarp(position) : position;
+        public Vector PerformPart1WarpIfApplicable(Vector position) => portals.TryGetValue(position, out var warp) ? warp.PerformWarp(position) : position;
 
         public static Grid Create(string input)
         {
@@ -52,12 +50,15 @@ namespace AoC.Day20.Part1
                         label = $"{tile.tile.Value}{tiles[tile.nextPosition]}",
                         warpTiles = new[] { tile.tile.Key, tile.nextPosition },
                         entryExitPointCandidate1 = tile.nextPosition + searchDirection,
-                        entryExitPointCandidate2 = tile.tile.Key - searchDirection
+                        entryExitPointCandidate2 = tile.tile.Key - searchDirection,
+                        offGridCandidate1 = tile.nextPosition + searchDirection + searchDirection,
+                        offGridCandidate2 = tile.tile.Key - searchDirection - searchDirection
                     })
                     .Select(tile => new
                     {
                         tile.label,
                         tile.warpTiles,
+                        isOuter = !tiles.ContainsKey(tile.offGridCandidate1) || !tiles.ContainsKey(tile.offGridCandidate2),
                         entryExitPoint =
                             IsAvailableSpace(tile.entryExitPointCandidate1)
                                 ? tile.entryExitPointCandidate1
@@ -82,28 +83,37 @@ namespace AoC.Day20.Part1
                         throw new InvalidOperationException($"Invalid group count of {x.Count()} for {x.Key}");
                     }
 
+                    var outerIndex = x.ElementAt(0).isOuter
+                        ? 0
+                        : x.ElementAt(1).isOuter
+                            ? 1
+                            : throw new InvalidOperationException($"Outer not found for {x.Key}");
+
+                    var innerIndex = !x.ElementAt(0).isOuter
+                        ? 0
+                        : !x.ElementAt(1).isOuter
+                            ? 1
+                            : throw new InvalidOperationException($"Inner not found for {x.Key}");
+
                     return new Warp(
                         x.Key,
-                        x.ElementAt(0).entryExitPoint,
-                        x.ElementAt(0).warpTiles,
-                        x.ElementAt(1).entryExitPoint,
-                        x.ElementAt(1).warpTiles);
+                        x.ElementAt(outerIndex).entryExitPoint,
+                        x.ElementAt(outerIndex).warpTiles,
+                        x.ElementAt(innerIndex).entryExitPoint,
+                        x.ElementAt(innerIndex).warpTiles);
                 });
 
             // Build dictionary of all the warp entry and exit points
-            var warps = new Dictionary<Vector, Warp>();
+            var portals = new Dictionary<Vector, Warp>();
             foreach (var warp in warpList)
             {
-                ////warps.Add(warp.EntryExitPointA, warp);
-                ////warps.Add(warp.EntryExitPointB, warp);
-
-                foreach (var warpTile in warp.WarpTiles)
+                foreach (var portal in warp.PortalTiles)
                 {
-                    warps.Add(warpTile, warp);
+                    portals.Add(portal, warp);
                 }
             }
 
-            return new Grid(tiles, warps, startTile, endTile);
+            return new Grid(tiles, portals, startTile, endTile);
         }
     }
 }

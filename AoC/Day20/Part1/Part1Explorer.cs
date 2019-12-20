@@ -4,14 +4,14 @@ using Common.Extensions;
 
 namespace AoC.Day20.Part1
 {
-    public class Explorer
+    public class Part1Explorer
     {
         private readonly Grid grid;
         private readonly Vector initialPosition;
         private readonly int initialNumberOfSteps;
         private readonly Dictionary<Vector, int> gridSteps = new Dictionary<Vector, int>(); // KEY is grid location, VALUE is the number of steps from origins
 
-        public Explorer(Grid grid)
+        public Part1Explorer(Grid grid)
         {
             this.grid = grid;
             initialPosition = grid.StartTile;
@@ -55,15 +55,15 @@ namespace AoC.Day20.Part1
         /// Move north/east/south/west, to any explorable space, which hasn't yet been explored.
         /// If any current edge is a warp, then we warp through instead of bubbling out.
         /// </summary>
-        private IReadOnlyList<Vector> GetNextEdges(IReadOnlyList<Vector> edges) =>
+        private IReadOnlyList<Vector> GetNextEdges(IEnumerable<Vector> edges) =>
             edges
                 .SelectMany(edge =>
                     new[]
                     {
-                        grid.PerformWarpIfApplicable(edge + MovementCommand.North.MovementVector),
-                        grid.PerformWarpIfApplicable(edge + MovementCommand.South.MovementVector),
-                        grid.PerformWarpIfApplicable(edge + MovementCommand.East.MovementVector),
-                        grid.PerformWarpIfApplicable(edge + MovementCommand.West.MovementVector)
+                        grid.PerformPart1WarpIfApplicable(edge + MovementCommand.North.MovementVector),
+                        grid.PerformPart1WarpIfApplicable(edge + MovementCommand.South.MovementVector),
+                        grid.PerformPart1WarpIfApplicable(edge + MovementCommand.East.MovementVector),
+                        grid.PerformPart1WarpIfApplicable(edge + MovementCommand.West.MovementVector)
                     })
                 .Where(nextPos => grid.IsAvailableLocation(nextPos))
                 .Where(nextPos => !gridSteps.ContainsKey(nextPos))
