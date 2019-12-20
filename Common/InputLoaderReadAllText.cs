@@ -31,7 +31,7 @@ namespace Common
                 Path.GetDirectoryName(GetInputFilePathForCurrentDayRelativeToBin()) ?? throw new InvalidOperationException(),
                 "input-part-2.txt");
 
-            return File.ReadAllText(filePath).Trim();
+            return File.ReadAllText(filePath).TrimEnd();
         }
     }
 }

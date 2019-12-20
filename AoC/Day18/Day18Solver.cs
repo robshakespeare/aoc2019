@@ -37,7 +37,8 @@ namespace AoC.Day18
             var cacheBranches = new ConcurrentDictionary<(string positionId, int numberOfSteps, string keysRemaining), char>();
 
             // KEY is position in grid combined with remaining keys, VALUE is the next reachable keys found from that location
-            var cacheKeysFound = new ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>>();
+            var cacheKeysFound =
+                new ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location, Vector[] locations)>>();
 
             var part1Result = new Part1Result();
 
@@ -55,13 +56,13 @@ namespace AoC.Day18
         }
 
         private void Explore(Grid grid,
-            IReadOnlyList<Vector> positions,
+            Vector[] positions,
             int numberOfSteps,
             int numberOfKeysToFind,
             bool isFirstLevel,
             Part1Result part1Result,
             ConcurrentDictionary<(string positionId, int numberOfSteps, string keysRemaining), char> cacheBranches,
-            ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location)>> cacheKeysFound)
+            ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location, Vector[] locations)>> cacheKeysFound)
         {
             if (numberOfSteps >= part1Result.MinNumberOfStepsToCollectAllKeys)
             {
@@ -90,7 +91,7 @@ namespace AoC.Day18
                 return;
             }
 
-            List<(char key, int numberOfSteps, Vector location)> keysFound;
+            List<(char key, int numberOfSteps, Vector location, Vector[] locations)> keysFound;
             var explorerId = (positionId, keysRemaining);
             if (cacheKeysFound.TryGetValue(explorerId, out var keysFoundCached))
             {
@@ -112,7 +113,7 @@ namespace AoC.Day18
             //       > we should reset our "explored" paths
             //       > use that key to unlock its door
             //       > Note: if no paths, then there's no keys left, so store this route's number of steps, and DON'T recurse
-            void ProcessChild((char key, int numberOfSteps, Vector location) keyFound)
+            void ProcessChild((char key, int numberOfSteps, Vector location, Vector[] locations) keyFound)
             {
                 var totalStepsSoFar = keyFound.numberOfSteps + numberOfSteps;
 
@@ -133,7 +134,7 @@ namespace AoC.Day18
                 }
                 else if (totalStepsSoFar < part1Result.MinNumberOfStepsToCollectAllKeys)
                 {
-                    Explore(childGrid, keyFound.location, totalStepsSoFar, numberOfKeysToFind, false, part1Result, cacheBranches, cacheKeysFound);
+                    Explore(childGrid, keyFound.locations, totalStepsSoFar, numberOfKeysToFind, false, part1Result, cacheBranches, cacheKeysFound);
                 }
             }
 
@@ -153,9 +154,31 @@ namespace AoC.Day18
             }
         }
 
-        public override long? SolvePart2(string input)
+        public override long? SolvePart2(string _)
         {
-            return base.SolvePart2(input);
+            var input = new InputLoaderReadAllText(18).LoadInputSeparatePart2();
+
+            var (initialGrid, initialPositions) = GridParser.Parse(input);
+
+            var cacheBranches = new ConcurrentDictionary<(string positionId, int numberOfSteps, string keysRemaining), char>();
+
+            // KEY is position in grid combined with remaining keys, VALUE is the next reachable keys found from that location
+            var cacheKeysFound =
+                new ConcurrentDictionary<(string positionId, string keysRemaining), List<(char key, int numberOfSteps, Vector location, Vector[] locations)>>();
+
+            var part1Result = new Part1Result();
+
+            Explore(
+                initialGrid,
+                initialPositions,
+                0,
+                initialGrid.NumberOfKeysRemaining,
+                true,
+                part1Result,
+                cacheBranches,
+                cacheKeysFound);
+
+            return part1Result.MinNumberOfStepsToCollectAllKeys;
         }
     }
 }

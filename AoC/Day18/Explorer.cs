@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,15 +11,13 @@ namespace AoC.Day18
         private readonly Grid grid;
         private readonly Dictionary<Vector, int> gridSteps = new Dictionary<Vector, int>(); // KEY is grid location, VALUE is the number of steps from origins
 
-        private readonly List<(char key, int numberOfSteps, Vector location)> keysFound = new List<(char key, int numberOfSteps, Vector location)>();
-
-        public IReadOnlyList<Vector> InitialPositions { get; }
+        public Vector[] InitialPositions { get; }
         public int InitialNumberOfSteps { get; }
 
         /// <remarks>
         /// Note that the `numberOfSteps` if the number of steps to reach the current position.
         /// </remarks>
-        public Explorer(Grid grid, IReadOnlyList<Vector> positions, Part1Result part1Result)
+        public Explorer(Grid grid, Vector[] positions, Part1Result part1Result)
         {
             this.grid = grid;
             this.part1Result = part1Result;
@@ -26,31 +25,36 @@ namespace AoC.Day18
             InitialNumberOfSteps = 0;
         }
 
-        public List<(char key, int numberOfSteps, Vector location)> Explore()
+        public List<(char key, int numberOfSteps, Vector location, Vector[] locations)> Explore()
         {
-            var edges = InitialPositions;
-            foreach (var initialPosition in InitialPositions)
-            {
-                gridSteps[initialPosition] = InitialNumberOfSteps;
-            }
-            var numberOfSteps = InitialNumberOfSteps;
+            var keysFound = new List<(char key, int numberOfSteps, Vector location, Vector[] locations)>();
 
-            // spread out, through available spaces, recording the number of iterative spreads to any keys
-            var stop = false;
-            while (!stop && numberOfSteps <= part1Result.MinNumberOfStepsToCollectAllKeys)
+            foreach (var ip in InitialPositions.Select((initialPosition, index) => (initialPosition, index)))
             {
-                numberOfSteps++;
-                edges = GetNextEdges(edges);
-                stop = edges.Count == 0;
+                var edges = new[] { ip.initialPosition };
+                gridSteps[ip.initialPosition] = InitialNumberOfSteps;
+                var numberOfSteps = InitialNumberOfSteps;
 
-                foreach (var edge in edges)
+                // spread out, through available spaces, recording the number of iterative spreads to any keys
+                var stop = false;
+                while (!stop && numberOfSteps <= part1Result.MinNumberOfStepsToCollectAllKeys)
                 {
-                    gridSteps[edge] = numberOfSteps;
+                    numberOfSteps++;
+                    edges = GetNextEdges(edges);
+                    stop = edges.Length == 0;
 
-                    // If reached a key, then store it
-                    if (grid.IsKey(edge, out var key))
+                    foreach (var edge in edges)
                     {
-                        keysFound.Add((key, numberOfSteps, edge)); // store key, number of steps and location
+                        gridSteps[edge] = numberOfSteps;
+
+                        // If reached a key, then store it
+                        if (grid.IsKey(edge, out var key))
+                        {
+                            var locations = new Vector[InitialPositions.Length];
+                            Array.Copy(InitialPositions, locations, InitialPositions.Length);
+                            locations[ip.index] = edge;
+                            keysFound.Add((key, numberOfSteps, edge, locations)); // store key, number of steps and location
+                        }
                     }
                 }
             }

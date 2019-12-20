@@ -94,6 +94,7 @@ namespace AoC.Tests.Day18
         }
 
         [Test]
+        [Ignore("takes too long!")]
         public void Part2ReTest()
         {
             // ACT

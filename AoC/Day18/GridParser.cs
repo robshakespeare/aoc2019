@@ -7,12 +7,12 @@ namespace AoC.Day18
 {
     public static class GridParser
     {
-        public static (Grid grid, IReadOnlyList<Vector> startingPositions) Parse(string input)
+        public static (Grid grid, Vector[] startingPositions) Parse(string input)
         {
             var grid = new Dictionary<Vector, char>();
             var doors = new Dictionary<char, Vector>();
             var keys = new Dictionary<char, Vector>();
-            List<Vector> positions = new List<Vector>();
+            var positions = new List<Vector>();
 
             foreach (var tile in input
                 .ReadAllLines()
@@ -49,7 +49,7 @@ namespace AoC.Day18
                     grid,
                     new Dictionary<char, Vector>(doors.OrderBy(x => x.Key)),
                     new Dictionary<char, Vector>(keys.OrderBy(x => x.Key))),
-                positions);
+                positions.ToArray());
         }
     }
 }
