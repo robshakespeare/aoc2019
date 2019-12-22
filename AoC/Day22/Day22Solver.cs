@@ -6,7 +6,8 @@ namespace AoC.Day22
     {
         public override long? SolvePart1(string input)
         {
-            return base.SolvePart1(input);
+            var shuffledCards = new CardShuffler().Shuffle(input, 10007);
+            return shuffledCards[2019];
         }
 
         public override long? SolvePart2(string input)

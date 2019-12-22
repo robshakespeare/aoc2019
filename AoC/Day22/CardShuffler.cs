@@ -41,15 +41,25 @@ namespace AoC.Day22
 
         private static int[] DealWithIncrement(in int[] deck, in int increment)
         {
-            var result = new int[deck.Length];
+            var result = new int?[deck.Length];
             var index = 0;
             foreach (var card in deck)
             {
+                if (result[index] != null)
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot deal card {card} with increment {increment}, index {index} has already been dealt to with card {result[index]}");
+                }
+
                 result[index] = card;
                 index = (index + increment) % deck.Length;
             }
 
-            return result;
+            return result
+                .Select((card, resultIndex) =>
+                    card
+                    ?? throw new InvalidOperationException($"Invalid deal with increment, {resultIndex} was not dealt to."))
+                .ToArray();
         }
     }
 }
