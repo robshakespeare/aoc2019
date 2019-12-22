@@ -13,40 +13,48 @@ namespace AoC.Day21
     {
         private static readonly IntCodeComputer IntCodeComputer = new IntCodeComputer();
 
-        public override long? SolvePart1(string input)
-        {
-            var inputs = new Queue<long>(Encode(@"
-// jump if a three-tile-wide hole (with ground on the other side of the hole) is detected:
+        public override long? SolvePart1(string intCodeProgram) => Solve(intCodeProgram, @"
+// jump if next tile is a hole:
 NOT A J
-NOT B T
-AND T J
+
+// jump if 3rd tile in front is a hole:
 NOT C T
-AND T J
+OR T J
+
+// only jump if we have a landing:
 AND D J
+WALK");
 
-// jump if next tile is a hole, as long as we have a landing:
-NOT A T
-AND D T
-OR T J
+        public override long? SolvePart2(string intCodeProgram) => Solve(intCodeProgram, @"
+// jump if next tile is a hole:
+NOT A J
 
-// jump if 3rd tile in front is a hole, as long as we have a landing:
+// jump if 3rd tile in front is a hole:
 NOT C T
-AND D T
 OR T J
 
-WALK"));
+// jump if 5th is hole, as long as we have landing, and a landing after that for if we need to jump:
+//NOT E T
+//AND F T
+//AND H T
+//AND I T
+//OR T J
+//
+// only jump if we have a landing:
+AND D J
+RUN");
+
+        
+        private long? Solve(string intCodeProgram, string springScript)
+        {
+            var inputs = new Queue<long>(Encode(springScript));
 
             var intCodeState = IntCodeComputer.ParseAndEvaluate(
-                input,
+                intCodeProgram,
                 () => inputs.Dequeue(),
                 output => Console.Write(output < 128 ? Encoding.ASCII.GetString(new[] {(byte) output}) : ""));
 
             return intCodeState.LastOutputValue;
-        }
-
-        public override long? SolvePart2(string input)
-        {
-            return base.SolvePart2(input);
         }
 
         private static long[] Encode(string s) =>
@@ -58,6 +66,6 @@ WALK"));
                 .Append(10)
                 .ToArray();
 
-        private static readonly Regex StripComments = new Regex(@" ?//.+\n", RegexOptions.Compiled);
+        private static readonly Regex StripComments = new Regex(@" ?//.*\n", RegexOptions.Compiled);
     }
 }
