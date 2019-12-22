@@ -6,7 +6,7 @@ namespace AoC.Tests.Day22
 {
     public class CardShufflerTests
     {
-        private static readonly CardShuffler Sut = new CardShuffler();
+        private static readonly CardShuffler Sut = new CardShuffler(10);
 
         [Test]
         public void Shuffle_TestCase1()
@@ -14,7 +14,7 @@ namespace AoC.Tests.Day22
             // ACT
             var result = Sut.Shuffle(@"deal with increment 7
 deal into new stack
-deal into new stack", 10);
+deal into new stack");
 
             // ASSERT
             result.Should().BeEquivalentTo(
@@ -28,7 +28,7 @@ deal into new stack", 10);
             // ACT
             var result = Sut.Shuffle(@"cut 6
 deal with increment 7
-deal into new stack", 10);
+deal into new stack");
 
             // ASSERT
             result.Should().BeEquivalentTo(
@@ -42,7 +42,7 @@ deal into new stack", 10);
             // ACT
             var result = Sut.Shuffle(@"deal with increment 7
 deal with increment 9
-cut -2", 10);
+cut -2");
 
             // ASSERT
             result.Should().BeEquivalentTo(
@@ -63,7 +63,7 @@ deal with increment 7
 cut 3
 deal with increment 9
 deal with increment 3
-cut -1", 10);
+cut -1");
 
             // ASSERT
             result.Should().BeEquivalentTo(

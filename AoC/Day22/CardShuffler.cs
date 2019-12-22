@@ -1,13 +1,23 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Common.Extensions;
 
 namespace AoC.Day22
 {
     public class CardShuffler
     {
-        public int[] Shuffle(in string completeShuffleProcessInput, in int factoryOrderNumber)
+        private readonly int factoryOrderNumber;
+
+        public CardShuffler(in int factoryOrderNumber)
         {
-            var factoryOrderDeck = Enumerable.Range(0, factoryOrderNumber).ToArray();
+            this.factoryOrderNumber = factoryOrderNumber;
+        }
+
+        public IReadOnlyList<int> Shuffle(in string completeShuffleProcessInput)
+        {
+            var factoryOrderDeck = Enumerable.Range(0, factoryOrderNumber).Select(n => (int?)n).ToReadOnlyArray();
 
             var shuffleProcessParser = new ShuffleProcessParser();
             var deck = factoryOrderDeck;
@@ -24,24 +34,24 @@ namespace AoC.Day22
                     };
             }
 
-            return deck;
+            return Validate(deck).Select(card => card ?? throw new InvalidOperationException()).ToReadOnlyArray();
         }
 
-        private static int[] DealIntoNewStack(in int[] deck) =>
-            deck.Reverse().ToArray();
+        private IReadOnlyList<int?> DealIntoNewStack(in IReadOnlyList<int?> deck) =>
+            Validate(deck.Reverse().ToReadOnlyArray());
 
-        private static int[] CutPositive(in int[] deck, in int numCards) =>
-            deck.Skip(numCards).Concat(deck.Take(numCards)).ToArray();
+        private IReadOnlyList<int?> CutPositive(in IReadOnlyList<int?> deck, in int numCards) =>
+            Validate(deck.Skip(numCards).Concat(deck.Take(numCards)).ToReadOnlyArray());
 
-        private static int[] CutNegative(in int[] deck, in int numCards)
+        private IReadOnlyList<int?> CutNegative(in IReadOnlyList<int?> deck, in int numCards)
         {
-            var offset = deck.Length - numCards;
-            return deck.Skip(offset).Concat(deck.Take(offset)).ToArray();
+            var offset = deck.Count - numCards;
+            return Validate(deck.Skip(offset).Concat(deck.Take(offset)).ToReadOnlyArray());
         }
 
-        private static int[] DealWithIncrement(in int[] deck, in int increment)
+        private IReadOnlyList<int?> DealWithIncrement(in IReadOnlyList<int?> deck, in int increment)
         {
-            var result = new int?[deck.Length];
+            var result = new int?[deck.Count];
             var index = 0;
             foreach (var card in deck)
             {
@@ -52,14 +62,30 @@ namespace AoC.Day22
                 }
 
                 result[index] = card;
-                index = (index + increment) % deck.Length;
+                index = (index + increment) % deck.Count;
             }
 
-            return result
-                .Select((card, resultIndex) =>
-                    card
-                    ?? throw new InvalidOperationException($"Invalid deal with increment, {resultIndex} was not dealt to."))
-                .ToArray();
+            return Validate(result.ToReadOnlyArray());
+        }
+
+        private IReadOnlyList<int?> Validate(
+            in IReadOnlyList<int?> deck,
+            [CallerMemberName] in string? callerMemberName = null)
+        {
+            if (deck.Count != factoryOrderNumber)
+            {
+                throw new InvalidOperationException($"Error in {callerMemberName}, deck count {deck.Count} should be {factoryOrderNumber}.");
+            }
+
+            foreach (var (card, index) in deck.Select((card, index) => (card, index)))
+            {
+                if (card == null)
+                {
+                    throw new InvalidOperationException($"Error in {callerMemberName}, {index} was null.");
+                }
+            }
+
+            return deck;
         }
     }
 }
