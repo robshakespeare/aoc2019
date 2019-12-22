@@ -36,6 +36,11 @@ namespace Common.Extensions
         /// <summary>
         /// Normalizes the line endings in the specified string, so that all the line endings match the current environment's line endings.
         /// </summary>
-        public static string NormalizeLineEndings(this string s) => LineEndingsRegex.Replace(s, Environment.NewLine);
+        public static string NormalizeLineEndings(this string s) => NormalizeLineEndings(s, Environment.NewLine);
+
+        /// <summary>
+        /// Normalizes the line endings in the specified string, so that all the line endings match the specified line endings.
+        /// </summary>
+        public static string NormalizeLineEndings(this string s, string newLine) => LineEndingsRegex.Replace(s, newLine);
     }
 }
