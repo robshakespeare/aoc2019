@@ -8,10 +8,12 @@ namespace AoC.Day23
 
         public Network()
         {
-            NAT = new NAT();
+            NAT = new NAT(this);
         }
 
         public NAT NAT { get; }
+
+        public IEnumerable<NetworkInterfaceController> Nics => nics.Values;
 
         public NetworkInterfaceController AddNIC(long address)
         {

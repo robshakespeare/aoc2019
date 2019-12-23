@@ -23,6 +23,8 @@ namespace AoC.Day23
             incoming.Enqueue(packet.y);
         }
 
+        public bool IncomingIsEmpty => incoming.Count == 0;
+
         public long DequeueIncomingValue() => incoming.Count > 0 ? incoming.Dequeue() : -1;
 
         public void EnqueueOutgoingValue(long value)

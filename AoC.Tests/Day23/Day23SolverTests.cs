@@ -19,13 +19,14 @@ namespace AoC.Tests.Day23
         }
 
         [Test]
+        [Ignore("takes too long")]
         public void Part2ReTest()
         {
             // ACT
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part2Result.Should().Be(null);
+            part2Result.Should().Be(11504);
         }
     }
 }
