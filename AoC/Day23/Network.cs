@@ -1,17 +1,17 @@
-using System;
 using System.Collections.Generic;
 
 namespace AoC.Day23
 {
     public class Network
     {
-        private readonly Action<long, long, long> onSend;
         private readonly Dictionary<long, NetworkInterfaceController> nics = new Dictionary<long, NetworkInterfaceController>();
 
-        public Network(Action<long, long, long> onSend)
+        public Network()
         {
-            this.onSend = onSend;
+            NAT = new NAT();
         }
+
+        public NAT NAT { get; }
 
         public NetworkInterfaceController AddNIC(long address)
         {
@@ -20,14 +20,16 @@ namespace AoC.Day23
             return nic;
         }
 
-        public void Send(in long address, long x, long y)
+        public void Send(in long address, (long x, long y) packet)
         {
-            if (nics.TryGetValue(address, out var destination))
+            if (address == 255)
             {
-                destination.Receive(x, y);
+                NAT.Receive(packet);
             }
-
-            onSend(address, x, y);
+            else if (nics.TryGetValue(address, out var destinationNic))
+            {
+                destinationNic.Receive(packet);
+            }
         }
     }
 }

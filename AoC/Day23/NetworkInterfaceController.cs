@@ -17,10 +17,10 @@ namespace AoC.Day23
 
         public long Address { get; }
 
-        public void Receive(long x, long y)
+        public void Receive((long x, long y) packet)
         {
-            incoming.Enqueue(x);
-            incoming.Enqueue(y);
+            incoming.Enqueue(packet.x);
+            incoming.Enqueue(packet.y);
         }
 
         public long DequeueIncomingValue() => incoming.Count > 0 ? incoming.Dequeue() : -1;
@@ -35,7 +35,7 @@ namespace AoC.Day23
                 var x = outgoing.Dequeue();
                 var y = outgoing.Dequeue();
 
-                network.Send(address, x, y);
+                network.Send(address, (x, y));
             }
         }
     }

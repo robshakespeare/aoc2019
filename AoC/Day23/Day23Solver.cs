@@ -11,16 +11,7 @@ namespace AoC.Day23
         public override long? SolvePart1(string inputProgram)
         {
             var intCodeStateInput = IntCodeComputer.Parse(inputProgram);
-
-            long? result = null;
-            var network = new Network((address, x, y) =>
-            {
-                if (address == 255)
-                {
-                    result = y;
-                }
-            });
-
+            var network = new Network();
             var computers = Enumerable.Range(0, 50)
                 .Select(address =>
                 {
@@ -31,7 +22,7 @@ namespace AoC.Day23
                 })
                 .ToArray();
 
-            while (result == null)
+            while (network.NAT.LastPacketReceived == null)
             {
                 foreach (var (intCodeState, nic) in computers)
                 {
@@ -39,7 +30,7 @@ namespace AoC.Day23
                 }
             }
 
-            return result;
+            return network.NAT.LastPacketReceived.Value.y;
         }
 
         public override long? SolvePart2(string input)
