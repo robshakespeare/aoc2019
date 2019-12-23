@@ -54,19 +54,15 @@ namespace Common.IntCodes
         public bool EvaluateNextInstruction(IntCodeState intCodeState, Func<long> getNextInputValue, Action<long>? onNewOutputValue = null)
         {
             var instruction = intCodeState.ReadNextInstruction();
-            if (instruction.OpCode == 99)
-            {
-                return false;
-            }
-
             var gotoInstructionPointer = EvalInstruction(instruction, getNextInputValue, onNewOutputValue);
             intCodeState.InstructionPointer = gotoInstructionPointer ?? instruction.NewInstructionPointer;
-            return true;
+            return !intCodeState.Halted;
         }
 
         private static long? EvalInstruction(Instruction instruction, Func<long> getNextInputValue, Action<long>? onNewOutputValue) =>
             instruction.OpCode switch
                 {
+                99 => EvalHaltInstruction(instruction),
                 1 => EvalMathInstruction(instruction),
                 2 => EvalMathInstruction(instruction),
                 3 => EvalInputInstruction(instruction, getNextInputValue),
@@ -78,6 +74,12 @@ namespace Common.IntCodes
                 9 => EvalUpdateRelativeBaseOffset(instruction),
                 _ => throw new InvalidOperationException("Invalid opCode: " + instruction.OpCode)
                 };
+
+        private static long? EvalHaltInstruction(Instruction instruction)
+        {
+            instruction.IntCodeState.Halted = true;
+            return null;
+        }
 
         private static long? EvalMathInstruction(Instruction instruction)
         {

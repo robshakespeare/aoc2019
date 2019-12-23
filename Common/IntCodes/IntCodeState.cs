@@ -28,12 +28,15 @@ namespace Common.IntCodes
         private IntCodeState(SortedList<long, long> intCodes)
         {
             this.intCodes = intCodes;
+            Halted = false;
             InstructionPointer = 0;
             RelativeBase = 0;
             Outputs = new List<long>();
         }
 
         public IntCodeState CloneWithReset() => new IntCodeState(new SortedList<long, long>(intCodes));
+
+        public bool Halted { get; internal set; }
 
         public long InstructionPointer { get; set; }
 
