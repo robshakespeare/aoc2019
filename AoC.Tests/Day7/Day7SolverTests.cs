@@ -71,10 +71,8 @@ namespace AoC.Tests.Day7
         public void ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop_Part1_Tests(string inputProgram, int[] inputPhaseSettingSequence,
             int expectedResultMaxThrusterSignal)
         {
-            var intCodeComputer = new IntCodeComputer();
-
             // ACT
-            var result = intCodeComputer.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, inputPhaseSettingSequence);
+            var result = sut.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, inputPhaseSettingSequence);
 
             // ASSERT
             result.Should().Be(expectedResultMaxThrusterSignal);
@@ -184,10 +182,8 @@ namespace AoC.Tests.Day7
         public void ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop_Part2_Tests(string inputProgram, int[] inputPhaseSettingSequence,
             int expectedResultMaxThrusterSignal)
         {
-            var intCodeComputer = new IntCodeComputer();
-
             // ACT
-            var result = intCodeComputer.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, inputPhaseSettingSequence);
+            var result = sut.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, inputPhaseSettingSequence);
 
             // ASSERT
             result.Should().Be(expectedResultMaxThrusterSignal);

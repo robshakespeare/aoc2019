@@ -1,4 +1,7 @@
+using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Common;
 using Common.Extensions;
 using Common.IntCodes;
@@ -23,7 +26,7 @@ namespace AoC.Day7
 
         private long Solve(string inputProgram, int[] phaseSettings) =>
             GetAllPossibleCombinations(phaseSettings)
-                .Select(phaseSettingSequence => intCodeComputer.ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, phaseSettingSequence))
+                .Select(phaseSettingSequence => ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(inputProgram, phaseSettingSequence))
                 .OrderByDescending(finalOutputSignal => finalOutputSignal)
                 .First();
 
@@ -39,5 +42,79 @@ namespace AoC.Day7
                             .Select(x => x.ToArray());
                     })
                     .ToArray();
+
+        #region Signalling, PhaseSettingSequences and FeedbackLoops
+
+        public long ParseAndEvaluateWithPhaseSettingSequenceAndFeedbackLoop(string inputProgram, int[] phaseSettingSequence)
+        {
+            var deviceSignalConnectors = phaseSettingSequence.Select(phaseSetting => new PhaseSignalConnector(phaseSetting))
+                .ToArray();
+
+            deviceSignalConnectors.First().SetNextValue(0); // Seed input signal of the first device
+
+            var finalResults = new long[phaseSettingSequence.Length];
+
+            Parallel.ForEach(
+                deviceSignalConnectors.Select((connector, index) => (connector, index)),
+                device =>
+                {
+                    var nextDeviceIndex = device.index + 1 == deviceSignalConnectors.Length ? 0 : device.index + 1;
+                    var nextDeviceConnector = deviceSignalConnectors[nextDeviceIndex];
+
+                    var result = intCodeComputer.ParseAndEvaluate(inputProgram, device.connector.ReceiveNextValue, nextDeviceConnector.SetNextValue);
+
+                    if (result.LastOutputValue == null)
+                    {
+                        throw new InvalidOperationException("Invalid IntCodeComputer result, expected a LastOutputValue.");
+                    }
+
+                    finalResults[device.index] = result.LastOutputValue.Value;
+                });
+
+            return finalResults.Last();
+        }
+
+        public class SignalConnector
+        {
+            private readonly AutoResetEvent waitHandle = new AutoResetEvent(false);
+
+            private long nextValue;
+
+            public virtual long ReceiveNextValue()
+            {
+                waitHandle.WaitOne();
+                return nextValue;
+            }
+
+            public void SetNextValue(long value)
+            {
+                nextValue = value;
+                waitHandle.Set();
+            }
+        }
+
+        public class PhaseSignalConnector : SignalConnector
+        {
+            private readonly int phaseSetting;
+            private bool phaseSettingUsed;
+
+            public PhaseSignalConnector(int phaseSetting)
+            {
+                this.phaseSetting = phaseSetting;
+            }
+
+            public override long ReceiveNextValue()
+            {
+                if (phaseSettingUsed)
+                {
+                    return base.ReceiveNextValue();
+                }
+
+                phaseSettingUsed = true;
+                return phaseSetting;
+            }
+        }
+
+        #endregion
     }
 }
