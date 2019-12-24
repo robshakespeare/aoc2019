@@ -5,8 +5,8 @@ namespace AoC.Day22
 {
     public class Day22Solver : SolverReadAllText
     {
-        private const int Part1FactoryOrderNumber = 10007;
-        private const int Part1CardNumber = 2019; 
+        public const int Part1FactoryOrderNumber = 10007;
+        public const int Part1CardNumber = 2019; 
 
         public override long? SolvePart1(string input)
         {

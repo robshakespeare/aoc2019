@@ -17,6 +17,11 @@ namespace AoC.Day22
             var factoryOrderDeck = Enumerable.Range(0, factoryOrderNumber).ToArray();
             var deck = factoryOrderDeck;
 
+            return Shuffle(deck, shuffleProcess);
+        }
+
+        public int[] Shuffle(int[] deck, (InstructionType instruction, int operand)[] shuffleProcess)
+        {
             foreach (var (instruction, operand) in shuffleProcess)
             {
                 deck = instruction switch
