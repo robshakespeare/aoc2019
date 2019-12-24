@@ -24,8 +24,7 @@ namespace AoC.Day22
                 deck = instruction switch
                     {
                     InstructionType.DealIntoNewStack => DealIntoNewStack(deck),
-                    InstructionType.CutPositive => CutPositive(deck, operand),
-                    InstructionType.CutNegative => CutNegative(deck, operand),
+                    InstructionType.Cut => Cut(deck, operand),
                     InstructionType.DealWithIncrement => DealWithIncrement(deck, operand),
                     _ => throw new InvalidOperationException("Unexpected instruction type: " + instruction)
                     };
@@ -37,13 +36,12 @@ namespace AoC.Day22
         private static int[] DealIntoNewStack(in int[] deck) =>
             deck.Reverse().ToArray();
 
-        private static int[] CutPositive(in int[] deck, in int numCards) =>
-            deck.Skip(numCards).Concat(deck.Take(numCards)).ToArray();
-
-        private static int[] CutNegative(in int[] deck, in int numCards)
+        private static int[] Cut(in int[] deck, in int numCards)
         {
-            var offset = deck.Length - numCards;
-            return deck.Skip(offset).Concat(deck.Take(offset)).ToArray();
+            var skipTake = numCards >= 0
+                ? numCards
+                : deck.Length + numCards;
+            return deck.Skip(skipTake).Concat(deck.Take(skipTake)).ToArray();
         }
 
         private static int[] DealWithIncrement(in int[] deck, in int increment)

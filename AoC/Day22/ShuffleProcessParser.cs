@@ -17,13 +17,9 @@ namespace AoC.Day22
                 {
                     yield return (InstructionType.DealIntoNewStack, default);
                 }
-                else if (line.StartsWith("cut -"))
-                {
-                    yield return (InstructionType.CutNegative, Convert.ToInt32(new string(line.Skip("cut -".Length).ToArray())));
-                }
                 else if (line.StartsWith("cut "))
                 {
-                    yield return (InstructionType.CutPositive, Convert.ToInt32(new string(line.Skip("cut ".Length).ToArray())));
+                    yield return (InstructionType.Cut, Convert.ToInt32(new string(line.Skip("cut ".Length).ToArray())));
                 }
                 else if (line.StartsWith("deal with increment "))
                 {
