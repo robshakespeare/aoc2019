@@ -11,11 +11,17 @@ namespace AoC.Tests.Day22
         [Test]
         public void Part1ReTest()
         {
+            const int expectedResult = 2306;
+
             // ACT
             var part1Result = sut.SolvePart1();
+            var part1ResultV2 = sut.SolvePart1V2();
 
             // ASSERT
-            part1Result.Should().Be(2306);
+            part1Result.Should().Be(expectedResult);
+            part1ResultV2.Should().Be(expectedResult);
+
+            part1Result.Should().Be(part1ResultV2);
         }
 
         [Test]

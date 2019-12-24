@@ -18,6 +18,15 @@ namespace AoC.Day22
                 .index;
         }
 
+        public long? SolvePart1V2(string? input = null)
+        {
+            input ??= Input.Value;
+
+            var cardIndexShuffler = new CardIndexShuffler(Part1FactoryOrderNumber);
+            var parser = new ShuffleProcessParser();
+            return cardIndexShuffler.ShuffleIndex(Part1CardNumber, parser.Parse(input));
+        }
+
         public override long? SolvePart2(string input)
         {
             return base.SolvePart2(input);

@@ -8,7 +8,7 @@ namespace Common
 {
     public abstract class Solver<TInput, TOutputPart1, TOutputPart2> : SolverBase
     {
-        private Lazy<TInput> Input { get; }
+        protected Lazy<TInput> Input { get; }
 
         protected Solver(InputLoader<TInput> inputLoader)
         {
