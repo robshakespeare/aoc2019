@@ -20,8 +20,13 @@ namespace AoC.Day22
             return Shuffle(deck, shuffleProcess);
         }
 
-        public int[] Shuffle(int[] deck, (InstructionType instruction, int operand)[] shuffleProcess)
+        public int[] Shuffle(int[]? deck, (InstructionType instruction, int operand)[] shuffleProcess)
         {
+            if (deck == null)
+            {
+                return Shuffle(shuffleProcess);
+            }
+
             foreach (var (instruction, operand) in shuffleProcess)
             {
                 deck = instruction switch

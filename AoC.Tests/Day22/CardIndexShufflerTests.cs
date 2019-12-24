@@ -12,6 +12,12 @@ namespace AoC.Tests.Day22
         private static readonly CardShuffler CardShuffler = new CardShuffler(Day22Solver.Part1FactoryOrderNumber);
         private static readonly CardIndexShuffler Sut = new CardIndexShuffler(Day22Solver.Part1FactoryOrderNumber);
 
+        private static int GetIndexOfCardNumber(int[] deck) =>
+            (deck ?? throw new InvalidOperationException())
+            .Select((card, index) => (card, index))
+            .Single(x => x.card == Day22Solver.Part1CardNumber)
+            .index;
+
         [Test]
         public void TestCase1_V1_And_V2_WithMultipleIterations_ProduceSameResult()
         {
@@ -24,22 +30,16 @@ namespace AoC.Tests.Day22
                 int[] deck = null;
                 for (var i = 0; i < numIterations; i++)
                 {
-                    deck = deck == null
-                        ? CardShuffler.Shuffle(shuffleProcess)
-                        : CardShuffler.Shuffle(deck, shuffleProcess);
+                    deck = CardShuffler.Shuffle(deck, shuffleProcess);
                 }
 
-                v1IndexResult = (deck ?? throw new InvalidOperationException())
-                    .Select((card, index) => (card, index))
-                    .Single(x => x.card == Day22Solver.Part1CardNumber)
-                    .index;
+                v1IndexResult = GetIndexOfCardNumber(deck);
             }
 
             // v2
             int v2IndexResult;
             {
                 v2IndexResult = Day22Solver.Part1CardNumber;
-
                 for (var i = 0; i < numIterations; i++)
                 {
                     v2IndexResult = Sut.ShuffleIndex(v2IndexResult, shuffleProcess);
