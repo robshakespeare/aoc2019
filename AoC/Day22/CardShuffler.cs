@@ -12,14 +12,12 @@ namespace AoC.Day22
             this.factoryOrderNumber = factoryOrderNumber;
         }
 
-        public int[] Shuffle(in string completeShuffleProcessInput)
+        public int[] Shuffle((InstructionType instruction, int operand)[] shuffleProcess)
         {
             var factoryOrderDeck = Enumerable.Range(0, factoryOrderNumber).ToArray();
-
-            var shuffleProcessParser = new ShuffleProcessParser();
             var deck = factoryOrderDeck;
 
-            foreach (var (instruction, operand) in shuffleProcessParser.Parse(completeShuffleProcessInput))
+            foreach (var (instruction, operand) in shuffleProcess)
             {
                 deck = instruction switch
                     {

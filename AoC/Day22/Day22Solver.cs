@@ -5,12 +5,16 @@ namespace AoC.Day22
 {
     public class Day22Solver : SolverReadAllText
     {
+        private const int Part1FactoryOrderNumber = 10007;
+        private const int Part1CardNumber = 2019; 
+
         public override long? SolvePart1(string input)
         {
-            var shuffledCards = new CardShuffler(10007).Shuffle(input);
+            var parser = new ShuffleProcessParser();
+            var shuffledCards = new CardShuffler(Part1FactoryOrderNumber).Shuffle(parser.Parse(input));
             return shuffledCards
                 .Select((card, index) => (card, index))
-                .Single(x => x.card == 2019)
+                .Single(x => x.card == Part1CardNumber)
                 .index;
         }
 
