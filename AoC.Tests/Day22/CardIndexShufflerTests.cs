@@ -9,14 +9,48 @@ namespace AoC.Tests.Day22
 {
     public class CardIndexShufflerTests
     {
-        private static readonly CardShuffler CardShuffler = new CardShuffler(Day22Solver.Part1FactoryOrderNumber);
-        private static readonly CardIndexShuffler Sut = new CardIndexShuffler(Day22Solver.Part1FactoryOrderNumber);
+        private delegate int IndexShuffle(
+            int factoryOrderNumber,
+            int numIterations,
+            int cardNumber,
+            (InstructionType instruction, int operand)[] shuffleProcess);
 
-        private static int GetIndexOfCardNumber(int[] deck) =>
-            (deck ?? throw new InvalidOperationException())
-            .Select((card, index) => (card, index))
-            .Single(x => x.card == Day22Solver.Part1CardNumber)
-            .index;
+        private static int IndexShuffleV1(
+            int factoryOrderNumber,
+            int numIterations,
+            int cardNumber,
+            (InstructionType instruction, int operand)[] shuffleProcess)
+        {
+            var cardShuffler = new CardShuffler(factoryOrderNumber);
+
+            int[] deck = null;
+            for (var i = 0; i < numIterations; i++)
+            {
+                deck = cardShuffler.Shuffle(deck, shuffleProcess);
+            }
+
+            return (deck ?? throw new InvalidOperationException())
+                .Select((card, index) => (card, index))
+                .Single(x => x.card == cardNumber)
+                .index;
+        }
+
+        private static int IndexShuffleV2(
+            int factoryOrderNumber,
+            int numIterations,
+            int cardNumber,
+            (InstructionType instruction, int operand)[] shuffleProcess)
+        {
+            var cardIndexShuffler = new CardIndexShuffler(factoryOrderNumber);
+            var index = cardNumber;
+
+            for (var i = 0; i < numIterations; i++)
+            {
+                index = cardIndexShuffler.ShuffleIndex(index, shuffleProcess);
+            }
+
+            return index;
+        }
 
         [Test]
         public void TestCase1_V1_And_V2_WithMultipleIterations_ProduceSameResult()
@@ -24,30 +58,27 @@ namespace AoC.Tests.Day22
             var shuffleProcess = new ShuffleProcessParser().Parse(new InputLoaderReadAllText(22).LoadInput());
             const int numIterations = 5;
 
-            // v1
-            int v1IndexResult;
-            {
-                int[] deck = null;
-                for (var i = 0; i < numIterations; i++)
-                {
-                    deck = CardShuffler.Shuffle(deck, shuffleProcess);
-                }
+            IndexShuffle[] shufflers = {IndexShuffleV1, IndexShuffleV2};
 
-                v1IndexResult = GetIndexOfCardNumber(deck);
-            }
+            // ACT
+            var results = shufflers
+                .Select(shuffler => shuffler(
+                    Day22Solver.Part1FactoryOrderNumber,
+                    numIterations,
+                    Day22Solver.Part1CardNumber,
+                    shuffleProcess))
+                .ToArray();
 
-            // v2
-            int v2IndexResult;
+            foreach (var result in results)
             {
-                v2IndexResult = Day22Solver.Part1CardNumber;
-                for (var i = 0; i < numIterations; i++)
-                {
-                    v2IndexResult = Sut.ShuffleIndex(v2IndexResult, shuffleProcess);
-                }
+                Console.WriteLine(result);
             }
 
             // ASSERT
-            v1IndexResult.Should().Be(v2IndexResult);
+            results.Length.Should().Be(2);
+            results.Should().AllBeEquivalentTo(results.First());
+
+            shufflers.Should().OnlyHaveUniqueItems();
         }
     }
 }
