@@ -45,5 +45,7 @@ namespace AoC.Day24
 
             adjacentBugCount = null;
         }
+
+        public override string ToString() => $"{Position} {(IsInfested ? '#' : '.')}";
     }
 }

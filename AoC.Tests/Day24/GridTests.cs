@@ -1,4 +1,5 @@
 using AoC.Day24;
+using Common.Extensions;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -9,11 +10,12 @@ namespace AoC.Tests.Day24
         [Test]
         public void Load_And_Render_Roundtrip_Test()
         {
-            const string input = @"#....
+            var input = @"#....
 ####.
 ...##
 #.##.
-.##.#";
+.##.#".NormalizeLineEndings();
+
             var sut = Grid.Load(input);
 
             // ACT
@@ -46,34 +48,38 @@ namespace AoC.Tests.Day24
 #..##
 ..#..
 #....");
+
             // ACT & ASSERT 1
             sut.Update();
             sut.Render().Should().Be(@"#..#.
 ####.
 ###.#
 ##.##
-.##..");
+.##..".NormalizeLineEndings());
+
             // ACT & ASSERT 2
             sut.Update();
             sut.Render().Should().Be(@"#####
 ....#
 ....#
 ...#.
-#.###");
+#.###".NormalizeLineEndings());
+
             // ACT & ASSERT 3
             sut.Update();
             sut.Render().Should().Be(@"#....
 ####.
 ...##
 #.##.
-.##.#");
+.##.#".NormalizeLineEndings());
+
             // ACT & ASSERT 4
             sut.Update();
             sut.Render().Should().Be(@"####.
 ....#
 ##..#
 .....
-##...");
+##...".NormalizeLineEndings());
         }
     }
 }

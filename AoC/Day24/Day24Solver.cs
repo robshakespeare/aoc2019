@@ -27,9 +27,18 @@ namespace AoC.Day24
             return result.Value;
         }
 
-        public override long? SolvePart2(string input)
+        public override long? SolvePart2(string input) => SolvePart2(input, 200).CountInfestedTiles();
+
+        public GridceptionManager SolvePart2(string input, int numberOfRepetitions)
         {
-            return base.SolvePart2(input);
+            var gridceptionManager = GridceptionManager.Load(input);
+
+            for (var i = 0; i < numberOfRepetitions; i++)
+            {
+                gridceptionManager.Update();
+            }
+
+            return gridceptionManager;
         }
     }
 }
