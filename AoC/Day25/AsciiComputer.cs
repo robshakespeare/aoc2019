@@ -7,7 +7,7 @@ using Common.IntCodes;
 
 namespace AoC.Day25
 {
-    public class AsciiComputer // rs-todo: move to Common
+    public class AsciiComputer
     {
         private readonly IntCodeComputer intCodeComputer = new IntCodeComputer();
         private readonly Queue<long> inputs = new Queue<long>();

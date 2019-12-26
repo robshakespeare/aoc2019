@@ -20,8 +20,6 @@ namespace AoC.Day25
 
         private readonly Dictionary<string, RoomMemory> roomMemories = new Dictionary<string, RoomMemory>();
         private readonly List<string> currentInventory = new List<string>();
-        ////private readonly List<string> instructionHistory = new List<string>();
-        ////private readonly List<(string roomName, string fullText)> roomHistory = new List<(string roomName, string fullText)>();
 
         private RoomMemory? currentRoom;
         private string homeRoom = "";
@@ -44,8 +42,6 @@ namespace AoC.Day25
             var input = (interactive
                 ? Console.ReadLine()
                 : DecideNextInstruction()) ?? throw new InvalidOperationException("null input is not valid!");
-
-            ////instructionHistory.Add(input);
 
             if (Direction.IsDirection(input))
             {
@@ -122,8 +118,6 @@ namespace AoC.Day25
                 }
 
                 currentRoom = roomMemories[roomName];
-
-                ////roomHistory.Add((roomName, output));
             }
         }
 
