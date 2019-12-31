@@ -4,17 +4,18 @@ namespace AoC.Day22
 {
     public class Day22Solver : SolverReadAllText
     {
-        public const int Part1DeckSize = 10007;
-        public const int Part1CardNumber = 2019; 
-
         public override long? SolvePart1(string input)
         {
+            const int deckSize = 10007;
+            const int cardNumber = 2019;
+            const int numOfShuffles = 1;
             var shuffleProcess = new ShuffleProcessParser().Parse(input);
+
             return new CardShuffler().ShuffleThenGetIndexOfCard(
                 shuffleProcess,
-                Part1DeckSize,
-                1,
-                Part1CardNumber);
+                deckSize,
+                numOfShuffles,
+                cardNumber);
         }
 
         public override long? SolvePart2(string input)
