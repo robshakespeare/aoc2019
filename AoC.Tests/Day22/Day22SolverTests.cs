@@ -27,11 +27,13 @@ namespace AoC.Tests.Day22
         [Test]
         public void Part2ReTest()
         {
+            const long expectedResult = 12545532223512L;
+
             // ACT
             var part2Result = sut.SolvePart2();
 
             // ASSERT
-            part2Result.Should().Be(null);
+            part2Result.Should().Be(expectedResult);
         }
     }
 }
