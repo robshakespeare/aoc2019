@@ -3,46 +3,64 @@ using System.Linq;
 
 namespace AoC.Day22
 {
-    public class CardShuffler
+    public class CardShuffler : ICardShuffler
     {
-        private readonly int factoryOrderNumber;
+        public long ShuffleThenGetIndexOfCard(
+            (Technique technique, int operand)[] shuffleProcess,
+            long deckSize,
+            long numOfShuffles,
+            long cardNumber) =>
+            Shuffle(shuffleProcess, deckSize, numOfShuffles).ToList().IndexOf((int)cardNumber);
 
-        public CardShuffler(in int factoryOrderNumber)
+        public long ShuffleThenGetCardAtIndex(
+            (Technique technique, int operand)[] shuffleProcess,
+            long deckSize,
+            long numOfShuffles,
+            long cardIndex) =>
+            Shuffle(shuffleProcess, deckSize, numOfShuffles)[cardIndex];
+
+        public int[] Shuffle(
+            (Technique technique, int operand)[] shuffleProcess,
+            long deckSize,
+            long numOfShuffles)
         {
-            this.factoryOrderNumber = factoryOrderNumber;
-        }
+            var deck = CreateFactoryOrderDeck(deckSize);
 
-        public int[] Shuffle((InstructionType instruction, int operand)[] shuffleProcess)
-        {
-            var factoryOrderDeck = Enumerable.Range(0, factoryOrderNumber).ToArray();
-            var deck = factoryOrderDeck;
-
-            return Shuffle(deck, shuffleProcess);
-        }
-
-        public int[] Shuffle(int[]? deck, (InstructionType instruction, int operand)[] shuffleProcess)
-        {
-            if (deck == null)
+            for (var i = 0; i < numOfShuffles; i++)
             {
-                return Shuffle(shuffleProcess);
-            }
-
-            foreach (var (instruction, operand) in shuffleProcess)
-            {
-                deck = instruction switch
-                    {
-                    InstructionType.DealIntoNewStack => DealIntoNewStack(deck),
-                    InstructionType.Cut => Cut(deck, operand),
-                    InstructionType.DealWithIncrement => DealWithIncrement(deck, operand),
-                    _ => throw new InvalidOperationException("Unexpected instruction type: " + instruction)
-                    };
+                deck = Shuffle(deck, shuffleProcess);
             }
 
             return deck;
         }
 
-        private static int[] DealIntoNewStack(in int[] deck) =>
-            deck.Reverse().ToArray();
+        private static int[] CreateFactoryOrderDeck(long deckSize)
+        {
+            if (deckSize > Int32.MaxValue)
+            {
+                throw new NotSupportedException("V1 shuffler only supports Int32 deck sizes");
+            }
+
+            return Enumerable.Range(0, (int)deckSize).ToArray();
+        }
+
+        private static int[] Shuffle(int[] deck, (Technique technique, int operand)[] shuffleProcess)
+        {
+            foreach (var (technique, operand) in shuffleProcess)
+            {
+                deck = technique switch
+                {
+                    Technique.DealIntoNewStack => DealIntoNewStack(deck),
+                    Technique.Cut => Cut(deck, operand),
+                    Technique.DealWithIncrement => DealWithIncrement(deck, operand),
+                    _ => throw new InvalidOperationException("Unexpected technique: " + technique)
+                };
+            }
+
+            return deck;
+        }
+
+        private static int[] DealIntoNewStack(in int[] deck) => deck.Reverse().ToArray();
 
         private static int[] Cut(in int[] deck, in int numCards)
         {
@@ -56,6 +74,7 @@ namespace AoC.Day22
         {
             var result = new int[deck.Length];
             var index = 0;
+
             foreach (var card in deck)
             {
                 result[index] = card;

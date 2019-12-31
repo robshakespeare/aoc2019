@@ -15,16 +15,13 @@ namespace AoC.Tests.Day22
 
             // ACT
             var part1Result = sut.SolvePart1();
-            var part1ResultV2 = sut.SolvePart1V2();
 
             // ASSERT
             part1Result.Should().Be(expectedResult);
-            part1ResultV2.Should().Be(expectedResult);
-
-            part1Result.Should().Be(part1ResultV2);
         }
 
         [Test]
+        [Ignore("rs-todo: finish tidy up!")]
         public void Part2ReTest()
         {
             const long expectedResult = 12545532223512L;

@@ -1,6 +1,6 @@
 namespace AoC.Day22
 {
-    public enum InstructionType
+    public enum Technique
     {
         DealIntoNewStack,
         Cut,
