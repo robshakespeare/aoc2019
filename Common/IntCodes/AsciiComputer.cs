@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Common;
 using Common.Extensions;
-using Common.IntCodes;
 
-namespace AoC.Day25
+namespace Common.IntCodes
 {
     public class AsciiComputer
     {
