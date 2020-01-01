@@ -5,7 +5,6 @@ namespace AoC.Day22
         long ShuffleThenGetIndexOfCard(
             (Technique technique, int operand)[] shuffleProcess,
             long deckSize,
-            long numOfShuffles,
             long cardNumber);
 
         long ShuffleThenGetCardAtIndex(

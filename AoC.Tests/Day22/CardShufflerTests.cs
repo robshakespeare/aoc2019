@@ -86,7 +86,7 @@ cut -1");
             const int cardNumber = 2019;
 
             // ACT
-            var cardIndex = Sut.ShuffleThenGetIndexOfCard(shuffleProcess, 10007, 1, cardNumber);
+            var cardIndex = Sut.ShuffleThenGetIndexOfCard(shuffleProcess, 10007, cardNumber);
 
             // ASSERT
             cardIndex.Should().Be(2306);

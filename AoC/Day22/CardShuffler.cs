@@ -8,9 +8,8 @@ namespace AoC.Day22
         public long ShuffleThenGetIndexOfCard(
             (Technique technique, int operand)[] shuffleProcess,
             long deckSize,
-            long numOfShuffles,
             long cardNumber) =>
-            Shuffle(shuffleProcess, deckSize, numOfShuffles).ToList().IndexOf((int)cardNumber);
+            Shuffle(shuffleProcess, deckSize, 1).ToList().IndexOf((int)cardNumber);
 
         public long ShuffleThenGetCardAtIndex(
             (Technique technique, int operand)[] shuffleProcess,

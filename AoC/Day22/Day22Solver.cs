@@ -8,13 +8,11 @@ namespace AoC.Day22
         {
             const int deckSize = 10007;
             const int cardNumber = 2019;
-            const int numOfShuffles = 1;
             var shuffleProcess = new ShuffleProcessParser().Parse(input);
 
             return new CardShuffler().ShuffleThenGetIndexOfCard(
                 shuffleProcess,
                 deckSize,
-                numOfShuffles,
                 cardNumber);
         }
 
