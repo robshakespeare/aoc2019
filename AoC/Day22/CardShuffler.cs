@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AoC.Day22
 {
-    public class CardShuffler : ICardShuffler
+    public class CardShuffler
     {
         public long ShuffleThenGetIndexOfCard(
             (Technique technique, int operand)[] shuffleProcess,

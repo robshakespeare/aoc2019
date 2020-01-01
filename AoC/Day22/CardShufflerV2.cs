@@ -3,23 +3,8 @@ using System.Numerics;
 
 namespace AoC.Day22
 {
-    public class CardShufflerV2 : ICardShuffler
+    public class CardShufflerV2
     {
-        public long ShuffleThenGetIndexOfCard(
-            (Technique technique, int operand)[] shuffleProcess,
-            long deckSize,
-            long cardNumber)
-        {
-            var (increment, offset) = ComposeToSingleLinearPolynomial(shuffleProcess, deckSize, 1);
-            Console.WriteLine(new { increment, offset });
-            return (long) ((cardNumber - offset) / increment);
-            //return (long) (offset + increment * cardNumber) % deckSize;
-
-            // number = offset + increment * index
-
-            // cardNumber = (offset + index * increment) % deckSize
-        }
-
         public long ShuffleThenGetCardAtIndex(
             (Technique technique, int operand)[] shuffleProcess,
             long deckSize,

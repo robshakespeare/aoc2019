@@ -12,19 +12,6 @@ namespace AoC.Tests.Day22
         private static readonly ShuffleProcessParser Parser = new ShuffleProcessParser();
 
         [Test]
-        public void ShuffleThenGetIndexOfCard_Test()
-        {
-            var shuffleProcess = Parser.Parse(new InputLoaderReadAllText(22).LoadInput());
-            const int cardNumber = 2019;
-
-            // ACT
-            var cardIndex = Sut.ShuffleThenGetIndexOfCard(shuffleProcess, 10007, cardNumber);
-
-            // ASSERT
-            //cardIndex.Should().Be(2306);
-        }
-
-        [Test]
         public void ShuffleThenGetCardAtIndex_Test()
         {
             var shuffleProcess = Parser.Parse(new InputLoaderReadAllText(22).LoadInput());
