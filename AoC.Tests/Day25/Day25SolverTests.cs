@@ -9,14 +9,13 @@ namespace AoC.Tests.Day25
         private readonly Day25Solver sut = new Day25Solver();
 
         [Test]
-        [Ignore("rs-todo: fix this up, so that it asserts the correct value")]
         public void Part1ReTest()
         {
             // ACT
             var part1Result = sut.SolvePart1();
 
             // ASSERT
-            part1Result.Should().Be(null);
+            part1Result.Should().Be(20483);
         }
 
         [Test]

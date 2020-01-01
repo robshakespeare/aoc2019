@@ -15,21 +15,14 @@ using Common;
 
 namespace AoC.Day25
 {
-    public class Day25Solver : Solver<string, string?, string?>
+    public class Day25Solver : SolverReadAllText
     {
-        public Day25Solver() : base(new InputLoaderReadAllText(25))
-        {
-        }
-
-        public override string? SolvePart1(string inputProgram)
+        public override long? SolvePart1(string inputProgram)
         {
             var adventurer = new Adventurer();
             return adventurer.GoOnAdventure(inputProgram);
         }
 
-        public override string? SolvePart2(string input)
-        {
-            return base.SolvePart2(input);
-        }
+        public override long? SolvePart2(string input) => null;
     }
 }

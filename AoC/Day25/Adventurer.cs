@@ -29,10 +29,13 @@ namespace AoC.Day25
         private bool visitedSecurityCheckpointRoom;
         private readonly Queue<string> nextInstructionQueue = new Queue<string>(); 
 
-        public string GoOnAdventure(string inputProgram)
+        public long GoOnAdventure(string inputProgram)
         {
             asciiComputer.ParseAndEvaluate(inputProgram, ProvideInput, ConsumeOutput);
-            return outputBuffer.ToString();
+
+            var finalOutput = outputBuffer.ToString();
+
+            return Convert.ToInt64(Regex.Match(finalOutput, @"\d+").Value);
         }
 
         private string ProvideInput()
@@ -72,8 +75,6 @@ namespace AoC.Day25
 
             if (!string.IsNullOrEmpty(output))
             {
-                Console.WriteLine(output);
-
                 foreach (var outputChunk in output.Split(new[] { "== " }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     ParseOutputChunk(outputChunk);
