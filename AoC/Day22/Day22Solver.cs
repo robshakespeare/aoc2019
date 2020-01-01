@@ -18,7 +18,16 @@ namespace AoC.Day22
 
         public override long? SolvePart2(string input)
         {
-            return base.SolvePart2(input);
+            const long deckSize = 119315717514047;
+            const long numOfShuffles = 101741582076661;
+            const int cardIndex = 2020;
+            var shuffleProcess = new ShuffleProcessParser().Parse(input);
+
+            return new CardShufflerV2().ShuffleThenGetCardAtIndex(
+                shuffleProcess,
+                deckSize,
+                numOfShuffles,
+                cardIndex);
         }
     }
 }

@@ -21,7 +21,6 @@ namespace AoC.Tests.Day22
         }
 
         [Test]
-        [Ignore("rs-todo: finish tidy up!")]
         public void Part2ReTest()
         {
             const long expectedResult = 12545532223512L;
