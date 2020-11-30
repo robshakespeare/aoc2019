@@ -43,8 +43,10 @@ namespace Common
             return result;
         }
 
+        [return: MaybeNull]
         public TOutputPart1 SolvePart1() => SolvePartTimed(1, () => SolvePart1(Input.Value));
 
+        [return: MaybeNull]
         public TOutputPart2 SolvePart2() => SolvePartTimed(2, () => SolvePart2(Input.Value));
 
         [return: MaybeNull]

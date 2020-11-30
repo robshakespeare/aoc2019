@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		build.cake = build.cake
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -18,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AoC", "AoC\AoC.csproj", "{6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AoC.Tests", "AoC.Tests\AoC.Tests.csproj", "{DCDEA757-AD11-471E-93E7-D1B512754336}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntCodeBreakout", "IntCodeBreakout\IntCodeBreakout.csproj", "{5886F72E-8836-4EA3-94BB-D85D6875BB44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntCodeBreakout", "IntCodeBreakout\IntCodeBreakout.csproj", "{5886F72E-8836-4EA3-94BB-D85D6875BB44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
